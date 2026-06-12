@@ -27,22 +27,24 @@ class DefaultFirebaseOptions {
     );
   }
 
+  // Replace with your own Firebase project config.
+  // Run `flutterfire configure` to regenerate this file for your project.
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB9sUgJPMHUFs0h95Wg-oqrVZjg0H8LPDs',
-    appId: '1:30821726892:android:71f5ba8e91b92cb2e9bd09',
-    messagingSenderId: '30821726892',
-    projectId: 'voidpocket-97ae7',
-    databaseURL: 'https://voidpocket-97ae7-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'voidpocket-97ae7.firebasestorage.app',
+    apiKey: 'YOUR_API_KEY',
+    appId: 'YOUR_ANDROID_APP_ID',
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+    projectId: 'YOUR_PROJECT_ID',
+    databaseURL: 'https://YOUR_PROJECT_ID-default-rtdb.YOUR_REGION.firebasedatabase.app',
+    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB9sUgJPMHUFs0h95Wg-oqrVZjg0H8LPDs',
-    appId: '1:30821726892:ios:71f5ba8e91b92cb2e9bd09',
-    messagingSenderId: '30821726892',
-    projectId: 'voidpocket-97ae7',
-    databaseURL: 'https://voidpocket-97ae7-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'voidpocket-97ae7.firebasestorage.app',
-    iosBundleId: 'com.voidpocket.app',
+    apiKey: 'YOUR_API_KEY',
+    appId: 'YOUR_IOS_APP_ID',
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+    projectId: 'YOUR_PROJECT_ID',
+    databaseURL: 'https://YOUR_PROJECT_ID-default-rtdb.YOUR_REGION.firebasedatabase.app',
+    storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
+    iosBundleId: 'com.yourcompany.amber',
   );
 }

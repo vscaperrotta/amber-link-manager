@@ -8,7 +8,7 @@ Build: `flutter build apk` (requires Java 17+)
 ```
 lib/
 ├── main.dart                          # App entry — MultiProvider setup, share intent listener
-├── firebase_options.dart              # FlutterFire generated config (voidpocket-97ae7)
+├── firebase_options.dart              # FlutterFire generated config — replace with your own Firebase project
 │
 ├── models/
 │   └── link_item.dart                 # LinkItem — id, url, title, createdAt, aiDescription, metadata (tags, isFavorite, isRead, …)

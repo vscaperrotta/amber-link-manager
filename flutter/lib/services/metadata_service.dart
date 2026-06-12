@@ -16,7 +16,7 @@ class MetadataService {
       final uri = Uri.parse(urlStr);
 
       final response = await http
-          .get(uri, headers: {'User-Agent': 'Mozilla/5.0 Kangaroo/1.0'})
+          .get(uri, headers: {'User-Agent': 'Mozilla/5.0 Amber/1.0'})
           .timeout(_timeout);
 
       if (response.statusCode < 200 || response.statusCode >= 300) return null;

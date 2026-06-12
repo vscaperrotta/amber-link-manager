@@ -2,7 +2,7 @@
 
 Stack: TypeScript, esbuild, Firebase Auth + Firestore, SCSS  
 Build output: `main.js` + `styles.css` at project root (loaded by Obsidian directly)  
-Plugin id: `obsidian-kangaroo`
+Plugin id: `amber`
 
 ## Source tree
 
@@ -10,7 +10,7 @@ Plugin id: `obsidian-kangaroo`
 src/
 ├── main.ts                            # Plugin entry — registers view, ribbon icon, settings tab
 ├── constants.ts                       # VIEW_TYPE, NAME, FOLDER, PLUGIN_ICON, REPOSITORY_URL
-├── firebase.ts                        # Firebase init (Auth + Firestore, voidpocket-97ae7)
+├── firebase.ts                        # Firebase init (Auth + Firestore) — replace config with your own project
 │
 ├── types/
 │   ├── LinkType.ts                    # LinkEntry, Metadata (tags, description, aiDescription, isFavorite, isRead, …)
