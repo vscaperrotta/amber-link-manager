@@ -13,7 +13,6 @@ import renderLinksTabBar, { TabId } from '../components/linksTabBar';
 import renderLinksList from '../components/linksList';
 import renderLinksGrid from '../components/linksGrid';
 import renderLinksFavorites from '../components/linksFavorites';
-import { LinksChart } from '../components/linksChart';
 import { LinksTagView } from '../components/linksTagView';
 
 export default class PluginView extends ItemView {
@@ -22,7 +21,6 @@ export default class PluginView extends ItemView {
   private activeTab: TabId = 'grid';
   private tabContentEl: HTMLElement | null = null;
   private headerDestroy: (() => void) | null = null;
-  private linksChart: LinksChart | null = null;
   private linksTagView: LinksTagView | null = null;
 
   constructor(leaf: WorkspaceLeaf, plugin: MainPlugin) {
@@ -52,8 +50,6 @@ export default class PluginView extends ItemView {
     this.linksService = null;
     this.headerDestroy?.();
     this.headerDestroy = null;
-    this.linksChart?.destroy();
-    this.linksChart = null;
     this.linksTagView?.destroy();
     this.linksTagView = null;
   }
@@ -83,10 +79,6 @@ export default class PluginView extends ItemView {
 
     // Tab bar
     renderLinksTabBar(container, this.activeTab, (tab) => {
-      if (tab !== 'chart') {
-        this.linksChart?.destroy();
-        this.linksChart = null;
-      }
       if (tab !== 'tags') {
         this.linksTagView?.destroy();
         this.linksTagView = null;
@@ -168,12 +160,6 @@ export default class PluginView extends ItemView {
           this.linksTagView = new LinksTagView(this.tabContentEl);
         }
         this.linksTagView.render(links, allTags, onDelete, onAddTag, onDeleteTag, onEdit, onGlobalRenameTag, onGlobalDeleteTag, onGlobalMergeTag);
-        break;
-      case 'chart':
-        if (!this.linksChart) {
-          this.linksChart = new LinksChart(this.tabContentEl, this.plugin);
-        }
-        this.linksChart.render(links);
         break;
       case 'favorites':
         renderLinksFavorites(this.tabContentEl, links, loading, allTags, onDelete, onAddTag, onDeleteTag, onEdit, onToggleFavorite, onToggleRead);

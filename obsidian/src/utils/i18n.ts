@@ -36,7 +36,6 @@ const translations: Record<string, Record<string, string>> = {
     'tabs.list': 'List',
     'tabs.grid': 'Grid',
     'tabs.tags': 'Tags',
-    'tabs.chart': 'Graph',
     'tabs.favorites': 'Favorites',
 
     // Tags View
@@ -83,28 +82,6 @@ const translations: Record<string, Record<string, string>> = {
     'editLink.tagsPlaceholder': 'Tags: TAG1, TAG2, TAG3',
     'editLink.errorUrl': 'Please enter a valid URL.',
     'editLink.errorGeneric': 'Error saving link. Check console for details.',
-
-    // Chart
-    'chart.title': 'Chart view',
-    'chart.comingSoon': 'Coming soon.',
-
-    // Graph
-    'graph.searchPlaceholder': 'Search by tag or title\u2026',
-    'graph.physicsTitle': 'Physics settings',
-    'graph.optionsTitle': 'Options',
-    'graph.physics': 'Physics',
-    'graph.nodeColors': 'Node Colors',
-    'graph.resetColors': 'Reset',
-    'graph.noTags': 'No tags found.',
-    'graph.untagged': 'Untagged',
-    'graph.emptyState': 'No saved links. Add some to see the graph.',
-    'graph.noSearchResults': 'No results for this search.',
-    'graph.resetPhysics': 'Reset',
-    'graph.slider.chargeStrength': 'Repulsion',
-    'graph.slider.linkDistance': 'Link distance',
-    'graph.slider.velocityDecay': 'Velocity decay',
-    'graph.slider.alphaDecay': 'Alpha decay',
-    'graph.slider.centerStrength': 'Center force',
 
     // Plugin View
     'view.linkAdded': 'Link added!',
@@ -193,7 +170,6 @@ const translations: Record<string, Record<string, string>> = {
     'tabs.list': 'Lista',
     'tabs.grid': 'Griglia',
     'tabs.tags': 'Tag',
-    'tabs.chart': 'Grafo',
     'tabs.favorites': 'Preferiti',
 
     // Tags View
@@ -240,28 +216,6 @@ const translations: Record<string, Record<string, string>> = {
     'editLink.tagsPlaceholder': 'Tag: TAG1, TAG2, TAG3',
     'editLink.errorUrl': 'Inserisci un URL valido.',
     'editLink.errorGeneric': 'Errore nel salvataggio del link.',
-
-    // Chart
-    'chart.title': 'Vista grafico',
-    'chart.comingSoon': 'Prossimamente.',
-
-    // Graph
-    'graph.searchPlaceholder': 'Cerca per tag o titolo\u2026',
-    'graph.physicsTitle': 'Impostazioni fisica',
-    'graph.optionsTitle': 'Opzioni',
-    'graph.physics': 'Fisica',
-    'graph.nodeColors': 'Colori nodi',
-    'graph.resetColors': 'Reimposta',
-    'graph.noTags': 'Nessun tag trovato.',
-    'graph.untagged': 'Senza tag',
-    'graph.emptyState': 'Nessun link salvato. Aggiungine qualcuno per vedere il grafo.',
-    'graph.noSearchResults': 'Nessun risultato per questa ricerca.',
-    'graph.resetPhysics': 'Reimposta',
-    'graph.slider.chargeStrength': 'Repulsione',
-    'graph.slider.linkDistance': 'Distanza link',
-    'graph.slider.velocityDecay': 'Decadimento velocit\u00e0',
-    'graph.slider.alphaDecay': 'Decadimento alpha',
-    'graph.slider.centerStrength': 'Forza centrale',
 
     // Plugin View
     'view.linkAdded': 'Link aggiunto!',

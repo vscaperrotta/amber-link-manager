@@ -14,7 +14,6 @@ src/
 │
 ├── types/
 │   ├── LinkType.ts                    # LinkEntry, Metadata (tags, description, aiDescription, isFavorite, isRead, …)
-│   ├── d3.d.ts                        # D3 type declarations
 │   └── [BookType, DataType, …].ts    # Legacy book library types (unused by links feature)
 │
 ├── utils/
@@ -33,8 +32,7 @@ src/
 │   ├── linksList.ts                   # List view renderer
 │   ├── linksFavorites.ts              # Favorites grid renderer
 │   ├── linksTagView.ts                # Tag sidebar + filtered links view (LinksTagView class)
-│   ├── linksChart.ts                  # D3 force graph (linksChart class)
-│   ├── linksTabBar.ts                 # Tab bar (list / grid / tags / graph / favorites)
+│   ├── linksTabBar.ts                 # Tab bar (list / grid / tags / favorites)
 │   ├── addLinkModal.ts                # Modal: add new link
 │   ├── editLinkModal.ts               # Modal: edit existing link
 │   ├── authModal.ts                   # Modal: Firebase auth (email/password + Google)
@@ -58,7 +56,6 @@ src/
     │   ├── links-grid.scss            # .obs-amber-links-grid, .obs-amber-links-card
     │   ├── links-list.scss            # .obs-amber-links-list, .obs-amber-links-item
     │   ├── links-tag-view.scss        # .obs-amber-tag-view sidebar + tag menu btn
-    │   ├── links-chart.scss           # D3 graph styles
     │   ├── tab-bar.scss               # Tab bar
     │   ├── pill.scss                  # Tag pills
     │   ├── tag-input.scss             # Inline tag input
@@ -99,11 +96,9 @@ generateMissingDescriptions(onProgress) → batch AI for all links without aiDes
 |---|---|---|
 | `openrouterApiKey` | string | `""` |
 | `openrouterModel` | string | `"meta-llama/llama-3.2-3b-instruct:free"` |
-| `viewMode` | `"grid"` \| `"list"` \| `"graph"` | `"grid"` |
+| `viewMode` | `"grid"` \| `"list"` | `"grid"` |
 | `libraryFolder` | string | `"Amber"` |
 | `localJsonPath` | string \| null | `null` |
-| `graphPhysics` | object | `null` |
-| `graphColors` | Record<string,string> | `{}` |
 
 ## CSS class prefix
 

@@ -2,16 +2,13 @@ import { Plugin } from "obsidian";
 import { VIEW_TYPE, NAME, FOLDER, PLUGIN_ICON } from "./constants";
 import pluginView from "./views/pluginView";
 import LibrarySettingTab from "./settings/settingsTab";
-import type { GraphPhysicsSettings } from "./components/linksChart";
 
 type MainPluginData = {
   localJsonPath?: string;
   omdbApiKey?: string;
-  viewMode?: "grid" | "list" | "graph";
+  viewMode?: "grid" | "list";
   libraryFolder?: string;
   open?: boolean;
-  graphPhysics?: GraphPhysicsSettings;
-  graphColors?: Record<string, string>;
   openrouterApiKey?: string;
   openrouterModel?: string;
 };
@@ -19,10 +16,8 @@ type MainPluginData = {
 export default class MainPlugin extends Plugin {
   localJsonPath: string | null = null;
   omdbApiKey: string = "";
-  viewMode: "grid" | "list" | "graph" = "grid";
+  viewMode: "grid" | "list" = "grid";
   libraryFolder: string = FOLDER;
-  graphPhysics: GraphPhysicsSettings | null = null;
-  graphColors: Record<string, string> = {};
   openrouterApiKey: string = "";
   openrouterModel: string = "meta-llama/llama-3.2-3b-instruct:free";
 
@@ -47,10 +42,8 @@ export default class MainPlugin extends Plugin {
     const data = (await this.loadData()) as MainPluginData | null;
     this.localJsonPath = data?.localJsonPath ?? null;
     this.omdbApiKey = data?.omdbApiKey ?? "";
-    this.viewMode = data?.viewMode ?? "grid";
+    this.viewMode = (data?.viewMode === "list") ? "list" : "grid";
     this.libraryFolder = data?.libraryFolder ?? FOLDER;
-    this.graphPhysics = data?.graphPhysics ?? null;
-    this.graphColors = data?.graphColors ?? {};
     this.openrouterApiKey = data?.openrouterApiKey ?? "";
     this.openrouterModel = data?.openrouterModel ?? "meta-llama/llama-3.2-3b-instruct:free";
   }
@@ -60,18 +53,8 @@ export default class MainPlugin extends Plugin {
     await this.savePluginData();
   }
 
-  async setViewMode(viewMode: "grid" | "list" | "graph") {
+  async setViewMode(viewMode: "grid" | "list") {
     this.viewMode = viewMode;
-    await this.savePluginData();
-  }
-
-  async setGraphPhysics(settings: GraphPhysicsSettings) {
-    this.graphPhysics = settings;
-    await this.savePluginData();
-  }
-
-  async setGraphColors(colors: Record<string, string>) {
-    this.graphColors = colors;
     await this.savePluginData();
   }
 
@@ -84,8 +67,6 @@ export default class MainPlugin extends Plugin {
       openrouterModel: this.openrouterModel,
     };
     if (this.localJsonPath) data.localJsonPath = this.localJsonPath;
-    if (this.graphPhysics) data.graphPhysics = this.graphPhysics;
-    if (Object.keys(this.graphColors).length > 0) data.graphColors = this.graphColors;
     await this.saveData(data);
   }
 

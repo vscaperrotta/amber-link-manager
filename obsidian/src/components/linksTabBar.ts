@@ -1,12 +1,11 @@
 import { t } from '../utils/i18n';
 
-export type TabId = 'grid' | 'list' | 'tags' | 'chart' | 'favorites';
+export type TabId = 'grid' | 'list' | 'tags' | 'favorites';
 
 const TABS: { id: TabId; key: string }[] = [
   { id: 'grid', key: 'tabs.grid' },
   { id: 'list', key: 'tabs.list' },
   { id: 'tags', key: 'tabs.tags' },
-  { id: 'chart', key: 'tabs.chart' },
   { id: 'favorites', key: 'tabs.favorites' },
 ];
 
