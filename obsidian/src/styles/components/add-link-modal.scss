@@ -1,0 +1,17 @@
+.obs-amber-add-link-modal {
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .obs-amber-add-link-modal-title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .obs-amber-add-link-modal-submit {
+    align-self: flex-end;
+    padding: 8px 20px;
+  }
+}

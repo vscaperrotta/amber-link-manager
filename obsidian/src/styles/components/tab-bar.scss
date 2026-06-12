@@ -1,0 +1,29 @@
+.obs-amber-tab-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: var(--border-width) solid var(--color-base-50);
+}
+
+.obs-amber-tab-btn {
+  padding: 6px 14px;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+
+  &.is-active {
+    color: var(--text-normal);
+    border-bottom-color: var(--text-normal);
+  }
+
+  &:hover:not(.is-active) {
+    color: var(--text-normal);
+  }
+}
+
+.obs-amber-tab-content {
+  flex: 1;
+  overflow-y: auto;
+}

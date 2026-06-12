@@ -1,0 +1,23 @@
+.avatar {
+	align-items: center;
+	background: var(--surface-tertiary);
+	border-radius: var(--radius-lg);
+	color: var(--bg-primary);
+	display: flex;
+	flex-shrink: 0;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.avatar__img {
+	height: 100%;
+	object-fit: cover;
+	width: 100%;
+}
+
+.avatar__initials {
+	font-weight: 700;
+	line-height: 1;
+	text-transform: uppercase;
+	user-select: none;
+}

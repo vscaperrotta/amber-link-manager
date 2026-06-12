@@ -1,0 +1,63 @@
+@use './variables' as *;
+
+// MEDIA QUERY MANAGER
+//   $breakpoint arguement choices:
+//   - large-desktop   0 - 1440px:  Large Desktop
+//   - medium-desktop  0 - 1380px:  Medium Desktop
+//   - desktop         0 - 1280px:  Desktop
+//   - tab-land        0 - 1024px:  Tablet landscape
+//   - tab-port        0 - 768px:   Tablet portrait
+//   - phone           0 - 480px:   Phone
+//   - small-phone     0 - 375px:   Small Phone
+//   ORDER: Base + typography > general layout + grid > page layout > components
+//   1em = 10px
+
+@mixin keyframes($name) {
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
+@mixin respond($breakpoint, $direction) {
+  @if $breakpoint ==large-desktop {
+    @media only screen and (#{$direction}-width: $break-large-desk) {
+      @content;
+    }
+  }
+
+  @if $breakpoint ==medium-desktop {
+    @media only screen and (#{$direction}-width: $break-medium-desk) {
+      @content;
+    }
+  }
+
+  @if $breakpoint ==desktop {
+    @media only screen and (#{$direction}-width: $break-desk) {
+      @content;
+    }
+  }
+
+  @if $breakpoint ==tab-land {
+    @media only screen and (#{$direction}-width: $break-tablet-land) {
+      @content;
+    }
+  }
+
+  @if $breakpoint ==tab-port {
+    @media only screen and (#{$direction}-width: $break-tablet-port) {
+      @content;
+    }
+  }
+
+  @if $breakpoint ==phone {
+    @media only screen and (#{$direction}-width: $break-phone) {
+      @content;
+    }
+  }
+
+  @if $breakpoint ==small-phone {
+    @media only screen and (#{$direction}-width: $break-small-phone) {
+      @content;
+    }
+  }
+}

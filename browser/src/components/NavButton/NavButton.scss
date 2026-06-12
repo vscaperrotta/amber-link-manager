@@ -1,0 +1,63 @@
+.nav-button {
+	align-items: center;
+	background: none;
+	border: none;
+	border-radius: var(--radius-sm);
+	color: var(--text-secondary);
+	cursor: pointer;
+	display: flex;
+	font-size: 14px;
+	gap: var(--space-sm);
+	padding: var(--space-xs) var(--space-sm);
+	text-align: left;
+	width: 100%;
+	transition: background-color 0.15s ease, color 0.15s ease;
+
+	span:not(.nav-button__counter) {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		// Pre-allocate width for bold state to prevent layout shift on hover/active.
+		&::after {
+			content: attr(data-text);
+			display: block;
+			font-weight: 600;
+			height: 0;
+			overflow: hidden;
+			pointer-events: none;
+			visibility: hidden;
+		}
+	}
+
+	&:hover {
+		background: var(--bg-elevated);
+		color: var(--text-primary);
+		font-weight: 600;
+	}
+
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--shadow-focus);
+	}
+
+	&.nav-button--active {
+		background: var(--bg-elevated);
+		color: var(--text-primary);
+		font-weight: 600;
+
+		svg {
+			color: var(--accent);
+		}
+	}
+
+	.nav-button__counter {
+		color: var(--text-tertiary);
+		font-size: 0.6875rem;
+		font-variant-numeric: tabular-nums;
+		font-weight: 500;
+		margin-left: auto;
+	}
+}

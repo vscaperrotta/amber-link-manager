@@ -1,0 +1,112 @@
+import { LinkEntry } from '../types/LinkType';
+import renderTagInput from './tagInput';
+import { t } from '../utils/i18n';
+
+export default function renderLinksList(
+  container: HTMLElement,
+  links: LinkEntry[],
+  loading: boolean,
+  allTags: string[],
+  onDelete: (id: string) => Promise<void>,
+  onAddTag: (id: string, tag: string) => Promise<void>,
+  onDeleteTag: (id: string, tag: string) => Promise<void>,
+  onEdit: (id: string) => void,
+  onToggleFavorite: (id: string) => Promise<void>,
+  onToggleRead: (id: string) => Promise<void>
+): void {
+  container.empty();
+
+  if (loading) {
+    container.createEl('p', { text: t('links.loading'), cls: 'obs-amber-links-empty' });
+    return;
+  }
+
+  if (links.length === 0) {
+    container.createEl('p', { text: t('links.empty'), cls: 'obs-amber-links-empty' });
+    return;
+  }
+
+  const list = container.createEl('ul', { cls: 'obs-amber-links-list' });
+
+  links.forEach((link) => {
+    const isRead = link.metadata?.isRead ?? false;
+    const item = list.createEl('li', { cls: `obs-amber-links-item${isRead ? ' is-read' : ''}` });
+
+    const row = item.createDiv({ cls: 'obs-amber-links-item-row' });
+
+    const anchor = row.createEl('a', {
+      text: link.title || link.url,
+      cls: 'obs-amber-links-anchor',
+      href: link.url,
+    });
+    anchor.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.open(link.url, '_blank');
+    });
+
+    const rowActions = row.createDiv({ cls: 'obs-amber-links-item-actions' });
+
+    const isFav = link.metadata?.isFavorite ?? false;
+    const starBtn = rowActions.createEl('button', {
+      text: isFav ? '★' : '☆',
+      cls: `obs-amber-links-star-btn${isFav ? ' is-active' : ''}`,
+      title: t(isFav ? 'links.unfavorite' : 'links.favorite'),
+    });
+    starBtn.addEventListener('click', () => onToggleFavorite(link.id));
+
+    const readBtn = rowActions.createEl('button', {
+      text: isRead ? '✓' : '○',
+      cls: `obs-amber-links-read-btn${isRead ? ' is-read' : ''}`,
+      title: t(isRead ? 'links.markUnread' : 'links.markRead'),
+    });
+    readBtn.addEventListener('click', () => onToggleRead(link.id));
+
+    const editBtn = rowActions.createEl('button', {
+      text: t('links.edit'),
+      cls: 'obs-amber-links-edit',
+    });
+    editBtn.addEventListener('click', () => onEdit(link.id));
+
+    const deleteBtn = rowActions.createEl('button', {
+      text: t('links.delete'),
+      cls: 'obs-amber-links-delete',
+    });
+    deleteBtn.addEventListener('click', () => onDelete(link.id));
+
+    if (link.metadata?.aiDescription) {
+      item.createEl('p', { text: link.metadata.aiDescription, cls: 'obs-amber-links-description' });
+    }
+
+    const tagsRow = item.createDiv({ cls: 'obs-amber-links-tags' });
+
+    const tags = link.metadata?.tags ?? [];
+    tags.forEach((tag) => {
+      const pill = tagsRow.createEl('span', { cls: 'obs-amber-pill' });
+      pill.createEl('span', { text: tag, cls: 'obs-amber-pill__label' });
+      const deleteTagBtn = pill.createEl('button', { text: '×', cls: 'obs-amber-pill__delete' });
+      deleteTagBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        onDeleteTag(link.id, tag);
+      });
+    });
+
+    const addTagBtn = tagsRow.createEl('button', {
+      text: '+',
+      cls: 'obs-amber-tag-add-btn',
+    });
+
+    addTagBtn.addEventListener('click', () => {
+      addTagBtn.remove();
+      renderTagInput(
+        tagsRow,
+        allTags,
+        async (tag) => {
+          await onAddTag(link.id, tag);
+        },
+        () => {
+          tagsRow.appendChild(addTagBtn);
+        }
+      );
+    });
+  });
+}

@@ -1,0 +1,16 @@
+.obs-amber-plugin-view {
+  @include viewContent();
+}
+
+// Give tab content breathing room so content never sits edge-to-edge
+.obs-amber-tab-content {
+  padding: 14px 16px;
+}
+
+// Settings: AI generation status message
+.obs-amber-generate-status {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}

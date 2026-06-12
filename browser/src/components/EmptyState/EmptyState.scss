@@ -1,0 +1,33 @@
+// ── EmptyState ───────────────────────────────────────────────
+.empty-state {
+	align-items: center;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-sm);
+	padding: var(--space-xl) var(--space-md);
+	text-align: center;
+}
+
+.empty-state__icon {
+	color: var(--text-tertiary);
+	margin-bottom: var(--space-xs);
+}
+
+.empty-state__title {
+	color: var(--text-secondary);
+	font-size: var(--font-size-sm);
+	font-weight: 500;
+	margin: 0;
+}
+
+.empty-state__description {
+	color: var(--text-tertiary);
+	font-size: var(--font-size-xs);
+	line-height: var(--line-height-normal);
+	margin: 0;
+	max-width: 280px;
+}
+
+.empty-state__action {
+	margin-top: var(--space-xs);
+}

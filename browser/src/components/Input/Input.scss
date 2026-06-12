@@ -1,0 +1,62 @@
+.input {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-xs);
+	width: 100%;
+
+	.input__label {
+		color: var(--text-secondary);
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.input__field {
+		background: var(--bg-elevated);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+		color: var(--text-primary);
+		font-family: var(--font-display);
+		font-size: 16px;
+		height: 40px;
+		padding: var(--space-xs);
+		width: 100%;
+		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+		&:focus {
+			outline: none;
+			border-color: var(--border-focus);
+			box-shadow: var(--shadow-focus);
+		}
+
+		@media (forced-colors: active) {
+			&:focus {
+				outline: 2px solid ButtonText;
+				outline-offset: 1px;
+			}
+		}
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		&::placeholder {
+			color: var(--text-secondary);
+		}
+
+		// Modifier for URL fields
+		&--mono {
+			font-family: var(--font-mono);
+			font-size: 13px;
+		}
+	}
+
+	.input__error {
+		color: var(--status-error);
+		font-size: 12px;
+	}
+
+	&.input--error .input__field {
+		border-color: var(--status-error);
+	}
+}

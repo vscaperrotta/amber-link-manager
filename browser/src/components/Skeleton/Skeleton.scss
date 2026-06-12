@@ -1,0 +1,78 @@
+// ── Skeleton base ────────────────────────────────────────────
+@keyframes skeleton-pulse {
+	0% { background-position: 200% 0; }
+	100% { background-position: -200% 0; }
+}
+
+.skeleton {
+	background: linear-gradient(
+		90deg,
+		var(--bg-elevated) 25%,
+		var(--surface-dark-10) 50%,
+		var(--bg-elevated) 75%
+	);
+	background-size: 200% 100%;
+	animation: skeleton-pulse 1.5s ease-in-out infinite;
+	border-radius: var(--radius-sm);
+
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+		background: var(--bg-elevated);
+	}
+}
+
+.skeleton--text {
+	height: 12px;
+}
+
+.skeleton--circle {
+	border-radius: var(--radius-full);
+	flex-shrink: 0;
+}
+
+.skeleton--rect {
+	border-radius: var(--radius-md);
+}
+
+// ── Skeleton group (stacked lines) ──────────────────────────
+.skeleton__group {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-sm);
+}
+
+// ── SkeletonLinkRow (popup-style) ───────────────────────────
+.skeleton-link-rows {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-xs);
+}
+
+.skeleton-link-row {
+	align-items: center;
+	display: flex;
+	gap: var(--space-sm);
+	padding: var(--space-sm) 0;
+}
+
+.skeleton-link-row__text {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 6px;
+}
+
+// ── SkeletonLinkCard (newtab grid-style) ────────────────────
+.skeleton-link-card {
+	background: var(--bg-surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	overflow: hidden;
+}
+
+.skeleton-link-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: var(--space-sm);
+}

@@ -1,0 +1,11 @@
+{
+	"id": "amber",
+	"name": "Amber",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Plugin to search, save, and manage your reading collection (books, manga, comics).",
+	"author": "Vittorio Scaperrotta",
+	"authorUrl": "https://vittorioscaperrotta.me/",
+	"fundingUrl": "https://ko-fi.com/vittorioscaperrotta",
+	"isDesktopOnly": false
+}

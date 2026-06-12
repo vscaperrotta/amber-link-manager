@@ -1,0 +1,77 @@
+.obs-amber-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.obs-amber-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.obs-amber-add-link-cta {
+  font-size: 13px;
+  padding: 4px 12px;
+}
+
+.obs-amber-header-login-btn {
+  font-size: 13px;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.obs-amber-header-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--background-secondary);
+  color: var(--text-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: var(--cursor-link);
+  position: relative;
+  user-select: none;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.obs-amber-header-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--background-primary);
+  border: var(--border-width) solid var(--color-base-50);
+  border-radius: var(--radius-m);
+  padding: 4px;
+  z-index: 100;
+  min-width: 120px;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.obs-amber-header-logout-btn {
+  width: 100%;
+  text-align: left;
+  padding: 6px 10px;
+  border-radius: var(--radius-m);
+  font-size: 13px;
+  background: none;
+  border: none;
+  box-shadow: none;
+
+  &:hover {
+    background: var(--background-modifier-hover);
+  }
+}

@@ -1,0 +1,46 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"jsx": "react-jsx",
+		"baseUrl": ".",
+		"paths": {
+			"@background/*": [
+				"src/background/*"
+			],
+			"@components/*": [
+				"src/components/*"
+			],
+			"@contexts/*": [
+				"src/contexts/*"
+			],
+			"@options/*": [
+				"src/options/*"
+			],
+			"@popup/*": [
+				"src/popup/*"
+			],
+			"@newtab/*": [
+				"src/newtab/*"
+			],
+			"@styles/*": [
+				"src/styles/*"
+			],
+			"@utils/*": [
+				"src/utils/*"
+			]
+		},
+		"forceConsistentCasingInFileNames": true,
+		"checkJs": false,
+		"noEmit": true
+	},
+	"include": [
+		"src/**/*",
+		".storybook/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
+}

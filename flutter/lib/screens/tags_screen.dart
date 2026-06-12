@@ -1,0 +1,693 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../providers/link_provider.dart';
+import '../providers/ui_state_provider.dart';
+import '../models/link_item.dart';
+import '../theme/void_colors.dart';
+import '../utils/i18n.dart';
+import '../widgets/link_card.dart';
+import '../widgets/auth_nav_item.dart';
+
+class TagsScreen extends StatefulWidget {
+  const TagsScreen({super.key});
+
+  @override
+  State<TagsScreen> createState() => _TagsScreenState();
+}
+
+class _TagsScreenState extends State<TagsScreen> {
+  final Set<String> _selectedTags = {};
+
+  // Bulk-select mode
+  bool _selectMode = false;
+  final Set<String> _selectedLinkIds = {};
+  final TextEditingController _bulkTagController = TextEditingController();
+
+  @override
+  void dispose() {
+    context.read<UiStateProvider>().setSelectMode(false);
+    _bulkTagController.dispose();
+    super.dispose();
+  }
+
+  // ── Tag actions bottom sheet ─────────────────────────────────────────────
+
+  void _showTagActionsSheet(BuildContext context, String tag, LinkProvider provider) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: VoidColors.darkBgElevated,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => _TagActionsSheet(
+        tag: tag,
+        allTags: provider.allTags,
+        onRename: (newName) async {
+          Navigator.pop(ctx);
+          await provider.renameTag(tag, newName);
+        },
+        onDelete: () async {
+          Navigator.pop(ctx);
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (dlgCtx) => AlertDialog(
+              title: Text(t('tags.deleteTag')),
+              content: Text('#$tag'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dlgCtx, false),
+                  child: Text(t('common.cancel')),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(dlgCtx, true),
+                  child: Text(
+                    t('common.delete'),
+                    style: const TextStyle(color: VoidColors.darkStatusError),
+                  ),
+                ),
+              ],
+            ),
+          );
+          if (confirmed == true) await provider.deleteTag(tag);
+        },
+        onMerge: (targetTag) async {
+          Navigator.pop(ctx);
+          await provider.mergeTag(tag, targetTag);
+        },
+      ),
+    );
+  }
+
+  // ── Bulk-select bottom bar ────────────────────────────────────────────────
+
+  Widget _buildBulkBar(LinkProvider provider) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+      decoration: const BoxDecoration(
+        color: VoidColors.darkBgElevated,
+        border: Border(top: BorderSide(color: VoidColors.darkBorder)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Selected count
+          Text(
+            t('tags.selectedCount', {'n': '${_selectedLinkIds.length}'}),
+            style: GoogleFonts.outfit(
+              fontSize: 13,
+              color: VoidColors.darkTextTertiary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Tag input
+          TextField(
+            controller: _bulkTagController,
+            textCapitalization: TextCapitalization.characters,
+            decoration: InputDecoration(
+              hintText: t('tags.tagHint'),
+              isDense: true,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _selectedLinkIds.isEmpty
+                      ? null
+                      : () async {
+                          final tag = _bulkTagController.text.trim().toUpperCase();
+                          if (tag.isEmpty) return;
+                          final uiState = context.read<UiStateProvider>();
+                          await provider.addTagToLinks(
+                              _selectedLinkIds.toList(), tag);
+                          uiState.setSelectMode(false);
+                          setState(() {
+                            _selectMode = false;
+                            _selectedLinkIds.clear();
+                            _bulkTagController.clear();
+                          });
+                        },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: VoidColors.darkAccent,
+                    side: const BorderSide(color: VoidColors.darkAccent),
+                  ),
+                  child: Text(t('tags.addTagToSelected')),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: _selectedLinkIds.isEmpty
+                      ? null
+                      : () async {
+                          final tag = _bulkTagController.text.trim().toUpperCase();
+                          if (tag.isEmpty) return;
+                          final uiState = context.read<UiStateProvider>();
+                          await provider.removeTagFromLinks(
+                              _selectedLinkIds.toList(), tag);
+                          uiState.setSelectMode(false);
+                          setState(() {
+                            _selectMode = false;
+                            _selectedLinkIds.clear();
+                            _bulkTagController.clear();
+                          });
+                        },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: VoidColors.darkStatusError,
+                    side: const BorderSide(color: VoidColors.darkStatusError),
+                  ),
+                  child: Text(t('tags.removeTagFromSelected')),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final linkProvider = context.watch<LinkProvider>();
+    final allTags = linkProvider.allTags;
+    final links = linkProvider.links;
+
+    if (allTags.isEmpty) return _buildEmptyState();
+
+    final tagGroups = {
+      for (final tag in allTags)
+        tag: links.where((l) => l.tags.contains(tag)).toList(),
+    };
+
+    final tagsToShow =
+        _selectedTags.isNotEmpty ? _selectedTags.toList() : allTags;
+    final items = <_TagListItem>[];
+    for (final tag in tagsToShow) {
+      items.add(_TagHeader(tag, tagGroups[tag]?.length ?? 0));
+      for (final link in tagGroups[tag] ?? <LinkItem>[]) {
+        items.add(_TagLink(link));
+      }
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          t('tags.title'),
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w700),
+        ),
+        centerTitle: true,
+        actions: [
+          // Select mode toggle
+          TextButton(
+            onPressed: () {
+              final newMode = !_selectMode;
+              context.read<UiStateProvider>().setSelectMode(newMode);
+              setState(() {
+                _selectMode = newMode;
+                _selectedLinkIds.clear();
+                _bulkTagController.clear();
+              });
+            },
+            child: Text(
+              _selectMode ? t('tags.bulkDone') : t('tags.selectLinks'),
+              style: GoogleFonts.outfit(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: _selectMode
+                    ? VoidColors.darkAccent
+                    : VoidColors.darkTextSecondary,
+              ),
+            ),
+          ),
+          const AuthNavItem(),
+        ],
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Chip row ──────────────────────────────────────────────────────
+          SizedBox(
+            height: 52,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              itemCount: allTags.length + 1,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (context, i) {
+                if (i == 0) {
+                  final isAll = _selectedTags.isEmpty;
+                  return FilterChip(
+                    showCheckmark: false,
+                    avatar: Icon(
+                      isAll ? Icons.check : Icons.label_outline,
+                      size: 14,
+                      color: isAll
+                          ? VoidColors.darkAccent
+                          : VoidColors.darkTextTertiary,
+                    ),
+                    label: Text(
+                      t('tags.all'),
+                      style: GoogleFonts.outfit(
+                        fontSize: 12,
+                        color: VoidColors.darkTextSecondary,
+                      ),
+                    ),
+                    selected: isAll,
+                    onSelected: (_) {
+                      setState(() {
+                        _selectedTags.clear();
+                      });
+                    },
+                    selectedColor: VoidColors.darkAccentMuted,
+                    side: isAll
+                        ? const BorderSide(color: VoidColors.darkAccent)
+                        : const BorderSide(color: VoidColors.darkBorder),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                  );
+                }
+                final tag = allTags[i - 1];
+                final isSelected = _selectedTags.contains(tag);
+                return GestureDetector(
+                  onLongPress: () {
+                    HapticFeedback.mediumImpact();
+                    _showTagActionsSheet(context, tag, linkProvider);
+                  },
+                  child: FilterChip(
+                    showCheckmark: false,
+                    avatar: Icon(
+                      isSelected ? Icons.check : Icons.label_outline,
+                      size: 14,
+                      color: isSelected
+                          ? VoidColors.darkAccent
+                          : VoidColors.darkTextTertiary,
+                    ),
+                    label: Text(
+                      '$tag (${tagGroups[tag]!.length})',
+                      style: GoogleFonts.outfit(
+                        fontSize: 12,
+                        color: VoidColors.darkTextSecondary,
+                      ),
+                    ),
+                    selected: isSelected,
+                    onSelected: (_) {
+                      setState(() {
+                        if (_selectedTags.contains(tag)) {
+                          _selectedTags.remove(tag);
+                        } else {
+                          _selectedTags.add(tag);
+                        }
+                      });
+                    },
+                    selectedColor: VoidColors.darkAccentMuted,
+                    side: isSelected
+                        ? const BorderSide(color: VoidColors.darkAccent)
+                        : const BorderSide(color: VoidColors.darkBorder),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                  ),
+                );
+              },
+            ),
+          ),
+          const Divider(height: 1),
+          // ── Grouped links list ─────────────────────────────────────────────
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.only(
+                top: 8,
+                bottom: _selectMode ? 0 : 96,
+              ),
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                if (item is _TagHeader) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                    child: Row(
+                      children: [
+                        Text(
+                          '#${item.tag}',
+                          style: GoogleFonts.outfit(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: VoidColors.darkAccent,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${item.count}',
+                          style: GoogleFonts.outfit(
+                            fontSize: 12,
+                            color: VoidColors.darkTextTertiary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                final linkItem = (item as _TagLink).link;
+                return LinkCard(
+                  key: ValueKey('${index}_${linkItem.id}'),
+                  link: linkItem,
+                  keyPrefix: '${index}_',
+                  selectable: _selectMode,
+                  selected: _selectedLinkIds.contains(linkItem.id),
+                  onSelectChanged: _selectMode
+                      ? (val) {
+                          setState(() {
+                            if (val) {
+                              _selectedLinkIds.add(linkItem.id);
+                            } else {
+                              _selectedLinkIds.remove(linkItem.id);
+                            }
+                          });
+                        }
+                      : null,
+                  onFavoriteToggle: () =>
+                      context.read<LinkProvider>().toggleFavorite(linkItem.id),
+                  onReadToggle: () =>
+                      context.read<LinkProvider>().toggleRead(linkItem.id),
+                  onDismissConfirm: () async {
+                    return await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text(t('dialog.deleteTitle')),
+                        content: Text(t('dialog.deleteMessage')),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text(t('common.cancel')),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, true),
+                            child: Text(
+                              t('common.delete'),
+                              style: const TextStyle(
+                                color: VoidColors.darkStatusError,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  onDismissed: () =>
+                      context.read<LinkProvider>().deleteLink(linkItem.id),
+                );
+              },
+            ),
+          ),
+          // ── Bulk-select bottom bar ────────────────────────────────────────
+          if (_selectMode) _buildBulkBar(linkProvider),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.label_off_outlined,
+              size: 64,
+              color: VoidColors.darkTextTertiary,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              t('tags.emptyTitle'),
+              style: GoogleFonts.outfit(
+                fontSize: 18,
+                color: VoidColors.darkTextTertiary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              t('tags.emptySubtitle'),
+              textAlign: TextAlign.center,
+              style: GoogleFonts.outfit(
+                fontSize: 14,
+                color: VoidColors.darkTextTertiary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Tag actions bottom sheet ──────────────────────────────────────────────────
+
+class _TagActionsSheet extends StatefulWidget {
+  final String tag;
+  final List<String> allTags;
+  final Future<void> Function(String newName) onRename;
+  final Future<void> Function() onDelete;
+  final Future<void> Function(String targetTag) onMerge;
+
+  const _TagActionsSheet({
+    required this.tag,
+    required this.allTags,
+    required this.onRename,
+    required this.onDelete,
+    required this.onMerge,
+  });
+
+  @override
+  State<_TagActionsSheet> createState() => _TagActionsSheetState();
+}
+
+class _TagActionsSheetState extends State<_TagActionsSheet> {
+  final _renameController = TextEditingController();
+  final _mergeController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _renameController.text = widget.tag;
+  }
+
+  @override
+  void dispose() {
+    _renameController.dispose();
+    _mergeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final otherTags =
+        widget.allTags.where((t) => t != widget.tag).toList();
+
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Handle bar
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: VoidColors.darkBorder,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+              child: Text(
+                '#${widget.tag}',
+                style: GoogleFonts.outfit(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: VoidColors.darkAccent,
+                ),
+              ),
+            ),
+            const Divider(height: 1, color: VoidColors.darkBorder),
+            // ── Rename ───────────────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+              child: Text(
+                t('tags.renameTag'),
+                style: GoogleFonts.outfit(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: VoidColors.darkTextTertiary,
+                  letterSpacing: 0.4,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _renameController,
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: InputDecoration(
+                        hintText: t('tags.renameHint'),
+                        isDense: true,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: VoidColors.darkAccent,
+                      foregroundColor: VoidColors.accentOnPrimary,
+                      minimumSize: const Size(72, 40),
+                    ),
+                    onPressed: () =>
+                        widget.onRename(_renameController.text.trim().toUpperCase()),
+                    child: Text(t('tags.confirm')),
+                  ),
+                ],
+              ),
+            ),
+            // ── Merge into ───────────────────────────────────────────────────
+            if (otherTags.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: Text(
+                  t('tags.mergeInto'),
+                  style: GoogleFonts.outfit(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: VoidColors.darkTextTertiary,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _MergeDropdown(
+                        tags: otherTags,
+                        controller: _mergeController,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: VoidColors.darkBgElevated,
+                        foregroundColor: VoidColors.darkTextPrimary,
+                        minimumSize: const Size(72, 40),
+                      ),
+                      onPressed: () {
+                        final target = _mergeController.text.trim().toUpperCase();
+                        if (target.isNotEmpty) widget.onMerge(target);
+                      },
+                      child: Text(t('tags.confirm')),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            // ── Delete ───────────────────────────────────────────────────────
+            const SizedBox(height: 8),
+            const Divider(height: 1, color: VoidColors.darkBorder),
+            ListTile(
+              leading: const Icon(
+                Icons.delete_outline,
+                color: VoidColors.darkStatusError,
+                size: 18,
+              ),
+              title: Text(
+                t('tags.deleteTag'),
+                style:
+                    GoogleFonts.outfit(color: VoidColors.darkStatusError),
+              ),
+              onTap: widget.onDelete,
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Simple dropdown for merge target ─────────────────────────────────────────
+
+class _MergeDropdown extends StatefulWidget {
+  final List<String> tags;
+  final TextEditingController controller;
+  const _MergeDropdown({required this.tags, required this.controller});
+
+  @override
+  State<_MergeDropdown> createState() => _MergeDropdownState();
+}
+
+class _MergeDropdownState extends State<_MergeDropdown> {
+  String? _selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      initialValue: _selected,
+      hint: Text(
+        t('tags.mergeHint'),
+        style: GoogleFonts.outfit(
+          fontSize: 13,
+          color: VoidColors.darkTextTertiary,
+        ),
+      ),
+      decoration: const InputDecoration(isDense: true),
+      dropdownColor: VoidColors.darkBgElevated,
+      items: widget.tags
+          .map(
+            (tag) => DropdownMenuItem(
+              value: tag,
+              child: Text(
+                tag,
+                style: GoogleFonts.outfit(
+                  fontSize: 13,
+                  color: VoidColors.darkTextPrimary,
+                ),
+              ),
+            ),
+          )
+          .toList(),
+      onChanged: (val) {
+        setState(() => _selected = val);
+        widget.controller.text = val ?? '';
+      },
+    );
+  }
+}
+
+// ── Internal list item types ──────────────────────────────────────────────────
+
+abstract class _TagListItem {}
+
+class _TagHeader extends _TagListItem {
+  final String tag;
+  final int count;
+  _TagHeader(this.tag, this.count);
+}
+
+class _TagLink extends _TagListItem {
+  final LinkItem link;
+  _TagLink(this.link);
+}

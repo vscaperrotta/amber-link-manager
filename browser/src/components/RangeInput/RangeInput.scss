@@ -1,0 +1,103 @@
+.range-input {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-xs);
+
+	&--disabled {
+		opacity: 0.45;
+		pointer-events: none;
+	}
+}
+
+.range-input__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-sm);
+}
+
+.range-input__label {
+	font-size: 0.8125rem;
+	color: var(--text-secondary);
+	line-height: 1;
+}
+
+.range-input__value {
+	font-size: 0.8125rem;
+	font-family: var(--font-mono);
+	color: var(--text-primary);
+	min-width: 3.5ch;
+	text-align: right;
+}
+
+// ── Range track + thumb reset ──
+.range-input__track {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 4px;
+	border-radius: var(--radius-full);
+	background: linear-gradient(
+		to right,
+		var(--accent) 0%,
+		var(--accent) var(--range-fill, 0%),
+		var(--bg-elevated) var(--range-fill, 0%),
+		var(--bg-elevated) 100%
+	);
+	outline: none;
+	cursor: pointer;
+	border: none;
+
+	&:focus-visible {
+		box-shadow: var(--shadow-focus);
+	}
+
+	// ── WebKit thumb ──
+	&::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 14px;
+		height: 14px;
+		border-radius: var(--radius-full);
+		background: var(--accent);
+		border: 2px solid var(--bg-surface);
+		box-shadow: var(--shadow-sm);
+		cursor: pointer;
+		transition: transform 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	&:hover::-webkit-slider-thumb {
+		transform: scale(1.15);
+		box-shadow: var(--shadow-focus);
+	}
+
+	// ── Firefox thumb ──
+	&::-moz-range-thumb {
+		width: 14px;
+		height: 14px;
+		border-radius: var(--radius-full);
+		background: var(--accent);
+		border: 2px solid var(--bg-surface);
+		box-shadow: var(--shadow-sm);
+		cursor: pointer;
+		transition: transform 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	&:hover::-moz-range-thumb {
+		transform: scale(1.15);
+		box-shadow: var(--shadow-focus);
+	}
+
+	// ── Firefox track ──
+	&::-moz-range-track {
+		height: 4px;
+		border-radius: var(--radius-full);
+		background: var(--bg-elevated);
+	}
+
+	&::-moz-range-progress {
+		height: 4px;
+		border-radius: var(--radius-full);
+		background: var(--accent);
+	}
+}

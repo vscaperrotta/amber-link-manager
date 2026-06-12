@@ -1,0 +1,28 @@
+.obs-amber-input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: var(--radius-m);
+    border: var(--border-width) solid var(--color-base-50);
+    background: var(--background-primary);
+    color: var(--text-normal);
+    box-shadow: none !important;
+    min-height: 36px;
+    max-width: 100%;
+    font-size: 14px;
+
+    &:hover {
+      background: none;
+    }
+  }
+
+  textarea {
+    min-height: 80px;
+  }
+}

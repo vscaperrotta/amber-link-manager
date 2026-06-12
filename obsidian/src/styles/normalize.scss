@@ -1,0 +1,61 @@
+// Workspace
+.workspace-tabs {
+
+  .workspace-leaf-content[data-type="KangarooView"] {
+    .view-content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6,
+      p,
+      a,
+      hr {
+        margin: 0;
+      }
+
+      a,
+      button {
+
+        &:hover {
+          cursor: var(--cursor-link);
+        }
+      }
+    }
+  }
+}
+
+// Modals
+.modal {
+  padding: 20px;
+
+  .modal-close-button {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  .modal-content h1,
+  .modal-content h2,
+  .modal-content h3,
+  .modal-content h4,
+  .modal-content h5,
+  .modal-content h6,
+  .modal-content p,
+  .modal-content a,
+  hr {
+    margin: 0;
+  }
+
+  a,
+  button {
+    &:hover {
+      cursor: var(--cursor-link);
+    }
+  }
+}

@@ -1,0 +1,116 @@
+@use '../../styles/mixins' as *;
+
+.header {
+	align-items: center;
+	background: var(--bg-primary);
+	border-bottom: 1px solid var(--border);
+	box-sizing: border-box;
+	display: flex;
+	justify-content: space-between;
+	left: 0;
+	min-height: var(--topbar-height);
+	max-height: calc(100vh - var(--space-md));
+	overflow-y: auto;
+	padding: var(--space-sm) var(--space-sm);
+	position: fixed;
+	right: 0;
+	top: 0;
+	width: 100%;
+	z-index: 20;
+
+	.header__content {
+		align-items: center;
+		display: flex;
+		flex: 1;
+		gap: var(--space-xl);
+		min-width: 0;
+
+		.header__logo-container {
+			align-items: center;
+			display: flex;
+			gap: var(--space-md);
+		}
+
+		.header__logo-mark {
+			align-items: center;
+			color: var(--accent);
+			display: flex;
+			flex-shrink: 0;
+		}
+
+		.header__title {
+			font-size: 1.25rem;
+			font-weight: 600;
+		}
+	}
+
+	.header__search {
+		display: flex;
+		flex: 1;
+		max-width: 20rem;
+		width: 100%;
+	}
+
+	.header__nav-links {
+		align-items: center;
+		display: flex;
+		gap: var(--space-xl);
+	}
+
+	.header__nav-link {
+		align-items: center;
+		color: var(--text-secondary);
+		display: flex;
+		font-family: var(--font-display);
+		font-size: 14px;
+		font-weight: 500;
+		gap: 6px;
+		text-decoration: none;
+		transition: color 0.15s ease;
+		white-space: nowrap;
+
+		&:hover {
+			color: var(--text-primary);
+			text-decoration: underline;
+		}
+	}
+
+	.header__nav-link-favicon {
+		border-radius: 2px;
+		flex-shrink: 0;
+	}
+
+	.header__actions {
+		align-items: flex-start;
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-md);
+		justify-content: flex-end;
+		max-width: 52%;
+	}
+}
+
+// ── Header Avatar ──────────────────────────────────────────
+.header-avatar-wrapper {
+	position: relative;
+}
+
+.header-avatar {
+	background: none;
+	border: none;
+	border-radius: 50%;
+	cursor: pointer;
+	display: flex;
+	flex-shrink: 0;
+	padding: 0;
+	transition: opacity 0.15s ease;
+
+	&:hover {
+		opacity: 0.85;
+	}
+
+	&:focus-visible {
+		box-shadow: var(--shadow-focus);
+		outline: none;
+	}
+}

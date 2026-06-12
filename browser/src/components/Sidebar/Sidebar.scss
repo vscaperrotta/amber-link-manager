@@ -1,0 +1,170 @@
+@use '../../styles/mixins' as *;
+
+@keyframes sidebar-text-in {
+	from {
+		opacity: 0;
+		transform: translateX(-6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+.sidebar {
+	background: var(--bg-surface);
+	border-right: 1px solid var(--border);
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	height: calc(100vh - var(--topbar-height));
+	left: 0;
+	overflow: hidden;
+	padding: var(--space-sm) 0 var(--space-md);
+	position: fixed;
+	top: var(--topbar-height);
+	transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+	width: var(--newtab-sidebar-width-collapsed);
+	z-index: 10;
+
+	@media (prefers-reduced-motion: reduce) {
+		transition: none;
+	}
+
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	// ── Header (toggle only) ──────────────────────────────────────────────────
+
+	.sidebar__header {
+		align-items: center;
+		display: flex;
+		flex-shrink: 0;
+		justify-content: center;
+		padding: var(--space-xs) var(--space-sm);
+
+		@include respond(tab-land, max) {
+			display: none;
+		}
+	}
+
+	.sidebar__toggle {
+		transform: rotate(180deg);
+	}
+
+	// ── Add section ───────────────────────────────────────────────────────────
+
+	.sidebar__add-section {
+		border-bottom: 1px solid var(--border);
+		border-top: 1px solid var(--border);
+		display: flex;
+		justify-content: center;
+		margin-top: var(--space-xs);
+		padding: var(--space-sm);
+	}
+
+	.sidebar__add-button {
+		padding: 0;
+		width: 32px;
+
+		.button__text {
+			display: none;
+		}
+	}
+
+	// ── Navigation ────────────────────────────────────────────────────────────
+
+	.sidebar__navigation {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-xs);
+		padding: var(--space-sm) var(--space-sm) 0;
+	}
+
+	.nav-button {
+		justify-content: center;
+
+		span:not(.nav-button__counter) {
+			display: none;
+		}
+	}
+
+	.button__text {
+		display: none;
+	}
+
+	// ── Expanded state ────────────────────────────────────────────────────────
+
+	&.sidebar-open {
+		width: var(--sidebar-width);
+
+		.sidebar__header {
+			justify-content: flex-end;
+		}
+
+		.sidebar__toggle {
+			transform: rotate(0);
+		}
+
+		.sidebar__add-button {
+			width: 100%;
+
+			.button__text {
+				animation: sidebar-text-in 0.15s ease 0.1s both;
+				display: inline;
+			}
+		}
+
+		.nav-button {
+			justify-content: flex-start;
+
+			span:not(.nav-button__counter) {
+				animation: sidebar-text-in 0.15s ease 0.1s both;
+				display: inline;
+			}
+		}
+
+		.button__text {
+			display: inline;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.sidebar__add-button .button__text,
+			.nav-button span:not(.nav-button__counter) {
+				animation: none;
+			}
+		}
+
+		// Collapse back on narrow screens even when open
+		@include respond(tab-land, max) {
+			width: var(--newtab-sidebar-width-collapsed);
+
+			.sidebar__header {
+				display: none;
+			}
+
+			.sidebar__add-button {
+				width: 32px;
+
+				.button__text {
+					display: none;
+				}
+			}
+
+			.nav-button {
+				justify-content: center;
+
+				span:not(.nav-button__counter) {
+					display: none;
+				}
+			}
+
+			.button__text {
+				display: none;
+			}
+		}
+	}
+}

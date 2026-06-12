@@ -1,0 +1,53 @@
+.icon-button {
+	background: none;
+	border: none;
+	border-radius: var(--radius-sm);
+	color: var(--text-secondary);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--space-xs);
+	transition: color 0.15s ease, background-color 0.15s ease;
+	gap: .5rem;
+
+	&:hover {
+		color: var(--accent);
+		background: var(--accent-muted);
+	}
+
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--shadow-focus);
+	}
+
+	&.icon-button--danger {
+		&:hover {
+			color: var(--status-error);
+			background: color-mix(in srgb, var(--status-error) 15%, transparent);
+		}
+	}
+
+	&.icon-button--info {
+		&:hover {
+			color: var(--status-info);
+			background: color-mix(in srgb, var(--status-info) 15%, transparent);
+		}
+	}
+
+	&.is-active {
+		color: var(--accent);
+		background: var(--accent-muted);
+	}
+
+	&.icon-button--disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+
+	.icon-button__title {
+		font-size: .85rem;
+		font-weight: 600;
+	}
+}

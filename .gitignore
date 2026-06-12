@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor
+.vscode/
+*.swp
+*.swo
+
+# Env / secrets (never commit)
+.env
+.env.local
+.env.*.local
+
+# Node (root level, if any tools added later)
+node_modules/

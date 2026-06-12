@@ -1,0 +1,23 @@
+// Theme
+@use './variables';
+@use './theme';
+@use './mixins';
+
+// Normalize
+@use './normalize';
+
+// Typography
+@use './typography';
+
+// Components
+// import components here...
+@use './components/tag-editor';
+
+// Font import (must be after @use rules)
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Geist+Mono:wght@400;700&display=swap');
+
+body {
+	font-family: var(--font-display);
+	background: var(--bg-primary);
+	color: var(--text-primary);
+}
