@@ -42,7 +42,16 @@ All clients are designed to work with any Firebase project. To use your own:
 1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
 2. Enable **Authentication** (email/password and/or Google)
 3. Enable **Firestore** in Native mode
-4. Copy your Firebase config and paste it into the config file of the client(s) you want to use
+4. Provide your Firebase config via environment variables (each client reads them at build time):
+
+   | Client | File | Loaded by |
+   |---|---|---|
+   | `browser/` | `.env` (copy from `.env.example`) | Vite — `import.meta.env.VITE_FIREBASE_*` |
+   | `obsidian/` | `.env` (copy from `.env.example`) | esbuild `define` — injected at build |
+   | `flutter/` | `env.json` (copy from `env.example.json`) | `flutter run --dart-define-from-file=env.json` |
+
 5. Deploy Firestore security rules so each user can only access their own data (`/users/{uid}/links/{linkId}`)
+
+The `.env` / `env.json` files are git-ignored — never commit your real config.
 
 No backend code to deploy — Firebase handles everything.
