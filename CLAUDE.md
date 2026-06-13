@@ -25,7 +25,7 @@ All clients share the same product model:
 - **Local fallback:** IndexedDB (browser) / SQLite (flutter) / JSON file (obsidian) when logged out
 - **Migration:** On login, local links migrate to Firestore and local storage is cleared
 - **Link model:** `id` (UUID v4), `url`, `title`, `savedAt`, optional `metadata` (tags, description, aiDescription, isFavorite, isRead, …)
-- **Firebase project:** `voidpocket-97ae7`
+
 - **AI descriptions:** OpenRouter API — fire-and-forget on save, batch generate in settings
 
 ## Working in a Sub-project

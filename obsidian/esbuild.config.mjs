@@ -1,6 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
+import fs from "fs";
 
 const banner =
 	`/*
@@ -11,12 +12,35 @@ if you want to view the source, please visit the github repository of this plugi
 
 const prod = (process.argv[2] === "production");
 
+// Load Firebase config from .env and inject as process.env.* replacements.
+function loadEnv() {
+	const out = {};
+	try {
+		const raw = fs.readFileSync(new URL("./.env", import.meta.url), "utf8");
+		for (const line of raw.split("\n")) {
+			const trimmed = line.trim();
+			if (!trimmed || trimmed.startsWith("#")) continue;
+			const eq = trimmed.indexOf("=");
+			if (eq === -1) continue;
+			const key = trimmed.slice(0, eq).trim();
+			const val = trimmed.slice(eq + 1).trim();
+			out[`process.env.${key}`] = JSON.stringify(val);
+		}
+	} catch {
+		console.warn("[esbuild] no .env found — Firebase config will be undefined. Copy .env.example to .env.");
+	}
+	return out;
+}
+
+const envDefine = loadEnv();
+
 const context = await esbuild.context({
 	banner: {
 		js: banner,
 	},
 	entryPoints: ["./src/main.ts"],
 	bundle: true,
+	define: envDefine,
 	external: [
 		"obsidian",
 		"electron",

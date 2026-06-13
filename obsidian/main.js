@@ -30,9 +30,9 @@ module.exports = __toCommonJS(main_exports);
 var import_obsidian8 = require("obsidian");
 
 // src/constants.ts
-var NAME = "Kangaroo";
-var VIEW_TYPE = "KangarooView";
-var FOLDER = "Kangaroo";
+var NAME = "Amber";
+var VIEW_TYPE = "AmberView";
+var FOLDER = "Amber";
 var PLUGIN_ICON = "link";
 var REPOSITORY_URL = "https://github.com/vscaperrotta/obsidian-amber";
 
@@ -21159,13 +21159,13 @@ function __PRIVATE_convertToDocSnapshot(t2, e, n) {
 
 // src/firebase.ts
 var firebaseConfig = {
-  apiKey: "AIzaSyB9sUgJPMHUFs0h95Wg-oqrVZjg0H8LPDs",
-  authDomain: "voidpocket-97ae7.firebaseapp.com",
-  databaseURL: "https://voidpocket-97ae7-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "voidpocket-97ae7",
-  storageBucket: "voidpocket-97ae7.firebasestorage.app",
-  messagingSenderId: "30821726892",
-  appId: "1:30821726892:web:71f5ba8e91b92cb2e9bd09"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.YOUR_REGION.firebasedatabase.app",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 var app = initializeApp(firebaseConfig);
 var auth = getAuth(app);

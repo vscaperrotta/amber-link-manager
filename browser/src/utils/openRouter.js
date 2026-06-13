@@ -68,7 +68,7 @@ export async function generateAiDescription({ url, title, html, apiKey, model })
 		headers: {
 			'Authorization': `Bearer ${apiKey}`,
 			'Content-Type': 'application/json',
-			'HTTP-Referer': 'https://amber.voidpocket.app',
+			'HTTP-Referer': 'https://amber.app',
 			'X-Title': 'Amber',
 		},
 		body: JSON.stringify({

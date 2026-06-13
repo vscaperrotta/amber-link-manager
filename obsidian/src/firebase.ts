@@ -3,15 +3,15 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "@firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Your web app's Firebase configuration
+// Firebase configuration — injected at build time from .env (see .env.example).
 const firebaseConfig = {
-  apiKey: "AIzaSyB9sUgJPMHUFs0h95Wg-oqrVZjg0H8LPDs",
-  authDomain: "voidpocket-97ae7.firebaseapp.com",
-  databaseURL: "https://voidpocket-97ae7-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "voidpocket-97ae7",
-  storageBucket: "voidpocket-97ae7.firebasestorage.app",
-  messagingSenderId: "30821726892",
-  appId: "1:30821726892:web:71f5ba8e91b92cb2e9bd09"
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
