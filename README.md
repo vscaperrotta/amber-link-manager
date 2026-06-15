@@ -1,8 +1,10 @@
-# Amber
+<h1><img src="./browser/public/icons/icon128.png" alt="" width="36" style="vertical-align:middle;margin-right:10px" />Amber</h1>
 
 Amber is a cross-platform link-saving app. Save, organize, and access URLs anywhere — a personal read-later tool with cloud sync and offline support.
 
 > Built entirely via vibe coding.
+
+<img src="./brand/home.png" alt="Amber home screenshot" width="720" />
 
 ## Platforms
 
