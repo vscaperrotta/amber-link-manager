@@ -7,13 +7,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Node requirement:** Node.js ≥ 22 (`.nvmrc` → `22.22.2`). Run `nvm use` before any command.
 
 ```bash
-yarn install           # install dependencies (Yarn 4.5.0, nodeLinker: node-modules)
-yarn dev               # development mode (Vite HMR)
-yarn build             # production: clear → vite build → generate manifest.json → zip
-yarn lint              # ESLint
-yarn clear             # delete dist/
-yarn storybook         # component dev server on :6006
-yarn build-storybook   # build static storybook
+npm install           # install dependencies
+npm dev               # development mode (Vite HMR)
+npm build             # production: clear → vite build → generate manifest.json → zip
+npm lint              # ESLint
+npm clear             # delete dist/
+npm storybook         # component dev server on :6006
+npm build-storybook   # build static storybook
 ```
 
 Load the extension: `chrome://extensions/` → "Developer mode" → "Load unpacked" → select `dist/`.
