@@ -1,6 +1,6 @@
 # MAP — browser (Chrome Extension)
 
-Stack: React 19, Vite, Firebase, SCSS, Yarn 4  
+Stack: React 19, Vite, Firebase, SCSS
 Build output: `dist/` (gitignored)
 
 ## Entry points (multi-entry Vite build)
