@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -165,131 +166,158 @@ class LinkCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(14),
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Row 1: unread dot + title + star
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Unread dot
-                    if (!link.isRead) ...[
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5, right: 6),
-                        child: Container(
-                          width: 6,
-                          height: 6,
-                          decoration: const BoxDecoration(
-                            color: VoidColors.darkAccent,
-                            shape: BoxShape.circle,
+                // Text content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title row
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (!link.isRead)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5, right: 6),
+                              child: Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: VoidColors.darkAccent,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                          Expanded(
+                            child: Text(
+                              link.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.outfit(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: VoidColors.darkTextPrimary,
+                                height: 1.35,
+                              ),
+                            ),
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: onFavoriteToggle,
+                            child: Tooltip(
+                              message: link.isFavorite
+                                  ? t('linkCard.removeFavorite')
+                                  : t('linkCard.addFavorite'),
+                              child: Icon(
+                                link.isFavorite
+                                    ? Icons.star
+                                    : Icons.star_border,
+                                size: 28,
+                                color: link.isFavorite
+                                    ? VoidColors.darkAccent
+                                    : VoidColors.darkTextTertiary,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                    Expanded(
-                      child: Text(
-                        link.title,
-                        maxLines: 2,
+                      const SizedBox(height: 4),
+                      // Domain
+                      Text(
+                        _extractDomain(link.url),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.outfit(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: VoidColors.darkTextPrimary,
-                          height: 1.35,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: onFavoriteToggle,
-                      child: Tooltip(
-                        message: link.isFavorite
-                            ? t('linkCard.removeFavorite')
-                            : t('linkCard.addFavorite'),
-                        child: Icon(
-                          link.isFavorite ? Icons.star : Icons.star_border,
-                          size: 28,
-                          color: link.isFavorite
-                              ? VoidColors.darkAccent
-                              : VoidColors.darkTextTertiary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                // Row 2: domain
-                Text(
-                  _extractDomain(link.url),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.outfit(
-                    fontSize: 11,
-                    color: VoidColors.darkTextTertiary,
-                  ),
-                ),
-                // Row 3: AI description (if present)
-                if ((link.aiDescription ?? '').isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    link.aiDescription!,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.outfit(
-                      fontSize: 12,
-                      color: VoidColors.darkTextSecondary,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-                // Row 4: tags
-                if (link.tags.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 4,
-                    runSpacing: 4,
-                    children: link.tags
-                        .map(
-                          (tag) => Chip(
-                            label: Text(tag.toUpperCase()),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ],
-                const SizedBox(height: 6),
-                // Row 4: timestamp + read toggle
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        _formatDate(link.createdAt),
-                        style: GoogleFonts.outfit(
-                          fontSize: 10,
+                          fontSize: 11,
                           color: VoidColors.darkTextTertiary,
                         ),
                       ),
-                    ),
-                    if (onReadToggle != null)
-                      GestureDetector(
-                        onTap: onReadToggle,
-                        child: Tooltip(
-                          message: link.isRead
-                              ? t('link.markUnread')
-                              : t('link.markRead'),
-                          child: Icon(
-                            link.isRead
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                            size: 28,
-                            color: link.isRead
-                                ? VoidColors.darkTextTertiary
-                                : VoidColors.darkAccent,
+                      // AI description
+                      if ((link.aiDescription ?? '').isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          link.aiDescription!,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.outfit(
+                            fontSize: 12,
+                            color: VoidColors.darkTextSecondary,
+                            height: 1.4,
                           ),
                         ),
+                      ],
+                      // Tags
+                      if (link.tags.isNotEmpty) ...[
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 4,
+                          runSpacing: 4,
+                          children: link.tags
+                              .map((tag) =>
+                                  Chip(label: Text(tag.toUpperCase())))
+                              .toList(),
+                        ),
+                      ],
+                      const SizedBox(height: 6),
+                      // Timestamp + read toggle
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _formatDate(link.createdAt),
+                              style: GoogleFonts.outfit(
+                                fontSize: 10,
+                                color: VoidColors.darkTextTertiary,
+                              ),
+                            ),
+                          ),
+                          if (onReadToggle != null)
+                            GestureDetector(
+                              onTap: onReadToggle,
+                              child: Tooltip(
+                                message: link.isRead
+                                    ? t('link.markUnread')
+                                    : t('link.markRead'),
+                                child: Icon(
+                                  link.isRead
+                                      ? Icons.visibility_outlined
+                                      : Icons.visibility_off_outlined,
+                                  size: 28,
+                                  color: link.isRead
+                                      ? VoidColors.darkTextTertiary
+                                      : VoidColors.darkAccent,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                  ],
+                    ],
+                  ),
                 ),
+                // Thumbnail (Pocket-style right side)
+                if (link.thumbnail != null && link.thumbnail!.isNotEmpty) ...[
+                  const SizedBox(width: 12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: CachedNetworkImage(
+                      imageUrl: link.thumbnail!,
+                      width: 72,
+                      height: 72,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                      placeholder: (_, __) => Container(
+                        width: 72,
+                        height: 72,
+                        decoration: BoxDecoration(
+                          color: VoidColors.darkBgElevated,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

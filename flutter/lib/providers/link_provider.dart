@@ -45,12 +45,18 @@ class LinkProvider extends ChangeNotifier {
     required String url,
     required String title,
     List<String> tags = const [],
+    String? thumbnail,
   }) async {
     final normalizedTags = tags
         .map((t) => t.trim().toUpperCase())
         .where((t) => t.isNotEmpty)
         .toList();
-    final link = LinkItem(url: url, title: title, tags: normalizedTags);
+    final link = LinkItem(
+      url: url,
+      title: title,
+      tags: normalizedTags,
+      thumbnail: thumbnail,
+    );
     await _repository.addLink(link);
     await loadLinks();
     return link;

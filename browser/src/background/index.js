@@ -5,6 +5,7 @@ import { deriveItemPreview } from '../utils/deriveItemPreview.js';
 import { addLink as dbAddLink, updateLink as dbUpdateLink, patchLinkMetadata as dbPatchMeta } from '../utils/db.js';
 import { addLink as fbAddLink, updateLink as fbUpdateLink, patchLinkMetadata as fbPatchMeta } from '../utils/firebaseDb.js';
 import { getOpenRouterApiKey, getOpenRouterModel, generateAiDescription } from '../utils/openRouter.js';
+import { uploadThumbnail } from '../utils/firebaseStorage.js';
 import {
 	SAVE_LINK_LOADING,
 	SAVE_LINK_SUCCESS,
@@ -134,8 +135,15 @@ async function saveSuccess(tabId, savedId, uid, entry) {
 
 	if (!entry.metadata?.thumbnail) {
 		// Nessuna thumbnail trovata — cattura screenshot prima che l'utente navighi via
-		const screenshot = await captureScreenshot(tabId);
+		let screenshot = await captureScreenshot(tabId);
 		if (screenshot) {
+			if (uid) {
+				try {
+					screenshot = await uploadThumbnail(uid, savedId, screenshot);
+				} catch (err) {
+					console.warn('[saveSuccess] Storage upload failed, keeping base64:', err?.message);
+				}
+			}
 			const updatedMeta = { ...(entry.metadata || {}), screenshot };
 			if (uid) {
 				await fbUpdateLink(uid, savedId, { metadata: updatedMeta });
