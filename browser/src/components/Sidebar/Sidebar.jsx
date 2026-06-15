@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import './Sidebar.scss';
-import { Home, Star, Tag, Network, PanelRightOpen, Plus } from 'lucide-react';
+import { Home, Star, Tag, PanelRightOpen, Plus } from 'lucide-react';
 import Button from '@components/Button';
 import IconButton from '@components/IconButton';
 import NavButton from '@components/NavButton';
@@ -54,12 +54,6 @@ export default function Sidebar({ onAdd, isOpen, onToggle, activeView, onNavigat
 					isActive={activeView === 'tags'}
 					onClick={() => onNavigate('tags')}
 					count={linkCounts?.tags ?? null}
-				/>
-				<NavButton
-					text={t('sidebar.navGraph')}
-					icon={<Network size={18} />}
-					isActive={activeView === 'graph'}
-					onClick={() => onNavigate('graph')}
 				/>
 			</nav>
 		</aside>

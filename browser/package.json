@@ -15,6 +15,7 @@
     "build": "better-npm-run build",
     "build:prepare": "node scripts/prepare.js",
     "build:web": "vite build",
+    "build:zip": "node scripts/zip.js",
     "lint": "eslint .",
     "preview": "better-npm-run preview",
     "clear": "rimraf --glob dist",
@@ -36,7 +37,7 @@
       }
     },
     "build": {
-      "command": "run-s clear build:web build:prepare",
+      "command": "run-s clear build:web build:prepare build:zip",
       "env": {
         "NODE_ENV": "production"
       }

@@ -8,7 +8,6 @@ import '../theme/void_colors.dart';
 import '../utils/i18n.dart';
 import '../widgets/link_card.dart';
 import '../widgets/link_grid_card.dart';
-import '../widgets/auth_nav_item.dart';
 
 // ── Time bucket helpers ────────────────────────────────────────────────────────
 
@@ -154,7 +153,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             onPressed: () => setState(() => _isGridView = !_isGridView),
           ),
-          const AuthNavItem(),
         ],
       ),
       body: Column(

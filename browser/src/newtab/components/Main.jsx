@@ -6,7 +6,6 @@ import EditModal from './EditModal.jsx';
 import HomeView from '@newtab/views/HomeView.jsx';
 import FavoritesView from '@newtab/views/FavoritesView.jsx';
 import TagsView from '@newtab/views/TagsView.jsx';
-import GraphView from '@newtab/views/GraphView.jsx';
 
 export default function Main(props) {
 	const { links, loading, deleteLink, updateLink, saveCustomLink } = useLinks();
@@ -106,10 +105,7 @@ export default function Main(props) {
 						onDelete={deleteLink}
 					/>
 				)}
-				{activeView === 'graph' && (
-					<GraphView links={links} />
-				)}
-			</section>
+				</section>
 
 			{isModalOpen && (
 				<EditModal

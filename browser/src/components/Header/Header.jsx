@@ -1,19 +1,16 @@
-import { useState, useRef } from 'react';
-import { Bookmark } from 'lucide-react';
+import { useState } from 'react';
 import './Header.scss';
 import PropTypes from 'prop-types';
 import { APP_NAME } from '@/common/constants.js';
 import Button from '@components/Button';
 import Avatar from '@components/Avatar';
 import UserModal from '@newtab/components/UserModal.jsx';
-import UserProfileModal from '@newtab/components/UserProfileModal.jsx';
 import { useUserSettings } from '@utils/useUserSettings.js';
+import { goToSettings } from '@utils/globalMethods.js';
 import { t } from '@utils/i18n';
 
 export default function Header(props) {
 	const [showUserModal, setShowUserModal] = useState(false);
-	const [showProfileModal, setShowProfileModal] = useState(false);
-	const avatarRef = useRef(null);
 	const { settings } = useUserSettings();
 	const headerLinks = settings.headerLinks || [];
 
@@ -21,7 +18,7 @@ export default function Header(props) {
 		<header className="header">
 			<div className="header__content">
 				<div className="header__logo-container">
-					<span className="header__logo-mark" aria-hidden="true"><Bookmark size={24} strokeWidth={2.5} /></span>
+					<img src="/icons/icon32.png" alt="" className="header__logo-mark" width={24} height={24} />
 					<h3 className="header__title">{APP_NAME}</h3>
 				</div>
 				{headerLinks.length > 0 && (
@@ -62,9 +59,8 @@ export default function Header(props) {
 			<div className="header__actions">
 				{props.auth ? (
 					<button
-						ref={avatarRef}
 						className="header-avatar"
-						onClick={() => setShowProfileModal(true)}
+						onClick={goToSettings}
 						aria-label={t('header.accountLabel')}
 						title={props.auth.displayName || props.auth.email}
 						type="button"
@@ -88,15 +84,6 @@ export default function Header(props) {
 
 			{showUserModal && (
 				<UserModal onClose={() => setShowUserModal(false)} />
-			)}
-
-			{props.auth && (
-				<UserProfileModal
-					user={props.auth}
-					isOpen={showProfileModal}
-					onClose={() => setShowProfileModal(false)}
-					anchorRef={avatarRef}
-				/>
 			)}
 		</header>
 	);
