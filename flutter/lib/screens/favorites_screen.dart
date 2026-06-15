@@ -6,7 +6,6 @@ import '../providers/link_provider.dart';
 import '../theme/void_colors.dart';
 import '../utils/i18n.dart';
 import '../widgets/link_card.dart';
-import '../widgets/auth_nav_item.dart';
 
 // ── Time bucket helpers (mirrors home_screen.dart) ────────────────────────────
 
@@ -117,7 +116,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           style: GoogleFonts.outfit(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
-        actions: const [AuthNavItem()],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

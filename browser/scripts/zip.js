@@ -1,52 +1,33 @@
 import fs from 'fs';
 import archiver from 'archiver';
+import { createRequire } from 'module';
 
-/**
- * Vite plugin that zips a folder (default "dist") at the end of the build process.
- *
- * @param {Object} [options={}] - Plugin options.
- * @param {string} [options.folderPath='dist'] - Path to the folder to be zipped.
- * @param {string} [options.outPath='dist.zip'] - Name or path of the output zip file.
- * @returns {import('vite').Plugin} A Vite plugin object.
- */
-export default function zipBuildPlugin(options = {}) {
-  const {
-    folderPath = 'dist',
-    outPath = 'dist.zip',
-  } = options;
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json');
 
-  return {
-    name: 'zip-build-plugin',
+const folderPath = 'dist';
+const outPath = `${pkg.name}.zip`;
 
-    /**
-     * Hook triggered after the Vite build process is completed.
-     * It creates a ZIP archive of the specified folder.
-     *
-     * @async
-     * @returns {Promise<void>}
-     */
-    async closeBundle() {
-      try {
-        console.log(`ZIP the folder "${folderPath}" into "${outPath}"...`);
+async function zipDist() {
+  try {
+    console.log(`ZIP the folder "${folderPath}" into "${outPath}"...`);
 
-        const output = fs.createWriteStream(outPath);
-        const archive = archiver('zip', { zlib: { level: 9 } });
+    const output = fs.createWriteStream(outPath);
+    const archive = archiver('zip', { zlib: { level: 9 } });
 
-        archive.on('error', (err) => {
-          throw err;
-        });
+    archive.on('error', (err) => { throw err; });
+    output.on('close', () => {
+      console.log(`ZIP created: ${outPath} (${archive.pointer()} bytes)`);
+    });
 
-        output.on('close', () => {
-          console.log(`ZIP created: ${outPath} (${archive.pointer()} bytes)`);
-        });
+    archive.pipe(output);
+    archive.directory(folderPath, false);
 
-        archive.pipe(output);
-        archive.directory(folderPath, false);
-
-        await archive.finalize();
-      } catch (error) {
-        console.error(`Error during the ZIP creation: ${error}`);
-      }
-    },
-  };
+    await archive.finalize();
+  } catch (error) {
+    console.error(`Error during the ZIP creation: ${error}`);
+    process.exit(1);
+  }
 }
+
+zipDist();

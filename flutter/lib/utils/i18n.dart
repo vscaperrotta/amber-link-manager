@@ -13,7 +13,6 @@ const Map<String, Map<String, String>> _translations = {
     'nav.home': 'Home',
     'nav.favorites': 'Favorites',
     'nav.tags': 'Tags',
-    'nav.graph': 'Graph',
     'nav.addLink': 'Add link',
     'nav.signIn': 'Sign in',
     'nav.signOut': 'Sign out',
@@ -35,13 +34,6 @@ const Map<String, Map<String, String>> _translations = {
     'tags.all': 'All',
     'tags.emptyTitle': 'No tags',
     'tags.emptySubtitle': 'Add tags to links to organize them',
-
-    // Graph
-    'graph.title': 'Graph',
-    'graph.emptyTitle': 'No links yet',
-    'graph.emptySubtitle': 'Add links to see them in the graph.',
-    'graph.searchPlaceholder': 'Search tags…',
-    'graph.noResults': 'No matching tags',
 
     // Tag Filtered
     'tagFiltered.empty': 'No links with this tag',
@@ -158,7 +150,6 @@ const Map<String, Map<String, String>> _translations = {
     'nav.home': 'Home',
     'nav.favorites': 'Preferiti',
     'nav.tags': 'Tag',
-    'nav.graph': 'Grafo',
     'nav.addLink': 'Aggiungi link',
     'nav.signIn': 'Accedi',
     'nav.signOut': 'Esci',
@@ -180,13 +171,6 @@ const Map<String, Map<String, String>> _translations = {
     'tags.all': 'Tutti',
     'tags.emptyTitle': 'Nessun tag',
     'tags.emptySubtitle': 'Aggiungi tag ai link per organizzarli',
-
-    // Graph
-    'graph.title': 'Grafo',
-    'graph.emptyTitle': 'Nessun link salvato',
-    'graph.emptySubtitle': 'Aggiungi link per vederli nel grafo.',
-    'graph.searchPlaceholder': 'Cerca tag…',
-    'graph.noResults': 'Nessun tag trovato',
 
     // Tag Filtered
     'tagFiltered.empty': 'Nessun link con questo tag',

@@ -2,18 +2,12 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import paths from './config/paths';
-import zipBuild from './scripts/zip.js'
-import pkgJson from './package.json';
 
 const APP_DIR = paths.appSrc;
 
 export default defineConfig({
   plugins: [
     react(),
-    zipBuild({
-      folderPath: 'dist',
-      outPath: `${pkgJson.name}.zip`,
-    })
   ],
   resolve: {
     alias: {

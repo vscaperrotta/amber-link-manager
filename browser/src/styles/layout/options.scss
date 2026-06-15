@@ -415,8 +415,6 @@ body {
 	}
 }
 
-// ── Graph variant select ───────────────────────────────────
-
 .options__ai-bulk-status {
 	font-size: 0.8125rem;
 	font-variant-numeric: tabular-nums;
@@ -424,21 +422,4 @@ body {
 	&--progress { color: var(--text-tertiary); }
 	&--done     { color: var(--status-active); }
 	&--error    { color: var(--status-error); }
-}
-
-.options__graph-variant-select {
-	background: var(--bg-elevated);
-	border: 1px solid var(--border);
-	border-radius: var(--radius-sm);
-	color: var(--text-primary);
-	cursor: pointer;
-	flex-shrink: 0;
-	font-family: var(--font-display);
-	font-size: 13px;
-	padding: var(--space-xs) var(--space-sm);
-
-	&:focus {
-		border-color: var(--border-focus);
-		outline: none;
-	}
 }

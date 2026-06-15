@@ -11,8 +11,8 @@ import '../utils/i18n.dart';
 import '../screens/home_screen.dart';
 import '../screens/favorites_screen.dart';
 import '../screens/tags_screen.dart';
-import '../screens/graph_screen.dart';
 import '../screens/add_link_screen.dart';
+import '../screens/options_screen.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
@@ -28,7 +28,6 @@ class _MainScaffoldState extends State<MainScaffold> {
     HomeScreen(),
     FavoritesScreen(),
     TagsScreen(),
-    GraphScreen(),
   ];
 
   @override
@@ -170,11 +169,14 @@ class _MainScaffoldState extends State<MainScaffold> {
                   onTap: () => setState(() => _selectedIndex = 2),
                 ),
                 _NavItem(
-                  icon: Icons.bubble_chart_outlined,
-                  selectedIcon: Icons.bubble_chart,
-                  label: t('nav.graph'),
-                  selected: _selectedIndex == 3,
-                  onTap: () => setState(() => _selectedIndex = 3),
+                  icon: Icons.person_outline,
+                  selectedIcon: Icons.person,
+                  label: t('options.title'),
+                  selected: false,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const OptionsScreen()),
+                  ),
                 ),
               ],
             ),

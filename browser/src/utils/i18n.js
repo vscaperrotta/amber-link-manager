@@ -104,7 +104,6 @@ const translations = {
 		'sidebar.navHome': 'Home',
 		'sidebar.navFavorites': 'Favorites',
 		'sidebar.navTags': 'Tags',
-		'sidebar.navGraph': 'Graph',
 
 		// ── Header ────────────────────────────────────────────
 		'header.logoAlt': 'Logo',
@@ -146,6 +145,8 @@ const translations = {
 		'options.password': 'Password',
 		'options.signIn': 'Sign in',
 		'options.footer.caption': 'Link saver for Chrome.',
+		'options.privacySection': 'Privacy Policy',
+		'options.privacyOpen': 'Read Privacy Policy',
 		'options.preferencesSection': 'Preferences',
 		'options.defaultView': 'Default view',
 		'options.defaultViewDesc': 'Layout shown when you open a new tab.',
@@ -181,28 +182,6 @@ const translations = {
 		'options.aiBulkError': 'Error — check your API key and try again',
 		'options.saveErrorTitle': 'Save failed',
 		'options.saveErrorMessage': 'Could not save settings. Please try again.',
-
-		// ── Graph ─────────────────────────────────────────────
-		'graph.nodeColors': 'Node colors',
-		'graph.resetColors': 'Reset default colors',
-		'graph.reset': 'Reset',
-		'graph.noTags': 'No tags found.',
-		'graph.untagged': '(untagged)',
-		'graph.untaggedLabel': 'untagged',
-		'graph.physics': 'Physics',
-		'graph.resetPhysics': 'Reset default values',
-		'graph.emptyState': 'Tag your links to see how they connect.',
-		'graph.searchPlaceholder': 'Search tags...',
-		'graph.optionsTitle': 'Graph options',
-		'graph.noSearchResults': 'No tags match your search.',
-
-		// ── Slider labels ─────────────────────────────────────
-		'graph.slider.chargeStrength': 'Repulsion',
-		'graph.slider.linkDistance': 'Link distance',
-		'graph.slider.velocityDecay': 'Friction',
-		'graph.slider.alphaDecay': 'Cooling',
-		'graph.slider.centerStrength': 'Gravity',
-		'graph.slider.minSharedTags': 'Min shared tags',
 
 		// ── Empty states ─────────────────────────────────────
 		'emptyState.noLinks.title': 'Save your first link',
@@ -337,7 +316,6 @@ const translations = {
 		'sidebar.navHome': 'Home',
 		'sidebar.navFavorites': 'Preferiti',
 		'sidebar.navTags': 'Tag',
-		'sidebar.navGraph': 'Grafo',
 
 		// ── Header ────────────────────────────────────────────
 		'header.logoAlt': 'Logo',
@@ -379,6 +357,8 @@ const translations = {
 		'options.password': 'Password',
 		'options.signIn': 'Accedi',
 		'options.footer.caption': 'Salva link per Chrome.',
+		'options.privacySection': 'Privacy Policy',
+		'options.privacyOpen': 'Leggi la Privacy Policy',
 		'options.preferencesSection': 'Preferenze',
 		'options.defaultView': 'Vista predefinita',
 		'options.defaultViewDesc': 'Layout all\'apertura di una nuova scheda.',
@@ -414,28 +394,6 @@ const translations = {
 		'options.aiBulkError': 'Errore — controlla la chiave API e riprova',
 		'options.saveErrorTitle': 'Salvataggio fallito',
 		'options.saveErrorMessage': 'Impossibile salvare le impostazioni. Riprova.',
-
-		// ── Graph ─────────────────────────────────────────────
-		'graph.nodeColors': 'Colori nodi',
-		'graph.resetColors': 'Ripristina colori predefiniti',
-		'graph.reset': 'Reset',
-		'graph.noTags': 'Nessun tag trovato.',
-		'graph.untagged': '(senza tag)',
-		'graph.untaggedLabel': 'senza tag',
-		'graph.physics': 'Fisica',
-		'graph.resetPhysics': 'Ripristina valori predefiniti',
-		'graph.emptyState': 'Aggiungi tag ai link per vedere come si connettono.',
-		'graph.searchPlaceholder': 'Cerca tag...',
-		'graph.optionsTitle': 'Opzioni grafo',
-		'graph.noSearchResults': 'Nessun tag corrisponde alla ricerca.',
-
-		// ── Slider labels ─────────────────────────────────────
-		'graph.slider.chargeStrength': 'Repulsione',
-		'graph.slider.linkDistance': 'Dist. link',
-		'graph.slider.velocityDecay': 'Attrito',
-		'graph.slider.alphaDecay': 'Raffreddamento',
-		'graph.slider.centerStrength': 'Gravità',
-		'graph.slider.minSharedTags': 'Tag in comune (min)',
 
 		// ── Empty states ─────────────────────────────────────
 		'emptyState.noLinks.title': 'Salva il tuo primo link',

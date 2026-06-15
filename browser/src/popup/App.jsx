@@ -109,9 +109,7 @@ export default function App() {
 		<div className="popup__container">
 			<header className="popup__header">
 				<div className="popup__header-brand">
-					<span className="popup__header-mark" aria-hidden="true">
-						<Bookmark size={16} strokeWidth={2.5} />
-					</span>
+					<img src="/icons/icon16.png" alt="" className="popup__header-mark" width={16} height={16} />
 					<h2 className="popup__title">{APP_NAME}</h2>
 				</div>
 				<IconButton

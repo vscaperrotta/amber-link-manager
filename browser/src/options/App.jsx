@@ -415,6 +415,19 @@ export default function App() {
 				onCancel={() => setSaveError(false)}
 			/>
 
+			{/* Privacy Policy */}
+			<section className="options__section">
+				<h2 className="options__section-title">{t('options.privacySection')}</h2>
+				<hr className="options__section-divider" />
+				<button
+					type="button"
+					className="options__view-btn"
+					onClick={() => Browser.tabs.create({ url: Browser.runtime.getURL('privacy.html') })}
+				>
+					{t('options.privacyOpen')}
+				</button>
+			</section>
+
 			<footer className="options__footer">
 				<p>{APP_NAME} v{APP_VERSION} — {t('options.footer.caption')}</p>
 			</footer>

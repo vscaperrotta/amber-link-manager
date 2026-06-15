@@ -8,7 +8,6 @@ import '../models/link_item.dart';
 import '../theme/void_colors.dart';
 import '../utils/i18n.dart';
 import '../widgets/link_card.dart';
-import '../widgets/auth_nav_item.dart';
 
 class TagsScreen extends StatefulWidget {
   const TagsScreen({super.key});
@@ -226,7 +225,6 @@ class _TagsScreenState extends State<TagsScreen> {
               ),
             ),
           ),
-          const AuthNavItem(),
         ],
       ),
       body: Column(
