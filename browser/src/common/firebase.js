@@ -21,11 +21,12 @@ export const app = initializeApp(firebaseConfig);
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
 
-// Initialize Firestore with long-polling fallback to avoid WebChannel/service worker issues
-// This helps in extension and newtab contexts where WebChannel streaming may fail.
+// Initialize Firestore with long-polling fallback to avoid WebChannel/service worker issues.
+// useFetchStreams must be true — XHR (the false-path transport) doesn't exist in the MV3
+// background service worker and throws "XMLHttpRequest is not defined" on first write.
 export const db = initializeFirestore(app, {
   experimentalForceLongPolling: true,
-  useFetchStreams: false,
+  useFetchStreams: true,
 });
 
 export const storage = getStorage(app);
