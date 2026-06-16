@@ -17,16 +17,9 @@ import {
 	TRIGGER_SAVE,
 } from '../common/actions.js';
 
-import { setDefaultIcon } from '../common/interface.js'
-
 /* Initial Setup
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-Browser.runtime.onInstalled.addListener(function () {
-	// Use SVG icons over the png for more control
-	setDefaultIcon()
-
-	// handle.setContextMenus()
-})
+// Icon is set declaratively via manifest's action.default_icon — no runtime override needed.
 
 // ── Auth helper ──────────────────────────────────────────────────────────────
 
