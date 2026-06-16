@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/link_item.dart';
 import '../theme/void_colors.dart';
 import '../utils/i18n.dart';
+import 'edit_link_sheet.dart';
 
 class LinkCard extends StatelessWidget {
   final LinkItem link;
@@ -12,12 +14,16 @@ class LinkCard extends StatelessWidget {
   final Future<bool?> Function() onDismissConfirm;
   final VoidCallback onDismissed;
   final String? keyPrefix;
+
   /// When true, shows a checkbox overlay and disables the URL tap.
   final bool selectable;
+
   /// Whether this card is currently selected (used when [selectable] is true).
   final bool selected;
+
   /// Called when the checkbox state changes (only used when [selectable]).
   final ValueChanged<bool>? onSelectChanged;
+
   /// Called when the user taps the read/unread toggle eye icon.
   final VoidCallback? onReadToggle;
 
@@ -44,23 +50,26 @@ class LinkCard extends StatelessWidget {
       final canLaunch = await canLaunchUrl(uri);
       if (!canLaunch) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(t('linkCard.cannotOpen'))),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(t('linkCard.cannotOpen'))));
         }
         return;
       }
-      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
       if (!launched && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(t('linkCard.cannotOpen'))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(t('linkCard.cannotOpen'))));
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(t('linkCard.cannotOpen'))),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(t('linkCard.cannotOpen'))));
       }
     }
   }
@@ -77,13 +86,28 @@ class LinkCard extends StatelessWidget {
 
   String _extractDomain(String url) {
     try {
-      final uri = Uri.parse(
-        url.startsWith('http') ? url : 'https://$url',
-      );
+      final uri = Uri.parse(url.startsWith('http') ? url : 'https://$url');
       return uri.host.replaceFirst('www.', '');
     } catch (_) {
       return url;
     }
+  }
+
+  void _openEditSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: VoidColors.darkBgSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => EditLinkSheet(link: link),
+    );
+  }
+
+  Future<void> _confirmAndDelete(BuildContext context) async {
+    final confirmed = await onDismissConfirm();
+    if (confirmed == true) onDismissed();
   }
 
   @override
@@ -136,21 +160,34 @@ class LinkCard extends StatelessWidget {
       );
     }
 
-    return Dismissible(
+    return Slidable(
       key: Key('${keyPrefix ?? ''}${link.id}'),
-      direction: DismissDirection.endToStart,
-      dismissThresholds: const {DismissDirection.endToStart: 0.65},
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        decoration: BoxDecoration(
-          color: VoidColors.darkStatusError,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Icon(Icons.delete, color: Colors.white),
+      endActionPane: ActionPane(
+        motion: const DrawerMotion(),
+        extentRatio: 0.45,
+        children: [
+          SlidableAction(
+            onPressed: (_) => _openEditSheet(context),
+            backgroundColor: VoidColors.darkBgElevated,
+            foregroundColor: VoidColors.darkTextPrimary,
+            icon: Icons.edit,
+            label: t('linkCard.editTooltip'),
+            borderRadius: const BorderRadius.horizontal(
+              left: Radius.circular(12),
+            ),
+          ),
+          SlidableAction(
+            onPressed: (_) => _confirmAndDelete(context),
+            backgroundColor: VoidColors.darkStatusError,
+            foregroundColor: Colors.white,
+            icon: Icons.delete,
+            label: t('common.delete'),
+            borderRadius: const BorderRadius.horizontal(
+              right: Radius.circular(12),
+            ),
+          ),
+        ],
       ),
-      confirmDismiss: (_) => onDismissConfirm(),
-      onDismissed: (_) => onDismissed(),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
         decoration: BoxDecoration(
@@ -161,163 +198,167 @@ class LinkCard extends StatelessWidget {
             width: link.isRead ? 1.0 : 1.5,
           ),
         ),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () => _openUrl(context, link.url),
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
+          child: IntrinsicHeight(
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Text content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title row
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (!link.isRead)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5, right: 6),
-                              child: Container(
-                                width: 6,
-                                height: 6,
-                                decoration: const BoxDecoration(
-                                  color: VoidColors.darkAccent,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          Expanded(
-                            child: Text(
-                              link.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: GoogleFonts.outfit(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: VoidColors.darkTextPrimary,
-                                height: 1.35,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: onFavoriteToggle,
-                            child: Tooltip(
-                              message: link.isFavorite
-                                  ? t('linkCard.removeFavorite')
-                                  : t('linkCard.addFavorite'),
-                              child: Icon(
-                                link.isFavorite
-                                    ? Icons.star
-                                    : Icons.star_border,
-                                size: 28,
-                                color: link.isFavorite
-                                    ? VoidColors.darkAccent
-                                    : VoidColors.darkTextTertiary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      // Domain
-                      Text(
-                        _extractDomain(link.url),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.outfit(
-                          fontSize: 11,
-                          color: VoidColors.darkTextTertiary,
-                        ),
-                      ),
-                      // AI description
-                      if ((link.aiDescription ?? '').isNotEmpty) ...[
-                        const SizedBox(height: 6),
-                        Text(
-                          link.aiDescription!,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.outfit(
-                            fontSize: 12,
-                            color: VoidColors.darkTextSecondary,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
-                      // Tags
-                      if (link.tags.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 4,
-                          runSpacing: 4,
-                          children: link.tags
-                              .map((tag) =>
-                                  Chip(label: Text(tag.toUpperCase())))
-                              .toList(),
-                        ),
-                      ],
-                      const SizedBox(height: 6),
-                      // Timestamp + read toggle
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _formatDate(link.createdAt),
-                              style: GoogleFonts.outfit(
-                                fontSize: 10,
-                                color: VoidColors.darkTextTertiary,
-                              ),
-                            ),
-                          ),
-                          if (onReadToggle != null)
-                            GestureDetector(
-                              onTap: onReadToggle,
-                              child: Tooltip(
-                                message: link.isRead
-                                    ? t('link.markUnread')
-                                    : t('link.markRead'),
-                                child: Icon(
-                                  link.isRead
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  size: 28,
-                                  color: link.isRead
-                                      ? VoidColors.darkTextTertiary
-                                      : VoidColors.darkAccent,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                // Thumbnail (Pocket-style right side)
-                if (link.thumbnail != null && link.thumbnail!.isNotEmpty) ...[
-                  const SizedBox(width: 12),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                // Thumbnail — flush left/top/bottom, fills full card height
+                if (link.thumbnail != null && link.thumbnail!.isNotEmpty)
+                  SizedBox(
+                    width: 88,
                     child: CachedNetworkImage(
                       imageUrl: link.thumbnail!,
-                      width: 72,
-                      height: 72,
                       fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) => const SizedBox.shrink(),
-                      placeholder: (_, __) => Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          color: VoidColors.darkBgElevated,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                      errorWidget: (_, __, ___) =>
+                          Container(color: VoidColors.darkBgElevated),
+                      placeholder: (_, __) =>
+                          Container(color: VoidColors.darkBgElevated),
                     ),
                   ),
-                ],
+                // Text content
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      link.thumbnail != null && link.thumbnail!.isNotEmpty
+                          ? 12
+                          : 14,
+                      14,
+                      14,
+                      14,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Title row
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (!link.isRead)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 5,
+                                  right: 6,
+                                ),
+                                child: Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: const BoxDecoration(
+                                    color: VoidColors.darkAccent,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                              ),
+                            Expanded(
+                              child: Text(
+                                link.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: VoidColors.darkTextPrimary,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: onFavoriteToggle,
+                              child: Tooltip(
+                                message: link.isFavorite
+                                    ? t('linkCard.removeFavorite')
+                                    : t('linkCard.addFavorite'),
+                                child: Icon(
+                                  link.isFavorite
+                                      ? Icons.star
+                                      : Icons.star_border,
+                                  size: 28,
+                                  color: link.isFavorite
+                                      ? VoidColors.darkAccent
+                                      : VoidColors.darkTextTertiary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        // Domain
+                        Text(
+                          _extractDomain(link.url),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.outfit(
+                            fontSize: 11,
+                            color: VoidColors.darkTextTertiary,
+                          ),
+                        ),
+                        // AI description
+                        if ((link.aiDescription ?? '').isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            link.aiDescription!,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.outfit(
+                              fontSize: 12,
+                              color: VoidColors.darkTextSecondary,
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                        // Tags
+                        if (link.tags.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Wrap(
+                            spacing: 4,
+                            runSpacing: 4,
+                            children: link.tags
+                                .map(
+                                  (tag) => Chip(label: Text(tag.toUpperCase())),
+                                )
+                                .toList(),
+                          ),
+                        ],
+                        const SizedBox(height: 6),
+                        // Timestamp + read toggle
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _formatDate(link.createdAt),
+                                style: GoogleFonts.outfit(
+                                  fontSize: 10,
+                                  color: VoidColors.darkTextTertiary,
+                                ),
+                              ),
+                            ),
+                            if (onReadToggle != null)
+                              GestureDetector(
+                                onTap: onReadToggle,
+                                child: Tooltip(
+                                  message: link.isRead
+                                      ? t('link.markUnread')
+                                      : t('link.markRead'),
+                                  child: Icon(
+                                    link.isRead
+                                        ? Icons.visibility_outlined
+                                        : Icons.visibility_off_outlined,
+                                    size: 28,
+                                    color: link.isRead
+                                        ? VoidColors.darkTextTertiary
+                                        : VoidColors.darkAccent,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
