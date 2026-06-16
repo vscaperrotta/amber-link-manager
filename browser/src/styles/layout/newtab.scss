@@ -78,7 +78,7 @@ body {
 	.newtab__toolbar-count {
 		color: var(--text-secondary);
 		flex-shrink: 0;
-		font-size: 15px;
+		font-size: 0.9375rem;
 		font-weight: 600;
 		white-space: nowrap;
 	}
@@ -100,7 +100,7 @@ body {
 
 	.newtab__empty {
 		color: var(--text-secondary);
-		font-size: 20px;
+		font-size: 1.25rem;
 		margin: 0;
 		padding: var(--space-md) 0;
 	}
@@ -139,11 +139,11 @@ body {
 
 .newtab__link-tag {
 	background: var(--bg-elevated);
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-sm);
 	color: var(--text-secondary);
 	font-size: 0.75rem;
-	padding: 1px var(--space-xs);
+	padding: 0.0625rem var(--space-xs);
 }
 
 // ── Links: shared ─────────────────────────────────────────
@@ -157,7 +157,7 @@ body {
 @keyframes link-enter {
 	from {
 		opacity: 0;
-		transform: translateY(4px);
+		transform: translateY(0.25rem);
 	}
 }
 
@@ -189,8 +189,8 @@ body {
 .newtab__link-meta {
 	align-items: center;
 	display: flex;
-	gap: 5px;
-	margin-top: 1px;
+	gap: 0.3125rem;
+	margin-top: 0.0625rem;
 }
 
 .newtab__link-domain {
@@ -225,7 +225,7 @@ body {
 
 	.newtab__link-item--list {
 		align-items: center;
-		border-bottom: 1px solid var(--border);
+		border-bottom: 0.0625rem solid var(--border);
 		display: flex;
 		gap: var(--space-md);
 		justify-content: space-between;
@@ -240,9 +240,9 @@ body {
 		.newtab__link-thumb {
 			border-radius: var(--radius-sm);
 			flex-shrink: 0;
-			height: 40px;
+			height: 2.5rem;
 			object-fit: cover;
-			width: 40px;
+			width: 2.5rem;
 
 			&.newtab__link-thumb--screenshot {
 				opacity: 0.85;
@@ -259,14 +259,14 @@ body {
 			color: var(--text-secondary);
 			-webkit-box-orient: vertical;
 			display: -webkit-box;
-			font-size: 14px;
+			font-size: 0.875rem;
 			-webkit-line-clamp: 3;
 			overflow: hidden;
 		}
 
 		.newtab__link-date {
 			color: var(--text-secondary);
-			font-size: 12px;
+			font-size: 0.75rem;
 			opacity: 0.7;
 		}
 
@@ -283,7 +283,7 @@ body {
 	.newtab__links--list {
 		display: grid;
 		gap: var(--space-lg);
-		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
 
 		.newtab__link-item--list {
 			align-items: flex-start;
@@ -298,11 +298,11 @@ body {
 .newtab__links--grid {
 	display: grid;
 	gap: var(--space-lg);
-	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
 
 	.newtab__link-item--grid {
 		background: var(--bg-surface);
-		border: 1px solid var(--border);
+		border: 0.0625rem solid var(--border);
 		border-radius: var(--radius-lg);
 		display: flex;
 		flex-direction: column;
@@ -314,7 +314,7 @@ body {
 		&:hover {
 			border-color: var(--border-focus);
 			box-shadow: var(--shadow-card);
-			transform: translateY(-3px);
+			transform: translateY(-0.1875rem);
 		}
 
 		// Select mode: suppress lift, make whole card the click target
@@ -369,7 +369,7 @@ body {
 
 		.newtab__link-thumb {
 			border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-			height: 130px;
+			height: 8.125rem;
 			object-fit: cover;
 			width: 100%;
 
@@ -389,21 +389,21 @@ body {
 			color: var(--text-secondary);
 			-webkit-box-orient: vertical;
 			display: -webkit-box;
-			font-size: 12px;
+			font-size: 0.75rem;
 			-webkit-line-clamp: 3;
 			overflow: hidden;
 		}
 
 		.newtab__link-date {
 			color: var(--text-secondary);
-			font-size: 11px;
+			font-size: 0.6875rem;
 			opacity: 0.7;
 		}
 
 		// Actions hidden at rest, revealed on hover / focus
 		.newtab__link-actions {
 			align-items: center;
-			border-top: 1px solid var(--border);
+			border-top: 0.0625rem solid var(--border);
 			display: flex;
 			gap: var(--space-sm);
 			justify-content: flex-end;
@@ -430,7 +430,7 @@ body {
 
 // ── Tag strip (horizontal pill row) ───────────────────────
 .newtab__tags-strip {
-	border-bottom: 1px solid var(--border);
+	border-bottom: 0.0625rem solid var(--border);
 	padding-bottom: var(--space-md);
 }
 
@@ -446,7 +446,7 @@ body {
 .newtab__tags-item {
 	align-items: center;
 	background: none;
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-full);
 	color: var(--text-secondary);
 	cursor: pointer;
@@ -454,8 +454,8 @@ body {
 	font-family: var(--font-display);
 	font-size: 0.8125rem;
 	font-weight: 500;
-	gap: 5px;
-	padding: 4px var(--space-sm);
+	gap: 0.3125rem;
+	padding: 0.25rem var(--space-sm);
 	text-align: left;
 	text-transform: uppercase;
 	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
@@ -527,7 +527,7 @@ body {
 
 .newtab__tags-link-item {
 	background: var(--bg-surface);
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-lg);
 	display: flex;
 	flex-direction: column;
@@ -567,7 +567,7 @@ body {
 .newtab__tags-link-meta {
 	align-items: center;
 	display: flex;
-	gap: 4px;
+	gap: 0.25rem;
 }
 
 .newtab__tags-link-domain {
@@ -618,7 +618,7 @@ body {
 
 	.fullscreen-loader__sidebar {
 		background: var(--bg-surface);
-		border-right: 1px solid var(--border);
+		border-right: 0.0625rem solid var(--border);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space-lg);
@@ -643,7 +643,7 @@ body {
 	.fullscreen-loader__grid {
 		display: grid;
 		gap: var(--space-lg);
-		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
 	}
 }
 
@@ -665,7 +665,7 @@ body {
 }
 
 .user-modal__tabs {
-	border-bottom: 1px solid var(--border);
+	border-bottom: 0.0625rem solid var(--border);
 	display: flex;
 	gap: 0;
 }
@@ -673,13 +673,13 @@ body {
 .user-modal__tab {
 	background: none;
 	border: none;
-	border-bottom: 2px solid transparent;
+	border-bottom: 0.125rem solid transparent;
 	color: var(--text-secondary);
 	cursor: pointer;
 	font-family: var(--font-display);
-	font-size: 14px;
+	font-size: 0.875rem;
 	font-weight: 500;
-	margin-bottom: -1px;
+	margin-bottom: -0.0625rem;
 	padding: var(--space-sm) var(--space-md);
 	transition: color 0.15s ease, border-color 0.15s ease;
 
@@ -697,13 +697,13 @@ body {
 .user-modal__google-btn {
 	align-items: center;
 	background: var(--bg-surface);
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-sm);
 	color: var(--text-primary);
 	cursor: pointer;
 	display: flex;
 	font-family: var(--font-display);
-	font-size: 14px;
+	font-size: 0.875rem;
 	font-weight: 500;
 	gap: var(--space-sm);
 	justify-content: center;
@@ -725,7 +725,7 @@ body {
 	align-items: center;
 	color: var(--text-secondary);
 	display: flex;
-	font-size: 12px;
+	font-size: 0.75rem;
 	gap: var(--space-sm);
 
 	&::before,
@@ -733,7 +733,7 @@ body {
 		background: var(--border);
 		content: '';
 		flex: 1;
-		height: 1px;
+		height: 0.0625rem;
 	}
 }
 
@@ -741,7 +741,7 @@ body {
 	background: rgba(230, 80, 80, 0.12);
 	border-radius: var(--radius-sm);
 	color: var(--status-error);
-	font-size: 13px;
+	font-size: 0.8125rem;
 	margin: 0;
 	padding: var(--space-xs) var(--space-sm);
 }
@@ -763,7 +763,7 @@ body {
 .newtab__pagination-btn {
 	align-items: center;
 	background: none;
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-sm);
 	color: var(--text-secondary);
 	cursor: pointer;
@@ -808,23 +808,32 @@ body {
 .newtab__pagination-ellipsis {
 	color: var(--text-tertiary);
 	font-size: 0.8125rem;
-	padding: 0 2px;
+	padding: 0 0.125rem;
 	user-select: none;
 }
 
-// ── Unread indicator dot ──────────────────────────────────
-.newtab__link-item--grid.newtab__link-item--unread::before {
-	background: var(--accent);
-	border-radius: 50%;
-	content: '';
-	display: block;
-	height: 7px;
-	pointer-events: none;
-	position: absolute;
-	right: var(--space-sm);
-	top: var(--space-sm);
-	width: 7px;
-	z-index: 2;
+// ── Unread indicator: dot + border ────────────────────────
+.newtab__link-item--grid.newtab__link-item--unread {
+	border-color: #000;
+	border-width: 0.125rem;
+
+	.newtab__link-thumb {
+		border-radius: calc(var(--radius-lg) - 0.125rem) calc(var(--radius-lg) - 0.125rem) 0 0;
+	}
+
+	&::before {
+		background: var(--accent);
+		border-radius: 50%;
+		content: '';
+		display: block;
+		height: 0.5625rem;
+		pointer-events: none;
+		position: absolute;
+		right: var(--space-sm);
+		top: var(--space-sm);
+		width: 0.5625rem;
+		z-index: 2;
+	}
 }
 
 // ── Select overlay (bulk mode) ────────────────────────────
@@ -850,15 +859,15 @@ body {
 .newtab__link-select-indicator {
 	align-items: center;
 	background: var(--bg-surface);
-	border: 2px solid var(--border);
+	border: 0.125rem solid var(--border);
 	border-radius: 50%;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, .40);
+	box-shadow: 0 0.0625rem 0.25rem rgba(0, 0, 0, .40);
 	color: #0F0F12;
 	display: flex;
-	height: 20px;
+	height: 1.25rem;
 	justify-content: center;
 	transition: background 0.15s ease, border-color 0.15s ease;
-	width: 20px;
+	width: 1.25rem;
 }
 
 .newtab__link-item--selected .newtab__link-select-indicator {
@@ -873,7 +882,7 @@ body {
 // ── Tag filter bar (HomeView) ─────────────────────────────
 .newtab__tag-filter-bar {
 	align-items: center;
-	border-bottom: 1px solid var(--border);
+	border-bottom: 0.0625rem solid var(--border);
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--space-xs) var(--space-sm);
@@ -897,8 +906,8 @@ body {
 		flex-shrink: 0;
 		font-family: var(--font-display);
 		font-size: 0.75rem;
-		gap: 3px;
-		padding: 3px var(--space-xs);
+		gap: 0.1875rem;
+		padding: 0.1875rem var(--space-xs);
 		transition: color 0.12s;
 
 		&:hover { color: var(--text-primary); }
@@ -915,19 +924,19 @@ body {
 .newtab__toolbar-pill--icon {
 	align-items: center;
 	display: inline-flex;
-	gap: 4px;
+	gap: 0.25rem;
 }
 
 .newtab__toolbar-pill {
 	background: var(--bg-elevated);
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-full);
 	color: var(--text-secondary);
 	cursor: pointer;
 	font-family: var(--font-display);
 	font-size: 0.75rem;
 	font-weight: 500;
-	padding: 3px var(--space-sm);
+	padding: 0.1875rem var(--space-sm);
 	transition: background 0.15s, border-color 0.15s, color 0.15s;
 	white-space: nowrap;
 
@@ -958,23 +967,23 @@ body {
 .newtab__match-toggle {
 	align-items: center;
 	background: var(--bg-elevated);
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-full);
 	display: flex;
-	gap: 2px;
-	padding: 2px;
+	gap: 0.125rem;
+	padding: 0.125rem;
 }
 
 .newtab__match-btn {
 	background: none;
 	border: none;
-	border-radius: calc(var(--radius-full) - 2px);
+	border-radius: calc(var(--radius-full) - 0.125rem);
 	color: var(--text-secondary);
 	cursor: pointer;
 	font-family: var(--font-display);
 	font-size: 0.75rem;
 	font-weight: 500;
-	padding: 3px var(--space-sm);
+	padding: 0.1875rem var(--space-sm);
 	transition: background 0.12s, color 0.12s;
 
 	&:hover { color: var(--text-primary); }
@@ -988,14 +997,14 @@ body {
 
 .newtab__select-toggle {
 	background: none;
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-full);
 	color: var(--text-secondary);
 	cursor: pointer;
 	font-family: var(--font-display);
 	font-size: 0.75rem;
 	font-weight: 500;
-	padding: 3px var(--space-sm);
+	padding: 0.1875rem var(--space-sm);
 	transition: background 0.15s, border-color 0.15s, color 0.15s;
 
 	&:hover {
@@ -1015,7 +1024,7 @@ body {
 .newtab__bulk-bar {
 	align-items: center;
 	background: var(--bg-elevated);
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-lg);
 	display: flex;
 	flex-wrap: wrap;
@@ -1040,13 +1049,13 @@ body {
 
 .newtab__bulk-tag-input {
 	background: var(--bg-surface);
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-sm);
 	color: var(--text-primary);
 	font-family: var(--font-display);
 	font-size: 0.8125rem;
 	outline: none;
-	padding: 4px var(--space-sm);
+	padding: 0.25rem var(--space-sm);
 	text-transform: uppercase;
 	transition: border-color 0.15s;
 	width: 8rem;
@@ -1058,15 +1067,15 @@ body {
 .newtab__bulk-btn {
 	align-items: center;
 	background: none;
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-sm);
 	color: var(--text-secondary);
 	cursor: pointer;
 	display: flex;
 	font-family: var(--font-display);
 	font-size: 0.75rem;
-	gap: 4px;
-	padding: 4px var(--space-sm);
+	gap: 0.25rem;
+	padding: 0.25rem var(--space-sm);
 	transition: background 0.12s, border-color 0.12s, color 0.12s;
 	white-space: nowrap;
 
@@ -1084,18 +1093,18 @@ body {
 
 	.newtab__tags-item-actions {
 		background: var(--bg-elevated);
-		border: 1px solid var(--border);
+		border: 0.0625rem solid var(--border);
 		border-radius: var(--radius-sm);
 		box-shadow: var(--shadow-sm);
 		display: flex;
 		flex-direction: row;
-		gap: 1px;
+		gap: 0.0625rem;
 		left: 50%;
 		opacity: 0;
-		padding: 2px;
+		padding: 0.125rem;
 		pointer-events: none;
 		position: absolute;
-		top: calc(100% + 5px);
+		top: calc(100% + 0.3125rem);
 		transform: translateX(-50%);
 		transition: opacity 0.12s ease;
 		z-index: 20;
@@ -1108,11 +1117,11 @@ body {
 			color: var(--text-tertiary);
 			cursor: pointer;
 			display: flex;
-			height: 22px;
+			height: 1.375rem;
 			justify-content: center;
 			padding: 0;
 			transition: color 0.12s, background 0.12s;
-			width: 22px;
+			width: 1.375rem;
 
 			&:hover {
 				background: var(--surface-dark-10);
@@ -1130,16 +1139,16 @@ body {
 
 .newtab__tags-rename-input {
 	background: var(--bg-elevated);
-	border: 1px solid var(--border-focus);
+	border: 0.0625rem solid var(--border-focus);
 	border-radius: var(--radius-full);
 	box-shadow: var(--shadow-focus);
 	color: var(--text-primary);
 	font-family: var(--font-display);
 	font-size: 0.8125rem;
 	font-weight: 500;
-	min-width: 100px;
+	min-width: 6.25rem;
 	outline: none;
-	padding: 4px var(--space-sm);
+	padding: 0.25rem var(--space-sm);
 	text-transform: uppercase;
 	width: auto;
 }
@@ -1148,7 +1157,7 @@ body {
 	align-items: center;
 	display: flex;
 	gap: var(--space-xs);
-	padding: 2px var(--space-xs);
+	padding: 0.125rem var(--space-xs);
 	width: 100%;
 
 	> span {
@@ -1169,11 +1178,11 @@ body {
 		border-radius: var(--radius-sm);
 		cursor: pointer;
 		display: flex;
-		height: 22px;
+		height: 1.375rem;
 		justify-content: center;
 		padding: 0;
 		transition: color 0.12s;
-		width: 22px;
+		width: 1.375rem;
 
 		&.confirm { color: var(--status-error); &:hover { color: #C83030; } }
 		&.cancel  { color: var(--text-tertiary); &:hover { color: var(--text-primary); } }
@@ -1182,14 +1191,14 @@ body {
 
 .newtab__tags-merge-select {
 	background: var(--bg-elevated);
-	border: 1px solid var(--border-focus);
+	border: 0.0625rem solid var(--border-focus);
 	border-radius: var(--radius-full);
 	color: var(--text-primary);
 	font-family: var(--font-display);
 	font-size: 0.8125rem;
-	min-width: 120px;
+	min-width: 7.5rem;
 	outline: none;
-	padding: 4px var(--space-sm);
+	padding: 0.25rem var(--space-sm);
 	text-transform: uppercase;
 	width: auto;
 

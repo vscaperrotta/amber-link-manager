@@ -22,7 +22,7 @@
 }
 
 .skeleton--text {
-	height: 12px;
+	height: 0.75rem;
 }
 
 .skeleton--circle {
@@ -59,13 +59,13 @@
 	display: flex;
 	flex: 1;
 	flex-direction: column;
-	gap: 6px;
+	gap: 0.375rem;
 }
 
 // ── SkeletonLinkCard (newtab grid-style) ────────────────────
 .skeleton-link-card {
 	background: var(--bg-surface);
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-md);
 	overflow: hidden;
 }
@@ -73,6 +73,6 @@
 .skeleton-link-card__body {
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	gap: 0.375rem;
 	padding: var(--space-sm);
 }

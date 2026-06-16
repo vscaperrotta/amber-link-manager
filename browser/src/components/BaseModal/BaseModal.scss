@@ -39,9 +39,9 @@
 	gap: var(--space-md);
 	opacity: 0;
 	padding: var(--space-lg);
-	transform: translateY(8px) scale(0.98);
+	transform: translateY(0.5rem) scale(0.98);
 	transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
-	width: min(480px, calc(100% - 2rem));
+	width: min(30rem, calc(100% - 2rem));
 
 	.modal__overlay--open & {
 		opacity: 1;
@@ -97,7 +97,7 @@
 	justify-content: flex-end;
 	gap: var(--space-sm);
 	padding-top: var(--space-sm);
-	border-top: 1px solid var(--border);
+	border-top: 0.0625rem solid var(--border);
 	margin-top: var(--space-xs);
 }
 
@@ -105,10 +105,10 @@
 
 .user-dropdown {
 	background: var(--bg-elevated);
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-md);
-	min-width: 220px;
+	min-width: 13.75rem;
 	z-index: 9999;
 
 	.user-dropdown__header {
@@ -121,7 +121,7 @@
 	.user-dropdown__identity {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 0.125rem;
 		min-width: 0;
 		overflow: hidden;
 	}
@@ -145,7 +145,7 @@
 
 	.user-dropdown__divider {
 		background: var(--border);
-		height: 1px;
+		height: 0.0625rem;
 		margin: 0;
 	}
 

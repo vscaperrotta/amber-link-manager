@@ -4,7 +4,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--space-xs);
-	min-height: 24px;
+	min-height: 1.5rem;
 }
 
 .tag-editor__input-wrapper {
@@ -14,15 +14,15 @@
 .tag-editor__add {
 	align-items: center;
 	background: none;
-	border: 1px dashed var(--border);
+	border: 0.0625rem dashed var(--border);
 	border-radius: var(--radius-sm);
 	color: var(--text-secondary);
 	cursor: pointer;
 	display: inline-flex;
-	height: 20px;
+	height: 1.25rem;
 	justify-content: center;
 	opacity: 0.7;
-	padding: 0 4px;
+	padding: 0 0.25rem;
 	transition: opacity 0.15s ease;
 
 	&:hover {
@@ -32,19 +32,19 @@
 
 .tag-editor__input {
 	background: var(--bg-elevated);
-	border: 1px solid var(--accent);
+	border: 0.0625rem solid var(--accent);
 	border-radius: var(--radius-sm);
 	color: var(--text-primary);
-	font-size: 11px;
-	height: 20px;
+	font-size: 0.6875rem;
+	height: 1.25rem;
 	outline: none;
 	padding: 0 var(--space-xs);
-	width: 80px;
+	width: 5rem;
 }
 
 .tag-editor__suggestions {
 	background: var(--bg-surface);
-	border: 1px solid var(--border);
+	border: 0.0625rem solid var(--border);
 	border-radius: var(--radius-sm);
 	box-shadow: var(--shadow-lg);
 	display: flex;
@@ -52,7 +52,7 @@
 	left: 0;
 	overflow: hidden;
 	position: absolute;
-	top: calc(100% + 4px);
+	top: calc(100% + 0.25rem);
 	z-index: 100;
 }
 
@@ -61,7 +61,7 @@
 	border: none;
 	color: var(--text-secondary);
 	cursor: pointer;
-	font-size: 11px;
+	font-size: 0.6875rem;
 	padding: var(--space-xs) var(--space-sm);
 	text-align: left;
 

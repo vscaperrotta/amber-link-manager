@@ -3,16 +3,16 @@
 	--font-display: 'Outfit', system-ui, sans-serif;
 	--font-mono: 'Geist Mono', 'JetBrains Mono', monospace;
 
-	--radius-sm: 6px;
-	--radius-md: 10px;
-	--radius-lg: 14px;
-	--radius-full: 9999px;
+	--radius-sm: 0.375rem;
+	--radius-md: 0.625rem;
+	--radius-lg: 0.875rem;
+	--radius-full: 624.9375rem;
 
-	--popup-width: 360px;
-	--popup-height: 560px;
-	--topbar-height: 52px;
-	--sidebar-width: 220px;
-	--newtab-sidebar-width-collapsed: 70px;
+	--popup-width: 22.5rem;
+	--popup-height: 35rem;
+	--topbar-height: 3.25rem;
+	--sidebar-width: 13.75rem;
+	--newtab-sidebar-width-collapsed: 4.375rem;
 
 	--space-2xs: 0.125rem;
 	--space-xs:  0.25rem;
@@ -70,12 +70,12 @@
 		--status-info:     #5096F0;
 		--status-archived: #A0A0B4;
 
-		--shadow-sm:    0 1px 4px rgba(0, 0, 0, .55);
-		--shadow-md:    0 4px 20px rgba(0, 0, 0, .60);
-		--shadow-lg:    0 8px 36px rgba(0, 0, 0, .70);
-		--shadow-card:  0 2px 8px rgba(0, 0, 0, .40);
-		--shadow-focus: 0 0 0 2px rgba(255, 255, 255, .12);
-		--shadow-amber: 0 0 0 2px rgba(244, 161, 53, .30);
+		--shadow-sm:    0 0.0625rem 0.25rem rgba(0, 0, 0, .55);
+		--shadow-md:    0 0.25rem 1.25rem rgba(0, 0, 0, .60);
+		--shadow-lg:    0 0.5rem 2.25rem rgba(0, 0, 0, .70);
+		--shadow-card:  0 0.125rem 0.5rem rgba(0, 0, 0, .40);
+		--shadow-focus: 0 0 0 0.125rem rgba(255, 255, 255, .12);
+		--shadow-amber: 0 0 0 0.125rem rgba(244, 161, 53, .30);
 	}
 }
 
@@ -115,11 +115,11 @@
 		--status-info:     #2060C8;
 		--status-archived: #8888A0;
 
-		--shadow-sm:    0 1px 4px rgba(0, 0, 0, .10);
-		--shadow-md:    0 4px 20px rgba(0, 0, 0, .12);
-		--shadow-lg:    0 8px 36px rgba(0, 0, 0, .16);
-		--shadow-card:  0 2px 8px rgba(0, 0, 0, .06);
-		--shadow-focus: 0 0 0 2px rgba(0, 0, 0, .10);
-		--shadow-amber: 0 0 0 2px rgba(212, 135, 10, .25);
+		--shadow-sm:    0 0.0625rem 0.25rem rgba(0, 0, 0, .10);
+		--shadow-md:    0 0.25rem 1.25rem rgba(0, 0, 0, .12);
+		--shadow-lg:    0 0.5rem 2.25rem rgba(0, 0, 0, .16);
+		--shadow-card:  0 0.125rem 0.5rem rgba(0, 0, 0, .06);
+		--shadow-focus: 0 0 0 0.125rem rgba(0, 0, 0, .10);
+		--shadow-amber: 0 0 0 0.125rem rgba(212, 135, 10, .25);
 	}
 }

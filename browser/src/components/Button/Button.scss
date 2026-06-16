@@ -1,15 +1,15 @@
 .button {
 	align-items: center;
 	display: flex;
-	height: 40px;
+	height: 2.5rem;
 	justify-content: center;
 	gap: var(--space-sm);
 	padding: 0 var(--space-md);
-	border: 1px solid transparent;
+	border: 0.0625rem solid transparent;
 	border-radius: var(--radius-sm);
 	cursor: pointer;
 	font-family: var(--font-display);
-	font-size: 14px;
+	font-size: 0.875rem;
 	font-weight: 600;
 	transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 
@@ -72,15 +72,15 @@
 	// ── Sizes ─────────────────────────────────────────────────
 
 	&.button--medium {
-		height: 40px;
+		height: 2.5rem;
 		padding: 0 var(--space-md);
-		font-size: 14px;
+		font-size: 0.875rem;
 	}
 
 	&.button--small {
-		height: 32px;
+		height: 2rem;
 		padding: 0 var(--space-sm);
-		font-size: 12px;
+		font-size: 0.75rem;
 	}
 
 	// ── State ─────────────────────────────────────────────────

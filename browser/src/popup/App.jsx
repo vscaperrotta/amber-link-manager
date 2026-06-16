@@ -1,8 +1,11 @@
-import { useState, useMemo } from 'react';
-import { Settings, Trash2, Plus, Search, Bookmark } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Settings, Trash2, Plus, Search, Bookmark, Pin } from 'lucide-react';
 import Browser from 'webextension-polyfill';
 import { APP_NAME } from '../common/constants.js';
 import { useLinks } from '@utils/useLinks';
+import { useAuth } from '@contexts/AuthContext.jsx';
+import { useUserSettings } from '@utils/useUserSettings';
+import { getCurrentTab } from '@utils/tabs';
 import { goToSettings } from '@utils/globalMethods.js';
 import Button from '@components/Button';
 import IconButton from '@components/IconButton';
@@ -19,6 +22,8 @@ import '@styles/layout/popup.scss';
 
 export default function App() {
 	const { links, loading, saveCurrentTab, saveCustomLink, deleteLink, updateLink } = useLinks();
+	const { user } = useAuth();
+	const { settings, updateSettings } = useUserSettings();
 
 	const [addManually, setAddManually] = useState(false);
 	const [customUrl, setCustomUrl] = useState('');
@@ -27,6 +32,30 @@ export default function App() {
 	const [saving, setSaving] = useState(false);
 	const [saveError, setSaveError] = useState('');
 	const [searchQuery, setSearchQuery] = useState('');
+
+	const headerLinks = useMemo(() => settings.headerLinks || [], [settings.headerLinks]);
+
+	const [currentTab, setCurrentTab] = useState({ url: '', title: '' });
+
+	useEffect(() => {
+		getCurrentTab().then(setCurrentTab);
+	}, []);
+
+	const isCurrentTabInHeader = headerLinks.some((l) => l.url === currentTab.url);
+
+	function handleToggleCurrentTabHeaderLink() {
+		if (!user || !currentTab.url) return;
+		if (isCurrentTabInHeader) {
+			updateSettings({ headerLinks: headerLinks.filter((l) => l.url !== currentTab.url) });
+		} else {
+			const newEntry = {
+				id: Date.now().toString(),
+				label: currentTab.title || currentTab.url,
+				url: currentTab.url,
+			};
+			updateSettings({ headerLinks: [...headerLinks, newEntry] });
+		}
+	}
 
 	const filteredLinks = useMemo(() => {
 		const q = searchQuery.trim().toLowerCase();
@@ -112,11 +141,20 @@ export default function App() {
 					<img src="/icons/icon16.png" alt="" className="popup__header-mark" width={16} height={16} />
 					<h2 className="popup__title">{APP_NAME}</h2>
 				</div>
-				<IconButton
-					icon={<Settings size={18} />}
-					onClick={goToSettings}
-					title={t('common.settings')}
-				/>
+				<div className="popup__header-actions">
+					<IconButton
+						icon={<Pin size={17} fill={isCurrentTabInHeader ? 'currentColor' : 'none'} />}
+						onClick={handleToggleCurrentTabHeaderLink}
+						disabled={!user || !currentTab.url}
+						title={isCurrentTabInHeader ? t('popup.removeFromHeaderLinks') : t('popup.addToHeaderLinks')}
+						className={isCurrentTabInHeader ? 'is-active' : ''}
+					/>
+					<IconButton
+						icon={<Settings size={18} />}
+						onClick={goToSettings}
+						title={t('common.settings')}
+					/>
+				</div>
 			</header>
 
 			<div className="popup__top">

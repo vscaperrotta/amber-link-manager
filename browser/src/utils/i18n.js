@@ -25,6 +25,9 @@ const translations = {
 		'popup.noResults': 'No links match.',
 		'popup.searchPlaceholder': 'Search saved links...',
 		'popup.openFullView': 'Open full library →',
+		'popup.addToHeaderLinks': 'Add to link bar',
+		'popup.removeFromHeaderLinks': 'Remove from link bar',
+		'popup.headerLinksLoginRequired': 'Sign in to use the link bar',
 
 		// ── HomeView ──────────────────────────────────────────
 		'homeView.linksCount': ({ count }) => `${count} link${count === 1 ? '' : 's'} saved`,
@@ -237,6 +240,9 @@ const translations = {
 		'popup.noResults': 'Nessun link trovato.',
 		'popup.searchPlaceholder': 'Cerca nei link salvati...',
 		'popup.openFullView': 'Apri libreria completa →',
+		'popup.addToHeaderLinks': 'Aggiungi alla barra link',
+		'popup.removeFromHeaderLinks': 'Rimuovi dalla barra link',
+		'popup.headerLinksLoginRequired': 'Accedi per usare la barra link',
 
 		// ── HomeView ──────────────────────────────────────────
 		'homeView.linksCount': ({ count }) => `${count} link salvat${count === 1 ? 'o' : 'i'}`,
