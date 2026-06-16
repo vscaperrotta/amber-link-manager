@@ -29,7 +29,7 @@ class LocalStorageService {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE links(
@@ -40,7 +40,8 @@ class LocalStorageService {
             savedAt INTEGER NOT NULL,
             is_favorite INTEGER NOT NULL DEFAULT 0,
             is_read INTEGER NOT NULL DEFAULT 1,
-            ai_description TEXT DEFAULT ''
+            ai_description TEXT DEFAULT '',
+            thumbnail TEXT DEFAULT ''
           )
         ''');
       },
@@ -49,8 +50,6 @@ class LocalStorageService {
           await db.execute(
             'ALTER TABLE links ADD COLUMN tags TEXT NOT NULL DEFAULT \'\'',
           );
-          // Rinomina createdAt → savedAt solo se la colonna esiste ancora
-          // (migration sicura: aggiunge savedAt ricavato da createdAt)
           try {
             await db.execute(
               'ALTER TABLE links ADD COLUMN savedAt INTEGER NOT NULL DEFAULT 0',
@@ -58,9 +57,7 @@ class LocalStorageService {
             await db.execute(
               'UPDATE links SET savedAt = CAST(strftime(\'%s\', createdAt) * 1000 AS INTEGER) WHERE savedAt = 0',
             );
-          } catch (_) {
-            // savedAt potrebbe già esistere
-          }
+          } catch (_) {}
         }
         if (oldVersion < 3) {
           await db.execute(
@@ -73,6 +70,11 @@ class LocalStorageService {
           );
           await db.execute(
             'ALTER TABLE links ADD COLUMN ai_description TEXT DEFAULT \'\'',
+          );
+        }
+        if (oldVersion < 5) {
+          await db.execute(
+            'ALTER TABLE links ADD COLUMN thumbnail TEXT DEFAULT \'\'',
           );
         }
       },

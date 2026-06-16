@@ -30,6 +30,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
   bool _isSaving = false;
   bool _isFetchingTitle = false;
   List<String> _tagSuggestions = [];
+  String? _thumbnail;
 
   @override
   void initState() {
@@ -116,15 +117,17 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
   Future<void> _fetchTitle() async {
     final url = _urlController.text.trim();
     if (url.isEmpty || !_isValidUrl(url)) return;
-    // Non sovrascrivere un titolo già inserito manualmente
     if (_titleController.text.trim().isNotEmpty) return;
 
     setState(() => _isFetchingTitle = true);
-    final fetched = await MetadataService.fetchTitle(url);
-    if (mounted && fetched != null && _titleController.text.trim().isEmpty) {
-      _titleController.text = fetched;
+    final meta = await MetadataService.fetchMetadata(url);
+    if (mounted) {
+      if (meta.title != null && _titleController.text.trim().isEmpty) {
+        _titleController.text = meta.title!;
+      }
+      _thumbnail = meta.thumbnail;
+      setState(() => _isFetchingTitle = false);
     }
-    if (mounted) setState(() => _isFetchingTitle = false);
   }
 
   bool _isValidUrl(String url) {
@@ -153,7 +156,12 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
     final provider = context.read<LinkProvider>();
     final auth = context.read<AuthProvider>();
 
-    final link = await provider.addLink(url: url, title: title, tags: tags);
+    final link = await provider.addLink(
+      url: url,
+      title: title,
+      tags: tags,
+      thumbnail: _thumbnail,
+    );
 
     if (mounted) Navigator.pop(context, true);
 

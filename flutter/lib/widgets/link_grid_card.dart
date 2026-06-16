@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -206,11 +207,30 @@ class LinkGridCard extends StatelessWidget {
             width: link.isRead ? 1.0 : 1.5,
           ),
         ),
-        padding: const EdgeInsets.all(11),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Thumbnail (Raindrop-style top image)
+            if (link.thumbnail != null && link.thumbnail!.isNotEmpty)
+              CachedNetworkImage(
+                imageUrl: link.thumbnail!,
+                width: double.infinity,
+                height: 110,
+                fit: BoxFit.cover,
+                errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                placeholder: (_, __) => Container(
+                  height: 110,
+                  color: VoidColors.darkBgElevated,
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.all(11),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
             // Row: domain + eye + star
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -292,6 +312,9 @@ class LinkGridCard extends StatelessWidget {
               ],
             ),
           ),
+            ],
+          ),
+        ),
     );
   }
 }
