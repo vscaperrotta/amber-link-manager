@@ -32,6 +32,8 @@ All clients share the same product model:
 
 Always `cd` into the relevant sub-project before running commands. Each manages its own dependencies and build independently.
 
+**Package manager: npm only — never yarn**, across all sub-projects. Don't introduce or commit a `yarn.lock`.
+
 ## Design System
 
 Void v2 — see [`DESIGN.md`](DESIGN.md) for full token reference. Key tokens:

@@ -6,14 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Node requirement:** Node.js ≥ 22 (`.nvmrc` → `22.22.2`). Run `nvm use` before any command.
 
+**Package manager: npm only — never yarn.** Lockfile is `package-lock.json`. Don't run `yarn install`/`yarn build`/etc., and don't commit a `yarn.lock`.
+
 ```bash
-npm install           # install dependencies
-npm dev               # development mode (Vite HMR)
-npm build             # production: clear → vite build → generate manifest.json → zip
-npm lint              # ESLint
-npm clear             # delete dist/
-npm storybook         # component dev server on :6006
-npm build-storybook   # build static storybook
+npm install                # install dependencies
+npm run dev                 # development mode (Vite HMR)
+npm run build                # production: clear → vite build → generate manifest.json → zip
+npm run lint                # ESLint
+npm run clear                # delete dist/
+npm run storybook           # component dev server on :6006
+npm run build-storybook     # build static storybook
 ```
 
 Load the extension: `chrome://extensions/` → "Developer mode" → "Load unpacked" → select `dist/`.
