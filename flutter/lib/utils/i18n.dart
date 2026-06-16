@@ -53,6 +53,13 @@ const Map<String, Map<String, String>> _translations = {
     'addLink.tagsLabel': 'Tags (comma-separated)',
     'addLink.tagsHint': 'SPORT, TECH, NEWS',
 
+    // Edit Link
+    'editLink.title': 'Edit Link',
+    'editLink.titleLabel': 'Title',
+    'editLink.descriptionLabel': 'Description (optional)',
+    'editLink.tagsLabel': 'Tags (comma-separated)',
+    'editLink.save': 'Save changes',
+
     // Auth
     'auth.signIn': 'Sign in',
     'auth.signUp': 'Register',
@@ -77,22 +84,17 @@ const Map<String, Map<String, String>> _translations = {
 
     // Link Card
     'linkCard.cannotOpen': 'Cannot open this link',
+    'linkCard.editTooltip': 'Edit',
     'linkCard.addFavorite': 'Add to favorites',
     'linkCard.removeFavorite': 'Remove from favorites',
     'linkCard.timeNow': 'now',
     'linkCard.timeDays': '{n}d',
-
-    // Grid Card actions
-    'gridCard.edit': 'Edit',
-    'gridCard.editNotImpl': 'Edit not available yet',
-    'gridCard.toggleRead': 'Toggle read',
 
     // Options / Settings screen
     'options.title': 'Settings',
     'options.sectionAccount': 'Account',
     'options.sectionCollection': 'Collection',
     'options.sectionAI': 'AI Descriptions',
-    'options.sectionPreferences': 'Preferences',
     'options.signedInAs': 'Signed in as',
     'options.signOut': 'Sign out',
     'options.signIn': 'Sign in / Register',
@@ -105,9 +107,6 @@ const Map<String, Map<String, String>> _translations = {
     'options.generating': 'Generating… {done} / {total}',
     'options.generateDone': 'Done — {n} generated',
     'options.generateError': 'Error — check your API key',
-    'options.defaultView': 'Default view',
-    'options.viewList': 'List',
-    'options.viewGrid': 'Grid',
     'options.save': 'Save',
     'options.saved': 'Saved',
 
@@ -190,6 +189,13 @@ const Map<String, Map<String, String>> _translations = {
     'addLink.tagsLabel': 'Tag (separati da virgola)',
     'addLink.tagsHint': 'SPORT, TECH, NEWS',
 
+    // Edit Link
+    'editLink.title': 'Modifica Link',
+    'editLink.titleLabel': 'Titolo',
+    'editLink.descriptionLabel': 'Descrizione (opzionale)',
+    'editLink.tagsLabel': 'Tag (separati da virgola)',
+    'editLink.save': 'Salva modifiche',
+
     // Auth
     'auth.signIn': 'Accedi',
     'auth.signUp': 'Registrati',
@@ -214,22 +220,17 @@ const Map<String, Map<String, String>> _translations = {
 
     // Link Card
     'linkCard.cannotOpen': 'Impossibile aprire il link',
+    'linkCard.editTooltip': 'Modifica',
     'linkCard.addFavorite': 'Aggiungi ai preferiti',
     'linkCard.removeFavorite': 'Rimuovi dai preferiti',
     'linkCard.timeNow': 'ora',
     'linkCard.timeDays': '{n}g',
-
-    // Grid Card actions
-    'gridCard.edit': 'Modifica',
-    'gridCard.editNotImpl': 'Modifica non ancora disponibile',
-    'gridCard.toggleRead': 'Segna come letto',
 
     // Options / Settings screen
     'options.title': 'Impostazioni',
     'options.sectionAccount': 'Account',
     'options.sectionCollection': 'Collezione',
     'options.sectionAI': 'Descrizioni AI',
-    'options.sectionPreferences': 'Preferenze',
     'options.signedInAs': 'Accesso come',
     'options.signOut': 'Esci',
     'options.signIn': 'Accedi / Registrati',
@@ -242,9 +243,6 @@ const Map<String, Map<String, String>> _translations = {
     'options.generating': 'Generazione… {done} / {total}',
     'options.generateDone': 'Completato — {n} generate',
     'options.generateError': 'Errore — controlla la chiave API',
-    'options.defaultView': 'Vista predefinita',
-    'options.viewList': 'Lista',
-    'options.viewGrid': 'Griglia',
     'options.save': 'Salva',
     'options.saved': 'Salvato',
 

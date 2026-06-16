@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/link_item.dart';
 import '../providers/link_provider.dart';
 import '../theme/void_colors.dart';
 import '../utils/i18n.dart';
 import '../widgets/link_card.dart';
-import '../widgets/link_grid_card.dart';
 
 // ── Time bucket helpers ────────────────────────────────────────────────────────
 
@@ -50,24 +48,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isGridView = false;
   bool _showUnreadOnly = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadDefaultView();
-  }
-
-  Future<void> _loadDefaultView() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isGrid = prefs.getBool('default_view_grid') ?? false;
-    if (mounted) setState(() => _isGridView = isGrid);
-  }
-
   // Groups links into ordered buckets, returns a flat list of header + item widgets.
-  List<Widget> _buildGroupedList(
-      BuildContext context, List<LinkItem> links, bool swipeEnabled) {
+  List<Widget> _buildGroupedList(BuildContext context, List<LinkItem> links) {
     final grouped = <_TimeBucket, List<LinkItem>>{};
     for (final link in links) {
       final b = _bucketFor(link.createdAt);
@@ -84,45 +68,37 @@ class _HomeScreenState extends State<HomeScreen> {
       items.add(_GroupHeader(label: _bucketLabel(bucket)));
 
       for (final link in bucketLinks) {
-        if (swipeEnabled) {
-          items.add(LinkCard(
-            key: ValueKey(link.id),
-            link: link,
-            onFavoriteToggle: () =>
-                context.read<LinkProvider>().toggleFavorite(link.id),
-            onDismissConfirm: () => showDialog<bool>(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text(t('dialog.deleteTitle')),
-                content: Text(t('dialog.deleteMessage')),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: Text(t('common.cancel')),
+        items.add(LinkCard(
+          key: ValueKey(link.id),
+          link: link,
+          onFavoriteToggle: () =>
+              context.read<LinkProvider>().toggleFavorite(link.id),
+          onDismissConfirm: () => showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(t('dialog.deleteTitle')),
+              content: Text(t('dialog.deleteMessage')),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: Text(t('common.cancel')),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: Text(
+                    t('common.delete'),
+                    style:
+                        const TextStyle(color: VoidColors.darkStatusError),
                   ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: Text(
-                      t('common.delete'),
-                      style:
-                          const TextStyle(color: VoidColors.darkStatusError),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            onDismissed: () =>
-                context.read<LinkProvider>().deleteLink(link.id),
-            onReadToggle: () =>
-                context.read<LinkProvider>().toggleRead(link.id),
-          ));
-        } else {
-          // Grid mode: use LinkGridCard wrapped (no swipe)
-          items.add(Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
-            child: LinkGridCard(link: link),
-          ));
-        }
+          ),
+          onDismissed: () =>
+              context.read<LinkProvider>().deleteLink(link.id),
+          onReadToggle: () =>
+              context.read<LinkProvider>().toggleRead(link.id),
+        ));
       }
     }
 
@@ -145,15 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
           style: GoogleFonts.outfit(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(
-              _isGridView ? Icons.view_list : Icons.grid_view,
-              color: VoidColors.darkTextTertiary,
-            ),
-            onPressed: () => setState(() => _isGridView = !_isGridView),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,9 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: VoidColors.darkAccent))
                   : filteredLinks.isEmpty
                       ? _buildEmptyState()
-                      : _isGridView
-                          ? _buildLinkGrid(context, filteredLinks)
-                          : _buildGroupedListView(context, filteredLinks),
+                      : _buildGroupedListView(context, filteredLinks),
             ),
           ),
         ],
@@ -231,60 +196,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildGroupedListView(BuildContext context, List<LinkItem> links) {
-    final items = _buildGroupedList(context, links, true);
+    final items = _buildGroupedList(context, links);
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 96),
       itemCount: items.length,
       itemBuilder: (_, i) => items[i],
     );
-  }
-
-  Widget _buildLinkGrid(BuildContext context, List<LinkItem> links) {
-    final grouped = <_TimeBucket, List<LinkItem>>{};
-    for (final link in links) {
-      grouped.putIfAbsent(_bucketFor(link.createdAt), () => []).add(link);
-    }
-
-    final slivers = <Widget>[];
-    for (final bucket in _TimeBucket.values) {
-      final bucketLinks = grouped[bucket];
-      if (bucketLinks == null || bucketLinks.isEmpty) continue;
-
-      slivers.add(SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 16, 14, 6),
-          child: Text(
-            _bucketLabel(bucket).toUpperCase(),
-            style: GoogleFonts.outfit(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: VoidColors.darkTextTertiary,
-              letterSpacing: 0.6,
-            ),
-          ),
-        ),
-      ));
-
-      slivers.add(SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        sliver: SliverGrid(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 6,
-            mainAxisSpacing: 6,
-            childAspectRatio: 0.72,
-          ),
-          delegate: SliverChildBuilderDelegate(
-            (ctx, i) => LinkGridCard(link: bucketLinks[i]),
-            childCount: bucketLinks.length,
-          ),
-        ),
-      ));
-    }
-
-    slivers.add(const SliverToBoxAdapter(child: SizedBox(height: 96)));
-
-    return CustomScrollView(slivers: slivers);
   }
 }
 

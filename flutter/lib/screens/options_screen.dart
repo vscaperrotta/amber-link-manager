@@ -30,12 +30,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
   int _genTotal = 0;
   String? _genResult;
 
-  // Preferences
-  bool _defaultGrid = false;
-
   static const _prefApiKey = 'openrouter_api_key';
   static const _prefModel = 'openrouter_model';
-  static const _prefDefaultGrid = 'default_view_grid';
   static const _defaultModel = 'openai/gpt-4o-mini';
 
   @override
@@ -72,7 +68,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
       setState(() {
         _apiKeyController.text = apiKey;
         _modelController.text = model;
-        _defaultGrid = prefs.getBool(_prefDefaultGrid) ?? false;
       });
     }
   }
@@ -117,12 +112,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
       } catch (_) {}
     }
     messenger.showSnackBar(SnackBar(content: Text(t('options.saved'))));
-  }
-
-  Future<void> _saveDefaultView(bool isGrid) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_prefDefaultGrid, isGrid);
-    setState(() => _defaultGrid = isGrid);
   }
 
   Future<void> _generateDescriptions() async {
@@ -449,34 +438,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
     );
   }
 
-  // ── Preferences section ───────────────────────────────────────────────────
-
-  Widget _buildPreferencesSection() {
-    return _card(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-          child: Row(
-            children: [
-              Text(
-                t('options.defaultView'),
-                style: GoogleFonts.outfit(
-                  fontSize: 14,
-                  color: VoidColors.darkTextPrimary,
-                ),
-              ),
-              const Spacer(),
-              _ViewToggle(
-                isGrid: _defaultGrid,
-                onChanged: _saveDefaultView,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<app.AuthProvider>();
@@ -498,8 +459,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
           _buildCollectionSection(linkProvider),
           _sectionHeader(t('options.sectionAI')),
           _buildAiSection(),
-          _sectionHeader(t('options.sectionPreferences')),
-          _buildPreferencesSection(),
         ],
       ),
     );
@@ -547,84 +506,3 @@ class _StatChip extends StatelessWidget {
   }
 }
 
-class _ViewToggle extends StatelessWidget {
-  final bool isGrid;
-  final ValueChanged<bool> onChanged;
-  const _ViewToggle({required this.isGrid, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _ToggleChip(
-          label: t('options.viewList'),
-          icon: Icons.view_list,
-          selected: !isGrid,
-          onTap: () => onChanged(false),
-        ),
-        const SizedBox(width: 6),
-        _ToggleChip(
-          label: t('options.viewGrid'),
-          icon: Icons.grid_view,
-          selected: isGrid,
-          onTap: () => onChanged(true),
-        ),
-      ],
-    );
-  }
-}
-
-class _ToggleChip extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-  const _ToggleChip({
-    required this.label,
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: selected ? VoidColors.darkAccentMuted : VoidColors.darkBgElevated,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: selected ? VoidColors.darkAccent : VoidColors.darkBorder,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 14,
-              color: selected
-                  ? VoidColors.darkAccent
-                  : VoidColors.darkTextTertiary,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: GoogleFonts.outfit(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: selected
-                    ? VoidColors.darkAccent
-                    : VoidColors.darkTextTertiary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
