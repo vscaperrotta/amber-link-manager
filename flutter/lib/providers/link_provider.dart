@@ -1,6 +1,23 @@
 import 'package:flutter/material.dart';
 import '../models/link_item.dart';
 import '../services/link_repository.dart';
+import '../utils/normalize_url.dart';
+
+/// Result of [LinkProvider.addLink] — either the newly saved link, or a flag
+/// that it was already saved (with the existing entry attached).
+class AddLinkResult {
+  final LinkItem? link;
+  final bool isDuplicate;
+  final LinkItem? existingLink;
+
+  const AddLinkResult.success(this.link)
+      : isDuplicate = false,
+        existingLink = null;
+
+  const AddLinkResult.duplicate(this.existingLink)
+      : link = null,
+        isDuplicate = true;
+}
 
 class LinkProvider extends ChangeNotifier {
   final LinkRepository _repository = LinkRepository();
@@ -41,12 +58,19 @@ class LinkProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<LinkItem> addLink({
+  Future<AddLinkResult> addLink({
     required String url,
     required String title,
     List<String> tags = const [],
     String? thumbnail,
+    String? collectionId,
   }) async {
+    final normalized = normalizeUrl(url);
+    final existing = _links.where((l) => normalizeUrl(l.url) == normalized);
+    if (existing.isNotEmpty) {
+      return AddLinkResult.duplicate(existing.first);
+    }
+
     final normalizedTags = tags
         .map((t) => t.trim().toUpperCase())
         .where((t) => t.isNotEmpty)
@@ -56,10 +80,11 @@ class LinkProvider extends ChangeNotifier {
       title: title,
       tags: normalizedTags,
       thumbnail: thumbnail,
+      collectionId: collectionId,
     );
     await _repository.addLink(link);
     await loadLinks();
-    return link;
+    return AddLinkResult.success(link);
   }
 
   Future<void> deleteLink(String id) async {

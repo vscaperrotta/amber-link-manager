@@ -6,7 +6,6 @@ const Map<String, Map<String, String>> _translations = {
     'common.save': 'Save',
     'common.cancel': 'Cancel',
     'common.delete': 'Delete',
-    'common.loading': 'Loading...',
     'common.saving': 'Saving...',
 
     // Navigation
@@ -14,7 +13,6 @@ const Map<String, Map<String, String>> _translations = {
     'nav.favorites': 'Favorites',
     'nav.tags': 'Tags',
     'nav.addLink': 'Add link',
-    'nav.signIn': 'Sign in',
     'nav.signOut': 'Sign out',
 
     // Home
@@ -48,6 +46,7 @@ const Map<String, Map<String, String>> _translations = {
     'addLink.urlHint': 'https://example.com',
     'addLink.urlRequired': 'Please enter a URL',
     'addLink.urlInvalid': 'Invalid URL',
+    'addLink.duplicateError': 'This link is already saved.',
     'addLink.titleLabel': 'Title (optional)',
     'addLink.titleHint': 'Link description',
     'addLink.tagsLabel': 'Tags (comma-separated)',
@@ -56,8 +55,9 @@ const Map<String, Map<String, String>> _translations = {
     // Edit Link
     'editLink.title': 'Edit Link',
     'editLink.titleLabel': 'Title',
-    'editLink.descriptionLabel': 'Description (optional)',
     'editLink.tagsLabel': 'Tags (comma-separated)',
+    'editLink.noteLabel': 'Personal note',
+    'editLink.noteHint': 'Your thoughts, context, why you saved this…',
     'editLink.save': 'Save changes',
 
     // Auth
@@ -101,6 +101,8 @@ const Map<String, Map<String, String>> _translations = {
     'options.totalLinks': 'Total links',
     'options.favorites': 'Favorites',
     'options.exportJson': 'Export as JSON',
+    'options.exportSuccess': '{n} links exported',
+    'options.exportError': 'Export failed',
     'options.openRouterKey': 'OpenRouter API key',
     'options.openRouterModel': 'Model',
     'options.generateDescriptions': 'Generate missing descriptions',
@@ -136,13 +138,19 @@ const Map<String, Map<String, String>> _translations = {
     // Read state
     'link.markRead': 'Mark as read',
     'link.markUnread': 'Mark as unread',
+
+    // Collections
+    'collections.fieldLabel': 'Collection',
+    'collections.none': 'No collection',
+    'collections.clearFilter': 'Clear collection filter',
+    'collections.emptyTitle': 'No links in this collection',
+    'collections.emptySubtitle': 'Edit a link and assign it to this collection.',
   },
   'it': {
     // Common
     'common.save': 'Salva',
     'common.cancel': 'Annulla',
     'common.delete': 'Elimina',
-    'common.loading': 'Caricamento...',
     'common.saving': 'Salvataggio...',
 
     // Navigation
@@ -150,7 +158,6 @@ const Map<String, Map<String, String>> _translations = {
     'nav.favorites': 'Preferiti',
     'nav.tags': 'Tag',
     'nav.addLink': 'Aggiungi link',
-    'nav.signIn': 'Accedi',
     'nav.signOut': 'Esci',
 
     // Home
@@ -184,6 +191,7 @@ const Map<String, Map<String, String>> _translations = {
     'addLink.urlHint': 'https://esempio.com',
     'addLink.urlRequired': 'Inserisci un URL',
     'addLink.urlInvalid': 'URL non valido',
+    'addLink.duplicateError': 'Questo link è già stato salvato.',
     'addLink.titleLabel': 'Titolo (opzionale)',
     'addLink.titleHint': 'Descrizione del link',
     'addLink.tagsLabel': 'Tag (separati da virgola)',
@@ -192,8 +200,9 @@ const Map<String, Map<String, String>> _translations = {
     // Edit Link
     'editLink.title': 'Modifica Link',
     'editLink.titleLabel': 'Titolo',
-    'editLink.descriptionLabel': 'Descrizione (opzionale)',
     'editLink.tagsLabel': 'Tag (separati da virgola)',
+    'editLink.noteLabel': 'Nota personale',
+    'editLink.noteHint': 'Pensieri, contesto, perché hai salvato questo link…',
     'editLink.save': 'Salva modifiche',
 
     // Auth
@@ -237,6 +246,8 @@ const Map<String, Map<String, String>> _translations = {
     'options.totalLinks': 'Link totali',
     'options.favorites': 'Preferiti',
     'options.exportJson': 'Esporta come JSON',
+    'options.exportSuccess': '{n} link esportati',
+    'options.exportError': 'Esportazione fallita',
     'options.openRouterKey': 'Chiave API OpenRouter',
     'options.openRouterModel': 'Modello',
     'options.generateDescriptions': 'Genera descrizioni mancanti',
@@ -272,6 +283,13 @@ const Map<String, Map<String, String>> _translations = {
     // Read state
     'link.markRead': 'Segna come letto',
     'link.markUnread': 'Segna come non letto',
+
+    // Collections
+    'collections.fieldLabel': 'Cartella',
+    'collections.none': 'Nessuna cartella',
+    'collections.clearFilter': 'Rimuovi filtro cartella',
+    'collections.emptyTitle': 'Nessun link in questa cartella',
+    'collections.emptySubtitle': 'Modifica un link e assegnalo a questa cartella.',
   },
 };
 

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../models/link_item.dart';
 import '../providers/link_provider.dart';
+import '../providers/collection_provider.dart';
 import '../theme/void_colors.dart';
 import '../utils/i18n.dart';
 import '../widgets/link_card.dart';
@@ -108,8 +109,17 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final linkProvider = context.watch<LinkProvider>();
+    final collectionProvider = context.watch<CollectionProvider>();
+    final collections = collectionProvider.collections;
+    final activeCollectionId = collectionProvider.activeCollectionId;
 
-    final allLinks = linkProvider.links;
+    var allLinks = linkProvider.links;
+
+    // Filter by active collection
+    if (activeCollectionId != null) {
+      allLinks = allLinks.where((l) => l.collectionId == activeCollectionId).toList();
+    }
+
     final filteredLinks = _showUnreadOnly
         ? allLinks.where((l) => !l.isRead).toList()
         : allLinks;
@@ -117,15 +127,53 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          t('home.title'),
+          activeCollectionId != null
+              ? (collectionProvider.activeCollection?.name ?? t('home.title'))
+              : t('home.title'),
           style: GoogleFonts.outfit(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
+        actions: activeCollectionId != null
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  tooltip: t('collections.clearFilter'),
+                  onPressed: () => collectionProvider.setActiveCollection(null),
+                ),
+              ]
+            : null,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Filter chips ─────────────────────────────────────────────────────
+          // ── Collection filter chips ───────────────────────────────────────
+          if (collections.isNotEmpty)
+            SizedBox(
+              height: 44,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                children: [
+                  _CollectionChip(
+                    label: t('home.filterAll'),
+                    selected: activeCollectionId == null,
+                    onTap: () => collectionProvider.setActiveCollection(null),
+                    icon: Icons.inbox_outlined,
+                  ),
+                  const SizedBox(width: 6),
+                  ...collections.map((col) => Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: _CollectionChip(
+                      label: col.name,
+                      selected: activeCollectionId == col.id,
+                      onTap: () => collectionProvider.setActiveCollection(col.id),
+                      icon: Icons.folder_outlined,
+                    ),
+                  )),
+                ],
+              ),
+            ),
+          // ── Filter chips ─────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
             child: Row(
@@ -144,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          // ── Main content ─────────────────────────────────────────────────────
+          // ── Main content ─────────────────────────────────────────────────
           Expanded(
             child: RefreshIndicator(
               onRefresh: () => linkProvider.loadLinks(),
@@ -153,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: CircularProgressIndicator(
                           color: VoidColors.darkAccent))
                   : filteredLinks.isEmpty
-                      ? _buildEmptyState()
+                      ? _buildEmptyState(activeCollectionId != null)
                       : _buildGroupedListView(context, filteredLinks),
             ),
           ),
@@ -162,18 +210,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isFiltered) {
     return ListView(
       children: [
         const SizedBox(height: 200),
         Center(
           child: Column(
             children: [
-              const Icon(Icons.link_off,
-                  size: 64, color: VoidColors.darkTextTertiary),
+              Icon(
+                isFiltered ? Icons.folder_open : Icons.link_off,
+                size: 64,
+                color: VoidColors.darkTextTertiary,
+              ),
               const SizedBox(height: 16),
               Text(
-                t('home.emptyTitle'),
+                isFiltered ? t('collections.emptyTitle') : t('home.emptyTitle'),
                 style: GoogleFonts.outfit(
                   fontSize: 18,
                   color: VoidColors.darkTextTertiary,
@@ -181,7 +232,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                t('home.emptySubtitle'),
+                isFiltered
+                    ? t('collections.emptySubtitle')
+                    : t('home.emptySubtitle'),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.outfit(
                   fontSize: 14,
@@ -201,6 +254,59 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(bottom: 96),
       itemCount: items.length,
       itemBuilder: (_, i) => items[i],
+    );
+  }
+}
+
+// ── Collection chip ────────────────────────────────────────────────────────────
+
+class _CollectionChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final IconData icon;
+
+  const _CollectionChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected ? VoidColors.darkAccentMuted : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: selected ? VoidColors.darkAccent : VoidColors.darkBorder,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: selected ? VoidColors.darkAccent : VoidColors.darkTextSecondary,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: GoogleFonts.outfit(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: selected ? VoidColors.darkAccent : VoidColors.darkTextSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -1,12 +1,12 @@
 import { Fragment, useState, useEffect, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { List, LayoutGrid, Search, Bookmark, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import { List, LayoutGrid, Search, Bookmark, FolderOpen, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import Input from '@components/Input';
-import IconButton from '@components/IconButton';
 import { SkeletonLinkCard } from '@components/Skeleton';
 import EmptyState from '@components/EmptyState';
 import LinkItem from '@newtab/components/LinkItem.jsx';
 import TagFilterBar from '@newtab/components/TagFilterBar.jsx';
+import { extractDomain } from '@utils/domain';
 import { useUserSettings } from '@utils/useUserSettings.js';
 import { t } from '@utils/i18n';
 
@@ -35,7 +35,7 @@ function getPageRange(current, total) {
   return result;
 }
 
-export default function HomeView({ links, loading, auth, onEdit, onDelete, updateLink }) {
+export default function HomeView({ links, loading, auth, onEdit, onDelete, updateLink, activeCollectionId, collections }) {
   const { settings, loading: settingsLoading } = useUserSettings();
   const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,6 +57,18 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
     setCurrentPage(1);
   }, [searchQuery, tagFilters, tagMatchMode, showUnreadOnly, viewMode]);
 
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key !== '/') return;
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      e.preventDefault();
+      document.getElementById('newtab-search-input')?.focus();
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const allTags = useMemo(
     () => [...new Set(links.flatMap(l => l.metadata?.tags || []))].sort(),
     [links]
@@ -70,8 +82,17 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
     return counts;
   }, [links]);
 
+  const activeCollection = useMemo(
+    () => activeCollectionId ? collections.find(c => c.id === activeCollectionId) : null,
+    [activeCollectionId, collections]
+  );
+
   const filtered = useMemo(() => {
     let result = links;
+
+    if (activeCollectionId !== null) {
+      result = result.filter(l => l.metadata?.collectionId === activeCollectionId);
+    }
 
     if (tagFilters.size > 0) {
       const tagArray = [...tagFilters];
@@ -92,12 +113,14 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
       result = result.filter(l =>
         (l.title || '').toLowerCase().includes(q) ||
         l.url.toLowerCase().includes(q) ||
-        (l.metadata?.aiDescription || l.metadata?.description || '').toLowerCase().includes(q)
+        (l.metadata?.aiDescription || l.metadata?.description || '').toLowerCase().includes(q) ||
+        extractDomain(l.url).toLowerCase().includes(q) ||
+        (l.metadata?.tags || []).join(' ').toLowerCase().includes(q)
       );
     }
 
     return result;
-  }, [links, searchQuery, tagFilters, tagMatchMode, showUnreadOnly]);
+  }, [links, searchQuery, tagFilters, tagMatchMode, showUnreadOnly, activeCollectionId]);
 
   // Date grouping only in grid view
   const groupedLinks = useMemo(() => {
@@ -148,12 +171,24 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
       link,
       viewMode,
       featured: !!featured,
+      showDescription: settings.showDescription !== false,
       onEdit: () => onEdit(link),
       onDelete: () => onDelete(link.id),
       allTags,
       onTagSave: (tags) => updateLink(link.id, { metadata: { ...(link.metadata || {}), tags } }),
       onToggleFavorite: () => updateLink(link.id, { metadata: { ...(link.metadata || {}), isFavorite: !link.metadata?.isFavorite } }),
       onToggleRead: () => updateLink(link.id, { metadata: { ...(link.metadata || {}), isRead: link.metadata?.isRead === false ? true : false } }),
+      onResolveSuggestions: (autoTags, remaining) => {
+        const current = link.metadata?.tags ?? [];
+        const merged = [...new Set([...current, ...autoTags])];
+        updateLink(link.id, { metadata: { ...(link.metadata || {}), tags: merged, pendingTagSuggestions: remaining.length > 0 ? remaining : null } });
+      },
+      onAcceptSuggestedTag: (tag) => {
+        const current = link.metadata?.tags ?? [];
+        const remaining = (link.metadata?.pendingTagSuggestions ?? []).filter(t => t.toUpperCase() !== tag.toUpperCase());
+        updateLink(link.id, { metadata: { ...(link.metadata || {}), tags: [...new Set([...current, tag.toUpperCase()])], pendingTagSuggestions: remaining.length > 0 ? remaining : null } });
+      },
+      onDismissSuggestions: () => updateLink(link.id, { metadata: { ...(link.metadata || {}), pendingTagSuggestions: null } }),
     };
   }
 
@@ -200,18 +235,6 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
 
   return (
     <>
-      {allTags.length > 0 && (
-        <TagFilterBar
-          tags={allTags}
-          activeTags={tagFilters}
-          onToggle={toggleTagFilter}
-          onClear={() => setTagFilters(new Set())}
-          tagCounts={tagCounts}
-          matchMode={tagMatchMode}
-          onMatchModeChange={setTagMatchMode}
-        />
-      )}
-
       <div className="newtab__toolbar">
         <div className="newtab__toolbar-left">
           <span className="newtab__toolbar-count">
@@ -224,6 +247,7 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
           </span>
           <div className="newtab__toolbar-search">
             <Input
+              id="newtab-search-input"
               type="text"
               placeholder={t('common.search') + '...'}
               value={searchQuery}
@@ -232,6 +256,13 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
           </div>
         </div>
         <div className="newtab__toolbar-extras">
+          <TagFilterBar
+            tags={allTags}
+            activeTags={tagFilters}
+            onToggle={toggleTagFilter}
+            onClear={() => setTagFilters(new Set())}
+            tagCounts={tagCounts}
+          />
           <button
             type="button"
             className={`newtab__toolbar-pill${showUnreadOnly ? ' newtab__toolbar-pill--active' : ''}`}
@@ -247,21 +278,25 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
             <CalendarDays size={13} />
             {t('homeView.groupByDate')}
           </button>
-          <div className="newtab__toolbar-view">
-            <IconButton
-              icon={<LayoutGrid size={18} />}
-              title={t('homeView.gridView')}
+          <div className="newtab__view-toggle" role="group" aria-label={t('homeView.viewModeLabel')}>
+            <button
+              type="button"
+              className={`newtab__view-toggle-btn${viewMode === 'grid' ? ' is-active' : ''}`}
               onClick={() => setViewMode('grid')}
-              className={viewMode === 'grid' ? 'is-active' : ''}
-              titleVisible
-            />
-            <IconButton
-              icon={<List size={18} />}
-              title={t('homeView.listView')}
+              aria-pressed={viewMode === 'grid'}
+            >
+              <LayoutGrid size={13} />
+              {t('homeView.gridView')}
+            </button>
+            <button
+              type="button"
+              className={`newtab__view-toggle-btn${viewMode === 'list' ? ' is-active' : ''}`}
               onClick={() => setViewMode('list')}
-              className={viewMode === 'list' ? 'is-active' : ''}
-              titleVisible
-            />
+              aria-pressed={viewMode === 'list'}
+            >
+              <List size={13} />
+              {t('homeView.listView')}
+            </button>
           </div>
         </div>
       </div>
@@ -274,9 +309,9 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
         </div>
       ) : filtered.length === 0 ? (
         <EmptyState
-          icon={searchQuery ? <Search size={32} /> : <Bookmark size={32} />}
-          title={t(searchQuery ? 'emptyState.noResults.title' : 'emptyState.noLinks.title')}
-          description={t(searchQuery ? 'emptyState.noResults.description' : 'emptyState.noLinks.description')}
+          icon={searchQuery ? <Search size={32} /> : activeCollectionId ? <FolderOpen size={32} /> : <Bookmark size={32} />}
+          title={t(searchQuery ? 'emptyState.noResults.title' : activeCollectionId ? 'emptyState.noCollectionLinks.title' : 'emptyState.noLinks.title')}
+          description={t(searchQuery ? 'emptyState.noResults.description' : activeCollectionId ? 'emptyState.noCollectionLinks.description' : 'emptyState.noLinks.description')}
         />
       ) : viewMode === 'list' ? (
         <>
@@ -327,10 +362,14 @@ HomeView.propTypes = {
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   updateLink: PropTypes.func,
+  activeCollectionId: PropTypes.string,
+  collections: PropTypes.array,
 };
 
 HomeView.defaultProps = {
   loading: false,
   auth: null,
   updateLink: () => { },
+  activeCollectionId: null,
+  collections: [],
 };

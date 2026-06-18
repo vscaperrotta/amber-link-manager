@@ -2,11 +2,11 @@ import { Fragment, useState, useEffect, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { List, LayoutGrid, Search, Star, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
 import Input from '@components/Input';
-import IconButton from '@components/IconButton';
 import { SkeletonLinkCard } from '@components/Skeleton';
 import EmptyState from '@components/EmptyState';
 import LinkItem from '@newtab/components/LinkItem.jsx';
 import TagFilterBar from '@newtab/components/TagFilterBar.jsx';
+import { extractDomain } from '@utils/domain';
 import { useUserSettings } from '@utils/useUserSettings.js';
 import { t } from '@utils/i18n';
 
@@ -35,7 +35,7 @@ function getPageRange(current, total) {
   return result;
 }
 
-export default function FavoritesView({ links, loading, auth, onEdit, onDelete, updateLink }) {
+export default function FavoritesView({ links, loading, auth, onEdit, onDelete, updateLink, activeCollectionId, collections }) {
   const { settings, loading: settingsLoading } = useUserSettings();
   const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,6 +78,10 @@ export default function FavoritesView({ links, loading, auth, onEdit, onDelete, 
   const filtered = useMemo(() => {
     let result = favorites;
 
+    if (activeCollectionId !== null) {
+      result = result.filter(l => l.metadata?.collectionId === activeCollectionId);
+    }
+
     if (tagFilters.size > 0) {
       const tagArray = [...tagFilters];
       result = result.filter(l => {
@@ -97,12 +101,14 @@ export default function FavoritesView({ links, loading, auth, onEdit, onDelete, 
       result = result.filter(l =>
         (l.title || '').toLowerCase().includes(q) ||
         l.url.toLowerCase().includes(q) ||
-        (l.metadata?.aiDescription || l.metadata?.description || '').toLowerCase().includes(q)
+        (l.metadata?.aiDescription || l.metadata?.description || '').toLowerCase().includes(q) ||
+        extractDomain(l.url).toLowerCase().includes(q) ||
+        (l.metadata?.tags || []).join(' ').toLowerCase().includes(q)
       );
     }
 
     return result;
-  }, [favorites, searchQuery, tagFilters, tagMatchMode, showUnreadOnly]);
+  }, [favorites, searchQuery, tagFilters, tagMatchMode, showUnreadOnly, activeCollectionId]);
 
   const groupedLinks = useMemo(() => {
     if (!groupByDate || viewMode !== 'grid') return null;
@@ -151,12 +157,24 @@ export default function FavoritesView({ links, loading, auth, onEdit, onDelete, 
       link,
       viewMode,
       featured: !!featured,
+      showDescription: settings.showDescription !== false,
       onEdit: () => onEdit(link),
       onDelete: () => onDelete(link.id),
       allTags,
       onTagSave: (tags) => updateLink(link.id, { metadata: { ...(link.metadata || {}), tags } }),
       onToggleFavorite: () => updateLink(link.id, { metadata: { ...(link.metadata || {}), isFavorite: !link.metadata?.isFavorite } }),
       onToggleRead: () => updateLink(link.id, { metadata: { ...(link.metadata || {}), isRead: link.metadata?.isRead === false ? true : false } }),
+      onResolveSuggestions: (autoTags, remaining) => {
+        const current = link.metadata?.tags ?? [];
+        const merged = [...new Set([...current, ...autoTags])];
+        updateLink(link.id, { metadata: { ...(link.metadata || {}), tags: merged, pendingTagSuggestions: remaining.length > 0 ? remaining : null } });
+      },
+      onAcceptSuggestedTag: (tag) => {
+        const current = link.metadata?.tags ?? [];
+        const remaining = (link.metadata?.pendingTagSuggestions ?? []).filter(t => t.toUpperCase() !== tag.toUpperCase());
+        updateLink(link.id, { metadata: { ...(link.metadata || {}), tags: [...new Set([...current, tag.toUpperCase()])], pendingTagSuggestions: remaining.length > 0 ? remaining : null } });
+      },
+      onDismissSuggestions: () => updateLink(link.id, { metadata: { ...(link.metadata || {}), pendingTagSuggestions: null } }),
     };
   }
 
@@ -201,18 +219,6 @@ export default function FavoritesView({ links, loading, auth, onEdit, onDelete, 
 
   return (
     <>
-      {allTags.length > 0 && (
-        <TagFilterBar
-          tags={allTags}
-          activeTags={tagFilters}
-          onToggle={toggleTagFilter}
-          onClear={() => setTagFilters(new Set())}
-          tagCounts={tagCounts}
-          matchMode={tagMatchMode}
-          onMatchModeChange={setTagMatchMode}
-        />
-      )}
-
       <div className="newtab__toolbar">
         <div className="newtab__toolbar-left">
           <span className="newtab__toolbar-count">
@@ -233,6 +239,13 @@ export default function FavoritesView({ links, loading, auth, onEdit, onDelete, 
           </div>
         </div>
         <div className="newtab__toolbar-extras">
+          <TagFilterBar
+            tags={allTags}
+            activeTags={tagFilters}
+            onToggle={toggleTagFilter}
+            onClear={() => setTagFilters(new Set())}
+            tagCounts={tagCounts}
+          />
           <button
             type="button"
             className={`newtab__toolbar-pill${showUnreadOnly ? ' newtab__toolbar-pill--active' : ''}`}
@@ -248,21 +261,25 @@ export default function FavoritesView({ links, loading, auth, onEdit, onDelete, 
             <CalendarDays size={13} />
             {t('homeView.groupByDate')}
           </button>
-          <div className="newtab__toolbar-view">
-            <IconButton
-              icon={<LayoutGrid size={18} />}
-              title={t('homeView.gridView')}
+          <div className="newtab__view-toggle" role="group" aria-label={t('homeView.viewModeLabel')}>
+            <button
+              type="button"
+              className={`newtab__view-toggle-btn${viewMode === 'grid' ? ' is-active' : ''}`}
               onClick={() => setViewMode('grid')}
-              className={viewMode === 'grid' ? 'is-active' : ''}
-              titleVisible
-            />
-            <IconButton
-              icon={<List size={18} />}
-              title={t('homeView.listView')}
+              aria-pressed={viewMode === 'grid'}
+            >
+              <LayoutGrid size={13} />
+              {t('homeView.gridView')}
+            </button>
+            <button
+              type="button"
+              className={`newtab__view-toggle-btn${viewMode === 'list' ? ' is-active' : ''}`}
               onClick={() => setViewMode('list')}
-              className={viewMode === 'list' ? 'is-active' : ''}
-              titleVisible
-            />
+              aria-pressed={viewMode === 'list'}
+            >
+              <List size={13} />
+              {t('homeView.listView')}
+            </button>
           </div>
         </div>
       </div>
@@ -328,10 +345,14 @@ FavoritesView.propTypes = {
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   updateLink: PropTypes.func,
+  activeCollectionId: PropTypes.string,
+  collections: PropTypes.array,
 };
 
 FavoritesView.defaultProps = {
   loading: false,
   auth: null,
   updateLink: () => { },
+  activeCollectionId: null,
+  collections: [],
 };

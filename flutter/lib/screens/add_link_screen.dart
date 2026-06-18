@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/link_item.dart';
 import '../providers/auth_provider.dart';
 import '../providers/link_provider.dart';
+import '../providers/collection_provider.dart';
 import '../services/firebase_storage_service.dart';
 import '../services/metadata_service.dart';
 import '../services/openrouter_service.dart';
@@ -31,6 +32,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
   bool _isFetchingTitle = false;
   List<String> _tagSuggestions = [];
   String? _thumbnail;
+  String? _selectedCollectionId;
 
   @override
   void initState() {
@@ -156,17 +158,28 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
     final provider = context.read<LinkProvider>();
     final auth = context.read<AuthProvider>();
 
-    final link = await provider.addLink(
+    final result = await provider.addLink(
       url: url,
       title: title,
       tags: tags,
       thumbnail: _thumbnail,
+      collectionId: _selectedCollectionId,
     );
+
+    if (result.isDuplicate) {
+      setState(() => _isSaving = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t('addLink.duplicateError'))),
+        );
+      }
+      return;
+    }
 
     if (mounted) Navigator.pop(context, true);
 
     // Fire-and-forget: generate AI description after save (screen already closed)
-    _generateAiDescription(provider, auth, link);
+    _generateAiDescription(provider, auth, result.link!);
   }
 
   Future<void> _generateAiDescription(
@@ -302,6 +315,32 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                     ),
                   ),
                 ),
+              const SizedBox(height: 16),
+              Consumer<CollectionProvider>(
+                builder: (context, collectionProvider, _) {
+                  final collections = collectionProvider.collections;
+                  if (collections.isEmpty) return const SizedBox.shrink();
+                  return DropdownButtonFormField<String>(
+                    value: _selectedCollectionId,
+                    decoration: InputDecoration(
+                      labelText: t('collections.fieldLabel'),
+                      prefixIcon: const Icon(Icons.folder_outlined),
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: null,
+                        child: Text(t('collections.none')),
+                      ),
+                      ...collections.map((col) => DropdownMenuItem(
+                        value: col.id,
+                        child: Text(col.name),
+                      )),
+                    ],
+                    onChanged: (val) => setState(() => _selectedCollectionId = val),
+                  );
+                },
+              ),
               const SizedBox(height: 24),
               FilledButton.icon(
                 onPressed: _isSaving ? null : _save,

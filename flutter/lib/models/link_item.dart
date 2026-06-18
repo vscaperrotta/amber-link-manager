@@ -10,6 +10,8 @@ class LinkItem {
   final bool isRead;
   final String? aiDescription;
   final String? thumbnail;
+  final String? note;
+  final String? collectionId;
 
   LinkItem({
     String? id,
@@ -21,6 +23,8 @@ class LinkItem {
     bool? isRead,
     this.aiDescription,
     this.thumbnail,
+    this.note,
+    this.collectionId,
   }) : id = id ?? const Uuid().v4(),
        tags = tags ?? const [],
        createdAt = createdAt ?? DateTime.now(),
@@ -38,6 +42,8 @@ class LinkItem {
       'is_read': isRead ? 1 : 0,
       'ai_description': aiDescription ?? '',
       'thumbnail': thumbnail ?? '',
+      'note': note ?? '',
+      'collection_id': collectionId ?? '',
     };
   }
 
@@ -52,6 +58,12 @@ class LinkItem {
     }
     if (thumbnail != null && thumbnail!.isNotEmpty) {
       metadata['thumbnail'] = thumbnail;
+    }
+    if (note != null && note!.isNotEmpty) {
+      metadata['note'] = note;
+    }
+    if (collectionId != null && collectionId!.isNotEmpty) {
+      metadata['collectionId'] = collectionId;
     }
     return {
       'url': url,
@@ -88,6 +100,8 @@ class LinkItem {
       isRead: _parseIsRead(map),
       aiDescription: _parseAiDescription(map),
       thumbnail: _parseThumbnail(map),
+      note: _parseNote(map),
+      collectionId: _parseCollectionId(map),
     );
   }
 
@@ -135,6 +149,32 @@ class LinkItem {
     return null;
   }
 
+  static String? _parseNote(Map<String, dynamic> map) {
+    final metadata = map['metadata'];
+    if (metadata is Map && metadata['note'] is String) {
+      final val = metadata['note'] as String;
+      return val.isEmpty ? null : val;
+    }
+    if (map['note'] is String) {
+      final val = map['note'] as String;
+      return val.isEmpty ? null : val;
+    }
+    return null;
+  }
+
+  static String? _parseCollectionId(Map<String, dynamic> map) {
+    final metadata = map['metadata'];
+    if (metadata is Map && metadata['collectionId'] is String) {
+      final val = metadata['collectionId'] as String;
+      return val.isEmpty ? null : val;
+    }
+    if (map['collection_id'] is String) {
+      final val = map['collection_id'] as String;
+      return val.isEmpty ? null : val;
+    }
+    return null;
+  }
+
   static List<String> _parseTags(Map<String, dynamic> map) {
     final metadata = map['metadata'];
     if (metadata is Map && metadata['tags'] is List) {
@@ -160,6 +200,9 @@ class LinkItem {
     bool? isRead,
     String? aiDescription,
     String? thumbnail,
+    String? note,
+    String? collectionId,
+    bool clearCollectionId = false,
   }) {
     return LinkItem(
       id: id,
@@ -171,6 +214,8 @@ class LinkItem {
       isRead: isRead ?? this.isRead,
       aiDescription: aiDescription ?? this.aiDescription,
       thumbnail: thumbnail ?? this.thumbnail,
+      note: note ?? this.note,
+      collectionId: clearCollectionId ? null : (collectionId ?? this.collectionId),
     );
   }
 
