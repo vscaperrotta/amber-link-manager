@@ -16,8 +16,9 @@ import {
   patchLinkMetadata as fbPatchLinkMetadata,
 } from './firebaseDb.js';
 import { getCurrentTab, isInternalUrl } from './tabs.js';
+import { normalizeUrl } from './normalizeUrl.js';
 import { FETCH_METADATA, METADATA_ENRICHED, GET_METADATA } from '../common/actions.js';
-import { getOpenRouterApiKey, getOpenRouterModel, generateAiDescription } from './openRouter.js';
+import { getOpenRouterApiKey, getOpenRouterModel, generateAiDescription, generateTagSuggestions } from './openRouter.js';
 
 async function _tryGenerateAiDescription({ url, title, id, uid, loadLocal }) {
   try {
@@ -26,10 +27,13 @@ async function _tryGenerateAiDescription({ url, title, id, uid, loadLocal }) {
     const model = await getOpenRouterModel();
     const desc = await generateAiDescription({ url, title, html: '', apiKey, model });
     if (!desc) return;
+    const pendingTagSuggestions = await generateTagSuggestions({ description: desc, title, apiKey, model });
+    const patch = { aiDescription: desc };
+    if (pendingTagSuggestions.length > 0) patch.pendingTagSuggestions = pendingTagSuggestions;
     if (uid) {
-      await fbPatchLinkMetadata(uid, id, { aiDescription: desc });
+      await fbPatchLinkMetadata(uid, id, patch);
     } else {
-      await dbPatchLinkMetadata(id, { aiDescription: desc });
+      await dbPatchLinkMetadata(id, patch);
       if (loadLocal) await loadLocal();
     }
   } catch (err) {
@@ -96,7 +100,7 @@ export function useLinks() {
    * Recupera i metadata dal content script della tab attiva, poi scrive su Firebase o IndexedDB.
    * L'arricchimento asincrono (thumbnail remota) è delegato al background in fire-and-forget.
    */
-  const saveCurrentTab = useCallback(async () => {
+  const saveCurrentTab = useCallback(async (collectionId = null) => {
     console.log('[saveCurrentTab] called — uid:', userRef.current?.uid ?? 'null');
     const tab = await getCurrentTab();
     console.log('[saveCurrentTab] tab:', tab);
@@ -126,8 +130,15 @@ export function useLinks() {
     const entry = {
       url: tab.url,
       title: tab.title || metadata?.siteName || tab.url,
-      ...(metadata ? { metadata } : {}),
+      ...((metadata || collectionId) ? { metadata: { ...(metadata || {}), ...(collectionId ? { collectionId } : {}) } } : {}),
     };
+
+    const normalized = normalizeUrl(entry.url);
+    const existingLink = links.find((l) => normalizeUrl(l.url) === normalized);
+    if (existingLink) {
+      console.log('[saveCurrentTab] duplicate detected:', existingLink.id);
+      return { duplicate: true, existingLink };
+    }
 
     const uid = userRef.current?.uid ?? null;
     let savedId;
@@ -158,16 +169,23 @@ export function useLinks() {
       }
       _tryGenerateAiDescription({ url: entry.url, title: entry.title, id: savedId, uid: null, loadLocal: loadLocalLinks });
     }
-    return savedId;
-  }, [loadLocalLinks]);
+    return { duplicate: false, savedId };
+  }, [loadLocalLinks, links]);
 
   /**
    * Salva un link inserito manualmente (URL + titolo opzionale).
    * Non ha accesso al DOM live → il background farà sempre fetch remoto per i metadata.
    */
-  const saveCustomLink = useCallback(async ({ url, title } = {}) => {
+  const saveCustomLink = useCallback(async ({ url, title, collectionId } = {}) => {
     if (!url) return;
-    const entry = { url, title: title || url };
+    const entry = { url, title: title || url, ...(collectionId ? { metadata: { collectionId } } : {}) };
+
+    const normalized = normalizeUrl(entry.url);
+    const existingLink = links.find((l) => normalizeUrl(l.url) === normalized);
+    if (existingLink) {
+      console.log('[saveCustomLink] duplicate detected:', existingLink.id);
+      return { duplicate: true, existingLink };
+    }
 
     if (userRef.current) {
       try {
@@ -177,6 +195,7 @@ export function useLinks() {
           payload: { url, id: docRef.id, uid: userRef.current.uid, tabId: null },
         }).catch(() => { });
         _tryGenerateAiDescription({ url, title: title || url, id: docRef.id, uid: userRef.current.uid, loadLocal: null });
+        return { duplicate: false, savedId: docRef.id };
       } catch (err) {
         console.error('[useLinks] fbAddLink error (custom)', err);
         throw err;
@@ -190,12 +209,13 @@ export function useLinks() {
           payload: { url, id: newId, uid: null, tabId: null },
         }).catch(() => { });
         _tryGenerateAiDescription({ url, title: title || url, id: newId, uid: null, loadLocal: loadLocalLinks });
+        return { duplicate: false, savedId: newId };
       } catch (err) {
         console.error('[useLinks] dbAddLink error (custom)', err);
         throw err;
       }
     }
-  }, [loadLocalLinks]);
+  }, [loadLocalLinks, links]);
 
   const deleteLink = useCallback(async (id) => {
     if (userRef.current) {

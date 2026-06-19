@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { getCollectionColor } from './collectionColors.js';
 import { useAuth } from '@contexts/AuthContext.jsx';
 import {
   getAllCollections,
@@ -34,21 +35,22 @@ export function useCollections() {
   }, [authReady, user, loadLocal]);
 
   const addCollection = useCallback(async ({ name, parentId = null }) => {
+    const color = getCollectionColor(collections.length);
     if (user) {
-      await fbAddCollection(user.uid, { name, parentId });
+      await fbAddCollection(user.uid, { name, parentId, color });
     } else {
-      await dbAddCollection({ id: crypto.randomUUID(), name, parentId, createdAt: Date.now() });
+      await dbAddCollection({ id: crypto.randomUUID(), name, parentId, color, createdAt: Date.now() });
       await loadLocal();
     }
-  }, [user, loadLocal]);
+  }, [user, collections.length, loadLocal]);
 
-  const renameCollection = useCallback(async (id, name) => {
+  const renameCollection = useCallback(async (id, name, color) => {
     if (user) {
-      await fbUpdateCollection(user.uid, id, { name });
+      await fbUpdateCollection(user.uid, id, { name, color });
     } else {
       const existing = collections.find(c => c.id === id);
       if (!existing) return;
-      await dbUpdateCollection({ ...existing, name });
+      await dbUpdateCollection({ ...existing, name, color });
       await loadLocal();
     }
   }, [user, collections, loadLocal]);

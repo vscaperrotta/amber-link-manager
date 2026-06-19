@@ -1,5 +1,40 @@
 @use '../../styles/mixins' as *;
 
+// ── Collection color picker (used inside BaseModal) ────────────────────────
+
+.collection-color-swatches {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: var(--space-sm);
+}
+
+.collection-color-swatch {
+	background: var(--swatch-color);
+	border: 0.1875rem solid transparent;
+	border-radius: 50%;
+	cursor: pointer;
+	height: 1.5rem;
+	padding: 0;
+	transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+	width: 1.5rem;
+
+	&:hover {
+		transform: scale(1.18);
+	}
+
+	&.is-selected {
+		border-color: var(--text-primary);
+		box-shadow: 0 0 0 0.125rem color-mix(in srgb, var(--swatch-color) 40%, transparent);
+		transform: scale(1.12);
+	}
+
+	&:focus-visible {
+		outline: 0.125rem solid var(--border-focus);
+		outline-offset: 0.125rem;
+	}
+}
+
 @keyframes sidebar-text-in {
 	from {
 		opacity: 0;
@@ -37,13 +72,13 @@
 		text-decoration: none;
 	}
 
-	// ── Header (toggle only) ──────────────────────────────────────────────────
+	// ── Header (collapse toggle — always visible on desktop) ────────────────
 
 	.sidebar__header {
 		align-items: center;
 		display: flex;
 		flex-shrink: 0;
-		justify-content: center;
+		justify-content: flex-end;
 		padding: var(--space-xs) var(--space-sm);
 
 		@include respond(tab-land, max) {
@@ -52,7 +87,7 @@
 	}
 
 	.sidebar__toggle {
-		transform: rotate(180deg);
+		transform: rotate(0);
 	}
 
 	// ── Add section ───────────────────────────────────────────────────────────
@@ -82,6 +117,10 @@
 		flex-direction: column;
 		gap: var(--space-xs);
 		padding: var(--space-sm) var(--space-sm) 0;
+	}
+
+	.sidebar__nav-toggle {
+		display: none;
 	}
 
 	.nav-button {
@@ -171,14 +210,29 @@
 		transition: background 0.12s ease, color 0.12s ease;
 		user-select: none;
 
-		&:hover { background: var(--bg-elevated); color: var(--text-primary); }
+		&:hover {
+			background: var(--bg-elevated);
+			color: var(--text-primary);
+		}
+
 		&:focus-visible { outline: 0.125rem solid var(--border-focus); }
 
 		&.is-active {
-			background: var(--accent-muted);
-			color: var(--accent);
+			background: color-mix(in srgb, var(--col-color, var(--accent)) 15%, transparent);
+			color: var(--col-color, var(--accent));
 			font-weight: 600;
 		}
+	}
+
+	// Colored dot — always visible (provides identity signal in collapsed mode)
+	.sidebar__collection-dot {
+		background: var(--col-color, var(--text-secondary));
+		border-radius: 50%;
+		display: block;
+		flex-shrink: 0;
+		height: 0.5rem;
+		min-width: 0.5rem;
+		width: 0.5rem;
 	}
 
 	.sidebar__collection-icon {
@@ -195,6 +249,17 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.sidebar__collection-count {
+		color: var(--col-color, var(--text-tertiary));
+		display: none;
+		flex-shrink: 0;
+		font-family: var(--font-display);
+		font-size: 0.6875rem;
+		font-variant-numeric: tabular-nums;
+		font-weight: 500;
+		margin-left: auto;
 	}
 
 	.sidebar__collection-actions {
@@ -222,14 +287,6 @@
 
 	&.sidebar-open {
 		width: var(--sidebar-width);
-
-		.sidebar__header {
-			justify-content: flex-end;
-		}
-
-		.sidebar__toggle {
-			transform: rotate(0);
-		}
 
 		.sidebar__add-button {
 			width: 100%;
@@ -267,6 +324,11 @@
 			display: block;
 		}
 
+		.sidebar__collection-count {
+			animation: sidebar-text-in 0.15s ease 0.1s both;
+			display: block;
+		}
+
 		.sidebar__collection-actions {
 			display: flex;
 		}
@@ -275,18 +337,15 @@
 			.sidebar__add-button .button__text,
 			.nav-button span:not(.nav-button__counter),
 			.sidebar__collections-label,
-			.sidebar__collection-name {
+			.sidebar__collection-name,
+			.sidebar__collection-count {
 				animation: none;
 			}
 		}
 
-		// Collapse back on narrow screens even when open
+		// ── Mobile: force collapse even when sidebar-open class is set ────────
 		@include respond(tab-land, max) {
 			width: var(--newtab-sidebar-width-collapsed);
-
-			.sidebar__header {
-				display: none;
-			}
 
 			.sidebar__add-button {
 				width: 2rem;
@@ -311,6 +370,7 @@
 			.sidebar__collections-label,
 			.sidebar__collections-empty,
 			.sidebar__collection-name,
+			.sidebar__collection-count,
 			.sidebar__collection-actions {
 				display: none;
 			}

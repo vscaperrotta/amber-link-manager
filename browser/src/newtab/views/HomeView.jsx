@@ -1,6 +1,6 @@
 import { Fragment, useState, useEffect, useRef, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { List, LayoutGrid, Search, Bookmark, FolderOpen, ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import { List, LayoutGrid, Search, Bookmark, FolderOpen, ChevronLeft, ChevronRight, CalendarDays, Folder } from 'lucide-react';
 import Input from '@components/Input';
 import { SkeletonLinkCard } from '@components/Skeleton';
 import EmptyState from '@components/EmptyState';
@@ -45,6 +45,37 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
   const [groupByDate, setGroupByDate] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const settingsApplied = useRef(false);
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [bulkCollectionId, setBulkCollectionId] = useState('');
+
+  function toggleSelectId(id) {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function exitSelectMode() {
+    setIsSelectMode(false);
+    setSelectedIds(new Set());
+    setBulkCollectionId('');
+  }
+
+  async function handleBulkAssign() {
+    if (!selectedIds.size) return;
+    const collectionId = bulkCollectionId || null;
+    await Promise.all(
+      [...selectedIds].map(id => {
+        const link = links.find(l => l.id === id);
+        if (!link) return null;
+        return updateLink(id, { metadata: { ...(link.metadata || {}), collectionId } });
+      })
+    );
+    exitSelectMode();
+  }
 
   useEffect(() => {
     if (!settingsApplied.current && !settingsLoading) {
@@ -172,6 +203,9 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
       viewMode,
       featured: !!featured,
       showDescription: settings.showDescription !== false,
+      selectable: isSelectMode,
+      selected: selectedIds.has(link.id),
+      onSelect: () => toggleSelectId(link.id),
       onEdit: () => onEdit(link),
       onDelete: () => onDelete(link.id),
       allTags,
@@ -298,8 +332,43 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
               {t('homeView.listView')}
             </button>
           </div>
+          <button
+            type="button"
+            className={`newtab__select-toggle${isSelectMode ? ' newtab__select-toggle--active' : ''}`}
+            onClick={() => { setIsSelectMode(v => !v); setSelectedIds(new Set()); setBulkCollectionId(''); }}
+          >
+            {isSelectMode ? t('tagsView.cancelSelect') : t('tagsView.selectLinks')}
+          </button>
         </div>
       </div>
+
+      {isSelectMode && selectedIds.size > 0 && (
+        <div className="newtab__bulk-bar">
+          <span className="newtab__bulk-bar-count">
+            {t('tagsView.selectedCount', { count: selectedIds.size })}
+          </span>
+          <div className="newtab__bulk-bar-action">
+            <span className="newtab__bulk-bar-label">{t('homeView.bulkAssignCollection')}</span>
+            <select
+              className="newtab__bulk-collection-select"
+              value={bulkCollectionId}
+              onChange={e => setBulkCollectionId(e.target.value)}
+            >
+              <option value="">{t('homeView.bulkNoCollection')}</option>
+              {collections.map(col => (
+                <option key={col.id} value={col.id}>{col.name}</option>
+              ))}
+            </select>
+            <button type="button" className="newtab__bulk-btn newtab__bulk-btn--primary" onClick={handleBulkAssign}>
+              <Folder size={13} />
+              {t('homeView.bulkAssignBtn')}
+            </button>
+          </div>
+          <button type="button" className="newtab__bulk-btn" onClick={exitSelectMode}>
+            {t('common.cancel')}
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <div className={`newtab__links newtab__links--${viewMode}`}>

@@ -18,7 +18,7 @@ class LocalStorageService {
 
     return await openDatabase(
       path,
-      version: 7,
+      version: 8,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE links(
@@ -40,6 +40,7 @@ class LocalStorageService {
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
             parent_id TEXT,
+            color TEXT,
             created_at INTEGER NOT NULL
           )
         ''');
@@ -93,6 +94,11 @@ class LocalStorageService {
               created_at INTEGER NOT NULL
             )
           ''');
+        }
+        if (oldVersion < 8) {
+          try {
+            await db.execute('ALTER TABLE collections ADD COLUMN color TEXT');
+          } catch (_) {}
         }
       },
     );

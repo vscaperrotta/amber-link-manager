@@ -145,6 +145,13 @@ const Map<String, Map<String, String>> _translations = {
     'collections.clearFilter': 'Clear collection filter',
     'collections.emptyTitle': 'No links in this collection',
     'collections.emptySubtitle': 'Edit a link and assign it to this collection.',
+    'collections.add': 'New collection',
+    'collections.addTitle': 'Add collection',
+    'collections.nameHint': 'Collection name',
+    'collections.rename': 'Rename',
+    'collections.deleteConfirm': 'Delete collection?',
+    'collections.deleteMessage': 'Links in this collection will not be deleted.',
+    'collections.manage': 'Manage collections',
   },
   'it': {
     // Common
@@ -290,6 +297,13 @@ const Map<String, Map<String, String>> _translations = {
     'collections.clearFilter': 'Rimuovi filtro cartella',
     'collections.emptyTitle': 'Nessun link in questa cartella',
     'collections.emptySubtitle': 'Modifica un link e assegnalo a questa cartella.',
+    'collections.add': 'Nuova cartella',
+    'collections.addTitle': 'Aggiungi cartella',
+    'collections.nameHint': 'Nome cartella',
+    'collections.rename': 'Rinomina',
+    'collections.deleteConfirm': 'Eliminare la cartella?',
+    'collections.deleteMessage': 'I link in questa cartella non verranno eliminati.',
+    'collections.manage': 'Gestisci cartelle',
   },
 };
 

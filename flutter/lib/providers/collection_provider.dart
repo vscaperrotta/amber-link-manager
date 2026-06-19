@@ -2,6 +2,23 @@ import 'package:flutter/material.dart';
 import '../models/collection_item.dart';
 import '../services/collection_repository.dart';
 
+const _kCollectionColors = [
+  '#F5A623',
+  '#5096F0',
+  '#50D282',
+  '#EE5555',
+  '#A78BFA',
+  '#4ECDC4',
+  '#FF8C42',
+  '#F06292',
+];
+
+Color collectionColor(String? hex, {int fallbackIndex = 0}) {
+  final h = (hex?.isNotEmpty == true ? hex! : _kCollectionColors[fallbackIndex % _kCollectionColors.length])
+      .replaceAll('#', '');
+  return Color(int.parse('FF$h', radix: 16));
+}
+
 class CollectionProvider extends ChangeNotifier {
   final CollectionRepository _repository = CollectionRepository();
   List<CollectionItem> _collections = [];
@@ -35,7 +52,8 @@ class CollectionProvider extends ChangeNotifier {
   }
 
   Future<void> addCollection(String name, {String? parentId}) async {
-    final collection = CollectionItem(name: name, parentId: parentId);
+    final color = _kCollectionColors[_collections.length % _kCollectionColors.length];
+    final collection = CollectionItem(name: name, parentId: parentId, color: color);
     await _repository.addCollection(collection);
     await loadCollections();
   }
