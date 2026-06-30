@@ -5,7 +5,7 @@
 <h1>Amber</h1>
 </div>
 
-Amber is a cross-platform link-saving app. Capture URLs in under 3 seconds from any device, organize them with tags and AI descriptions, and find them in under 5. A personal read-later tool with real-time cloud sync and offline support — built as an antidote to the browser bookmarks graveyard.
+Amber is a cross-platform link-saving app. Capture URLs in under 3 seconds from any device, organize them with tags and collections, and find them in under 5. A personal read-later tool with real-time cloud sync and offline support — built as an antidote to the browser bookmarks graveyard.
 
 > Built entirely via vibe coding.
 
@@ -41,23 +41,22 @@ Amber is a cross-platform link-saving app. Capture URLs in under 3 seconds from 
 - **Collection colors** — assign a custom color to each collection from a predefined palette; color shown as a dot in the sidebar and on collection items
 - **Bulk assign** — select multiple links and assign them to a collection in one action
 - **Tags** — attach up to 10 tags per link; stored and displayed uppercase
-- **AI tag suggestions** — on save, OpenRouter suggests 3–5 relevant tags based on title and URL; existing tags auto-apply, new ones prompt for confirmation
 - **Favorites** — star links for a dedicated Favorites view
 - **Read / Unread** — mark links as read to track your reading progress; filter by unread
 
-### Notes & Descriptions
+### Notes
 
 - **Personal notes** — free-text note field per link (`metadata.note`) for your own annotations — why you saved it, what you found, reading notes
-- **AI descriptions** — auto-generated one-liner via OpenRouter on save; batch-generate for all missing descriptions in Settings
-- **Description field** — manually edit the description of any link
+- **Description field** — manually edit the description of any link for your own reference
 
 ### Search & Browse
 
-- **Full-text search** — searches across title, URL, description, AI description, and page text in real time
+- **Full-text search** — searches across title, URL, description, and page text in real time
 - **Tag filtering** — filter the link list by one or more tags simultaneously
 - **Tag management** — rename, merge, and delete tags globally from the Tags view
 - **Favorites view** — dedicated view for starred links
 - **Sort options** — sort by newest, oldest, title A–Z, or domain
+- **Collection filtering** — browse and filter links by collection
 
 ### Import & Export
 
@@ -253,18 +252,6 @@ No backend code to deploy — Firebase handles auth, storage, and sync entirely.
 
 ---
 
-## AI Descriptions (OpenRouter)
-
-Amber uses [OpenRouter](https://openrouter.ai) as a proxy for AI-generated link descriptions and tag suggestions. To enable:
-
-1. Get an API key at [openrouter.ai/keys](https://openrouter.ai/keys)
-2. In the extension or app settings, paste the key under **OpenRouter API Key**
-3. Optionally set a custom model (default: `openai/gpt-4o-mini`)
-
-Descriptions are generated fire-and-forget on every save. You can also batch-generate descriptions for all links missing them from the Settings page.
-
----
-
 ## Data Model
 
 Every link is stored at `/users/{uid}/links/{linkId}` in Firestore with this shape:
@@ -277,8 +264,8 @@ Every link is stored at `/users/{uid}/links/{linkId}` in Firestore with this sha
   "savedAt": 1718000000000,
   "metadata": {
     "tags": ["DESIGN", "TOOLS"],
+    "collectionId": "optional-collection-id",
     "description": "Manual description",
-    "aiDescription": "AI-generated one-liner",
     "note": "Personal annotation",
     "isFavorite": false,
     "isRead": false,
