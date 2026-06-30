@@ -1,9 +1,5 @@
-<div style="text-align: center; width: 100%;">
-<img src="./browser/public/icons/icon128.png" alt="" width="24" style="vertical-align:middle;margin-right:10px" />
-<br />
-<br />
-<h1>Amber</h1>
-</div>
+<h1><img src="./browser/public/icons/icon128.png" alt="icon" width="24" style="vertical-align:middle;margin-right:10px" />
+Amber</h1>
 
 Amber is a cross-platform link-saving app. Capture URLs in under 3 seconds from any device, organize them with tags and collections, and find them in under 5. A personal read-later tool with real-time cloud sync and offline support — built as an antidote to the browser bookmarks graveyard.
 
