@@ -13,13 +13,12 @@ src/
 ├── firebase.ts                        # Firebase init (Auth + Firestore) — replace config with your own project
 │
 ├── types/
-│   ├── LinkType.ts                    # LinkEntry, Metadata (tags, description, aiDescription, isFavorite, isRead, …)
+│   ├── LinkType.ts                    # LinkEntry, Metadata (tags, description, isFavorite, isRead, …)
 │   └── [BookType, DataType, …].ts    # Legacy book library types (unused by links feature)
 │
 ├── utils/
-│   ├── linksService.ts                # Single source of truth — Firebase ↔ local JSON auto-switch, CRUD, tag mgmt, AI
+│   ├── linksService.ts                # Single source of truth — Firebase ↔ local JSON auto-switch, CRUD, tag mgmt
 │   ├── firebaseDb.ts                  # Firestore CRUD + real-time subscription (dot-notation metadata patches)
-│   ├── openRouter.ts                  # generateAiDescription() — OpenRouter API call
 │   ├── i18n.ts                        # t() — EN/IT translations
 │   └── helpers.ts                     # Misc utility functions
 │
@@ -46,7 +45,7 @@ src/
 │   └── pluginView.ts                  # ItemView — main plugin UI, owns LinksService instance
 │
 ├── settings/
-│   └── settingsTab.ts                 # PluginSettingTab — library config + AI Descriptions section
+│   └── settingsTab.ts                 # PluginSettingTab — library config and settings
 │
 └── styles/
     ├── main.scss                      # Imports all partials
@@ -80,22 +79,17 @@ LinksService (linksService.ts)
 
 addLink(url, title, metadata)
   → fbAddLink() or localAddLink()
-  → _tryGenerateAiDescription() [fire-and-forget, requires plugin.openrouterApiKey]
-    → generateAiDescription() → patchLinkMetadata(id, { aiDescription })
 
 patchLinkMetadata(id, patch)           ← safe: Firestore dot-notation, local deep-merge
 updateLink(id, updates)                ← also safe: Firestore dot-notation for metadata
 toggleRead(id) / toggleFavorite(id)   → patchLinkMetadata
 renameTag / deleteTag / mergeTag      → iterate affected links → patchLinkMetadata
-generateMissingDescriptions(onProgress) → batch AI for all links without aiDescription
 ```
 
 ## Plugin settings (data.json in vault)
 
 | Field | Type | Default |
 |---|---|---|
-| `openrouterApiKey` | string | `""` |
-| `openrouterModel` | string | `"meta-llama/llama-3.2-3b-instruct:free"` |
 | `viewMode` | `"grid"` \| `"list"` | `"grid"` |
 | `libraryFolder` | string | `"Amber"` |
 | `localJsonPath` | string \| null | `null` |

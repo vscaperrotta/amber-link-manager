@@ -61,7 +61,7 @@ Amber is a cross-platform link-saving app. Capture URLs in under 3 seconds from 
 ### Import & Export
 
 - **Import HTML bookmarks** — parse any Netscape Bookmark File (Chrome, Firefox, Safari exports); folders become tags; bulk-saves with duplicate detection
-- **Export JSON** — export your full library as a structured JSON file (`{ version, app, exportedAt, count, links[] }`) with all metadata fields including notes, AI descriptions, and thumbnails
+- **Export JSON** — export your full library as a structured JSON file (`{ version, app, exportedAt, count, links[] }`) with all metadata fields including notes and thumbnails
 
 ### Sync & Storage
 
@@ -297,7 +297,7 @@ amber-link-manager/
 │       ├── screens/      # App screens
 │       ├── widgets/      # Reusable widgets
 │       ├── providers/    # State management (Provider)
-│       └── services/     # Firebase, SQLite, OpenRouter
+│       └── services/     # Firebase, SQLite, metadata fetching
 ├── obsidian/         # Obsidian plugin
 │   └── src/
 │       ├── main.ts       # Plugin entry point

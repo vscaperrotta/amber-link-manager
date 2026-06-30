@@ -462,7 +462,7 @@ Current filter block:
       result = result.filter(l =>
         (l.title || '').toLowerCase().includes(q) ||
         l.url.toLowerCase().includes(q) ||
-        (l.metadata?.aiDescription || l.metadata?.description || '').toLowerCase().includes(q)
+        (l.metadata?.description || '').toLowerCase().includes(q)
       );
     }
 ```
@@ -473,7 +473,7 @@ New:
       result = result.filter(l =>
         (l.title || '').toLowerCase().includes(q) ||
         l.url.toLowerCase().includes(q) ||
-        (l.metadata?.aiDescription || l.metadata?.description || '').toLowerCase().includes(q) ||
+        (l.metadata?.description || '').toLowerCase().includes(q) ||
         extractDomain(l.url).toLowerCase().includes(q) ||
         (l.metadata?.tags || []).join(' ').toLowerCase().includes(q)
       );

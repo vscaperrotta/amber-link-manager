@@ -124,7 +124,7 @@ Implementazione:
 ### 6. Note personali sul link ✅ DONE
 **Effort:** 2–4 ore | **Client:** Browser + Flutter
 
-Campo testuale libero `metadata.note` separato da `aiDescription`. Utente può annotare perché ha salvato il link, a cosa serve, appunti di lettura.
+Campo testuale libero `metadata.note`. Utente può annotare perché ha salvato il link, a cosa serve, appunti di lettura.
 
 Implementato: textarea nel EditModal (browser) e campo note nel EditLinkSheet (Flutter). Mostra nota troncata nella link card con icona FileText/notes. SQLite migrato a v6. Export JSON include il campo.
 
@@ -195,14 +195,14 @@ Transcript salvato in `metadata.pageText` → ricercabile, usabile come contesto
 
 Implementazione:
 - `background/index.js`: detect youtube.com/watch?v= → chiama oEmbed + transcript
-- Transcript tronca a 3000 chars → passa a OpenRouter per aiDescription più ricca
+- Transcript tronca a 3000 chars → ricercabile in metadata.pageText
 
 ---
 
 ### 12. Reading time estimate
 **Effort:** 1 ora | **Client:** Browser + Flutter
 
-Calcola tempo lettura stimato da `metadata.pageText` o `aiDescription` (200 wpm medio). Mostra "~ 4 min" nella link card.
+Calcola tempo lettura stimato da `metadata.pageText` (200 wpm medio). Mostra "~ 4 min" nella link card.
 
 Implementazione: funzione pura `estimateReadingTime(text: string): number`, aggiunta a globalMethods.js. Mostrato nel link card con icona orologio.
 
