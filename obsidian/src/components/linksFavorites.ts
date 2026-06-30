@@ -78,10 +78,6 @@ export default function renderLinksFavorites(
       );
     });
 
-    if (link.metadata?.aiDescription) {
-      card.createEl('p', { text: link.metadata.aiDescription, cls: 'obs-amber-links-card-description' });
-    }
-
     const rowActions = card.createDiv({ cls: 'obs-amber-links-item-actions' });
 
     const starBtn = rowActions.createEl('button', {

@@ -4,8 +4,6 @@ import { NAME, VIEW_TYPE, REPOSITORY_URL } from "../constants";
 import MainPlugin from "../main";
 import { createDefaultData, createJsonFile, getDefaultPath, getFolder, saveLocalData } from "../services/storage";
 import { t } from "../utils/i18n";
-import { LinksService } from "../utils/linksService";
-
 export default class LibrarySettingTab extends PluginSettingTab {
   plugin: MainPlugin;
 
@@ -18,58 +16,6 @@ export default class LibrarySettingTab extends PluginSettingTab {
     const { containerEl } = this;
 
     containerEl.empty();
-
-    // AI Descriptions
-    new Setting(containerEl).setName(t('settings.aiHeading')).setHeading();
-
-    new Setting(containerEl)
-      .setName(t('settings.openRouterKey'))
-      .setDesc(t('settings.openRouterKeyDesc'))
-      .addText(text => text
-        .setPlaceholder('sk-or-...')
-        .setValue(this.plugin.openrouterApiKey)
-        .onChange(async (value) => {
-          await this.plugin.setOpenRouterApiKey(value.trim());
-        }));
-
-    new Setting(containerEl)
-      .setName(t('settings.openRouterModel'))
-      .setDesc(t('settings.openRouterModelDesc'))
-      .addText(text => text
-        .setPlaceholder('meta-llama/llama-3.2-3b-instruct:free')
-        .setValue(this.plugin.openrouterModel)
-        .onChange(async (value) => {
-          await this.plugin.setOpenRouterModel(value.trim() || 'meta-llama/llama-3.2-3b-instruct:free');
-        }));
-
-    let generateStatusEl: HTMLSpanElement | null = null;
-    const generateSetting = new Setting(containerEl)
-      .setName(t('settings.generateMissing'))
-      .setDesc(t('settings.generateMissingDesc'))
-      .addButton(button => button
-        .setButtonText(t('settings.generateBtn'))
-        .onClick(async () => {
-          if (!this.plugin.openrouterApiKey) {
-            if (generateStatusEl) generateStatusEl.textContent = t('settings.generateError');
-            return;
-          }
-          const service = this._getLinksService();
-          if (!service) return;
-          button.setDisabled(true);
-          if (generateStatusEl) generateStatusEl.textContent = '';
-          try {
-            const n = await service.generateMissingDescriptions((done, total) => {
-              if (generateStatusEl) {
-                generateStatusEl.textContent = t('settings.generating', { done: String(done), total: String(total) });
-              }
-            });
-            if (generateStatusEl) generateStatusEl.textContent = t('settings.generateDone', { n: String(n) });
-          } catch {
-            if (generateStatusEl) generateStatusEl.textContent = t('settings.generateError');
-          }
-          button.setDisabled(false);
-        }));
-    generateStatusEl = generateSetting.settingEl.createSpan({ cls: 'obs-amber-generate-status' });
 
     // Configuration
     new Setting(containerEl)
@@ -246,13 +192,4 @@ export default class LibrarySettingTab extends PluginSettingTab {
     }
   }
 
-  private _getLinksService(): LinksService | null {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE);
-    for (const leaf of leaves) {
-      if (leaf.view instanceof pluginView) {
-        return leaf.view.linksService;
-      }
-    }
-    return null;
-  }
 }

@@ -5,6 +5,8 @@ export const SAVE_LINK_LOADING = 'SAVE_LINK_LOADING'
 export const SAVE_LINK_SUCCESS = 'SAVE_LINK_SUCCESS'
 /** Background → content script: salvataggio fallito */
 export const SAVE_LINK_FAILURE = 'SAVE_LINK_FAILURE'
+/** Background → content script: salvataggio saltato, link già esistente */
+export const SAVE_LINK_DUPLICATE = 'SAVE_LINK_DUPLICATE'
 
 // ── Post-save metadata push ──────────────────────────────────────────────────
 /** Background → content script: preview derivata pronta (title, thumbnail, publisher) */

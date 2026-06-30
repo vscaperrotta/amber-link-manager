@@ -20,6 +20,15 @@ export default function Main(props) {
 		tags: new Set(links.flatMap(l => l.metadata?.tags || [])).size,
 	}), [links]);
 
+	const collectionCounts = useMemo(() => {
+		const counts = {};
+		links.forEach(l => {
+			const cid = l.metadata?.collectionId;
+			if (cid) counts[cid] = (counts[cid] || 0) + 1;
+		});
+		return counts;
+	}, [links]);
+
 	const allTags = useMemo(() =>
 		[...new Set(links.flatMap(l => l.metadata?.tags || []))].sort(),
 	[links]);
@@ -102,6 +111,7 @@ export default function Main(props) {
 				onCollectionAdd={addCollection}
 				onCollectionRename={renameCollection}
 				onCollectionDelete={deleteCollection}
+				collectionCounts={collectionCounts}
 			/>
 
 			<section className="newtab__main-content">

@@ -2,14 +2,15 @@ import Browser from 'webextension-polyfill';
 import { onAuthStateChanged } from '@firebase/auth';
 import { auth } from '../common/firebase.js';
 import { deriveItemPreview } from '../utils/deriveItemPreview.js';
-import { addLink as dbAddLink, updateLink as dbUpdateLink, patchLinkMetadata as dbPatchMeta } from '../utils/db.js';
-import { addLink as fbAddLink, updateLink as fbUpdateLink, patchLinkMetadata as fbPatchMeta } from '../utils/firebaseDb.js';
-import { getOpenRouterApiKey, getOpenRouterModel, generateAiDescription } from '../utils/openRouter.js';
+import { addLink as dbAddLink, updateLink as dbUpdateLink, patchLinkMetadata as dbPatchMeta, getAllLinks as dbGetAllLinks } from '../utils/db.js';
+import { addLink as fbAddLink, updateLink as fbUpdateLink, patchLinkMetadata as fbPatchMeta, getAllLinksOnce as fbGetAllLinksOnce } from '../utils/firebaseDb.js';
 import { uploadThumbnail } from '../utils/firebaseStorage.js';
+import { normalizeUrl } from '../utils/normalizeUrl.js';
 import {
 	SAVE_LINK_LOADING,
 	SAVE_LINK_SUCCESS,
 	SAVE_LINK_FAILURE,
+	SAVE_LINK_DUPLICATE,
 	UPDATE_ITEM_PREVIEW,
 	FETCH_METADATA,
 	METADATA_ENRICHED,
@@ -88,6 +89,15 @@ async function saveTab(tab, uidOverride) {
 	try {
 		uid = uidOverride !== undefined ? uidOverride : await getCurrentUid();
 		console.log('[saveTab] resolved uid:', uid);
+
+		const normalized = normalizeUrl(resolvedUrl);
+		const existingLinks = uid ? await fbGetAllLinksOnce(uid) : await dbGetAllLinks();
+		const duplicate = existingLinks.find((l) => normalizeUrl(l.url) === normalized);
+		if (duplicate) {
+			console.log('[saveTab] duplicate found — skipping save:', duplicate.id);
+			Browser.tabs.sendMessage(tabId, { action: SAVE_LINK_DUPLICATE }).catch(() => { });
+			return;
+		}
 
 		if (uid) {
 			console.log('[saveTab] saving to Firebase...');
@@ -277,7 +287,6 @@ function extractMetadataFromHtml(html, baseUrl) {
 		description,
 		siteName,
 		canonicalUrl,
-		tags: [],
 		author: '',
 		publishedDate: '',
 		readingTime: 0,
@@ -315,10 +324,12 @@ function triggerEnrichment({ url, id, uid, tabId, fallbackScreenshot = null }) {
 				...metadata,
 			};
 
+			// Patch (non overwrite) — preserva campi non derivati dalla pagina
+			// (es. tags, isRead, isFavorite) scritti nel frattempo da altri flussi.
 			if (uid) {
-				await fbUpdateLink(uid, id, { metadata: finalMetadata });
+				await fbPatchMeta(uid, id, finalMetadata);
 			} else {
-				await dbUpdateLink(id, { metadata: finalMetadata });
+				await dbPatchMeta(id, finalMetadata);
 			}
 
 			// Notifica il content script con la preview aggiornata
@@ -337,33 +348,9 @@ function triggerEnrichment({ url, id, uid, tabId, fallbackScreenshot = null }) {
 				payload: { id },
 			}).catch(() => { });
 
-			// AI description — fire-and-forget, won't block enrichment result
-			triggerAiDescription({ url, id, uid, html, title: metadata.siteName || '' });
 		} catch (err) {
 			clearTimeout(timer);
 			console.warn('[background] enrichment failed for', url, err?.message);
-		}
-	})();
-}
-
-function triggerAiDescription({ url, id, uid, html, title }) {
-	(async () => {
-		try {
-			const [apiKey, model] = await Promise.all([getOpenRouterApiKey(), getOpenRouterModel()]);
-			if (!apiKey) return;
-			const aiDescription = await generateAiDescription({ url, title, html, apiKey, model });
-			if (!aiDescription) return;
-			if (uid) {
-				await fbPatchMeta(uid, id, { aiDescription });
-			} else {
-				await dbPatchMeta(id, { aiDescription });
-			}
-			Browser.runtime.sendMessage({
-				action: METADATA_ENRICHED,
-				payload: { id },
-			}).catch(() => { });
-		} catch (err) {
-			console.warn('[background] AI description failed for', url, err?.message);
 		}
 	})();
 }
@@ -372,6 +359,15 @@ function triggerAiDescription({ url, id, uid, html, title }) {
 
 Browser.action.onClicked.addListener(async (tab) => {
 	if (!tab.id || !tab.url) return;
+	await saveTab(tab);
+});
+
+// ── Keyboard shortcut ────────────────────────────────────────────────────────
+
+Browser.commands.onCommand.addListener(async (command) => {
+	if (command !== 'save-current-tab') return;
+	const [tab] = await Browser.tabs.query({ active: true, lastFocusedWindow: true });
+	if (!tab?.id || !tab.url) return;
 	await saveTab(tab);
 });
 

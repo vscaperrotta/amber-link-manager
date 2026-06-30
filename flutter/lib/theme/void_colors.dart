@@ -21,7 +21,6 @@ abstract final class VoidColors {
   static const lightBgSurface = Color(0xFFFFFFFF);
   static const lightBgElevated = Color(0xFFEBEBEF);
   static const lightAccent = Color(0xFFE8950F);
-  static const lightAccentMuted = Color(0x1AD4870A); // rgba(212,135,10,0.10)
   static const lightTextPrimary = Color(0xFF0F0F12);
   static const lightTextSecondary = Color(0xFF3C3C58);
   static const lightTextTertiary = Color(0xFF48486A);

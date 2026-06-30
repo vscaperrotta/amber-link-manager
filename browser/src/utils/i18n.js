@@ -63,6 +63,13 @@ const translations = {
 		'tagsView.deleteTag': 'Delete tag',
 		'tagsView.mergeTag': 'Merge into…',
 		'tagsView.searchPlaceholder': 'Search links or tags…',
+		'tagsView.statsTags': 'tags',
+		'tagsView.statsTagged': 'tagged',
+		'tagsView.statsUntagged': 'untagged',
+		'tagsView.backToIndex': 'Back to all tags',
+		'tagsView.related': 'Also in:',
+		'tagsView.links': 'links',
+		'tagsView.confirmDelete': 'Delete this tag from all links?',
 
 		// ── EditModal ─────────────────────────────────────────
 		'editModal.titleAdd': 'Add link',
@@ -133,10 +140,6 @@ const translations = {
 		'linkItem.delete': 'Delete',
 		'linkItem.markRead': 'Mark as read',
 		'linkItem.markUnread': 'Mark as unread',
-		'linkItem.suggestions': 'Suggested',
-		'linkItem.addSuggestion': 'Add tag',
-		'linkItem.dismissSuggestions': 'Dismiss suggestions',
-
 		// ── BaseModal ─────────────────────────────────────────
 		'baseModal.close': 'Close',
 
@@ -178,25 +181,6 @@ const translations = {
 		'options.importProgress': 'Importing… {done}/{total}',
 		'options.importDone': 'Done — {count} imported, {skipped} duplicates skipped',
 		'options.importError': "Couldn't read that file. Make sure it's a bookmarks HTML export.",
-
-		// ── AI description ────────────────────────────────────
-		'options.aiSection': 'AI Descriptions',
-		'options.aiApiKey': 'OpenRouter API Key',
-		'options.aiApiKeyDesc': 'Auto-generate descriptions using a free AI model when saving links. Get a free key at openrouter.ai.',
-		'options.aiApiKeyPlaceholder': 'sk-or-v1-...',
-		'options.aiApiKeySaved': 'Saved ✓',
-		'options.aiApiKeyRemove': 'Remove',
-		'options.aiModel': 'Model',
-		'options.aiModelDesc': 'OpenRouter model ID. Append :free for free-tier models.',
-		'options.aiModelPlaceholder': 'meta-llama/llama-3.2-3b-instruct:free',
-		'options.aiBulkGenerate': 'Generate missing descriptions',
-		'options.aiBulkGenerateDesc': 'Run AI on all links that don\'t have a description yet.',
-		'options.aiBulkBtn': 'Generate all',
-		'options.aiBulkProgress': ({ done, total }) => `Generating… ${done} / ${total}`,
-		'options.aiBulkDone': ({ count }) => count > 0 ? `Done — ${count} generated` : 'All links already have descriptions',
-		'options.aiBulkError': 'Error — check your API key and try again',
-		'options.saveErrorTitle': 'Save failed',
-		'options.saveErrorMessage': 'Could not save settings. Please try again.',
 
 		// ── Empty states ─────────────────────────────────────
 		'emptyState.noLinks.title': 'Save your first link',
@@ -303,6 +287,13 @@ const translations = {
 		'tagsView.deleteTag': 'Elimina tag',
 		'tagsView.mergeTag': 'Unisci in…',
 		'tagsView.searchPlaceholder': 'Cerca link o tag…',
+		'tagsView.statsTags': 'tag',
+		'tagsView.statsTagged': 'con tag',
+		'tagsView.statsUntagged': 'senza tag',
+		'tagsView.backToIndex': 'Torna a tutti i tag',
+		'tagsView.related': 'Anche in:',
+		'tagsView.links': 'link',
+		'tagsView.confirmDelete': 'Eliminare questo tag da tutti i link?',
 
 		// ── EditModal ─────────────────────────────────────────
 		'editModal.titleAdd': 'Aggiungi link',
@@ -373,10 +364,6 @@ const translations = {
 		'linkItem.delete': 'Elimina',
 		'linkItem.markRead': 'Segna come letto',
 		'linkItem.markUnread': 'Segna come non letto',
-		'linkItem.suggestions': 'Suggeriti',
-		'linkItem.addSuggestion': 'Aggiungi tag',
-		'linkItem.dismissSuggestions': 'Ignora suggerimenti',
-
 		// ── BaseModal ─────────────────────────────────────────
 		'baseModal.close': 'Chiudi',
 
@@ -418,25 +405,6 @@ const translations = {
 		'options.importProgress': 'Importazione… {done}/{total}',
 		'options.importDone': 'Completato — {count} importati, {skipped} duplicati ignorati',
 		'options.importError': 'File non leggibile. Assicurati sia un export HTML dei bookmark.',
-
-		// ── AI description ────────────────────────────────────
-		'options.aiSection': 'Descrizioni AI',
-		'options.aiApiKey': 'Chiave API OpenRouter',
-		'options.aiApiKeyDesc': 'Genera automaticamente descrizioni con un modello AI gratuito quando salvi un link. Ottieni una chiave gratuita su openrouter.ai.',
-		'options.aiApiKeyPlaceholder': 'sk-or-v1-...',
-		'options.aiApiKeySaved': 'Salvata ✓',
-		'options.aiApiKeyRemove': 'Rimuovi',
-		'options.aiModel': 'Modello',
-		'options.aiModelDesc': 'ID modello OpenRouter. Aggiungi :free per i modelli gratuiti.',
-		'options.aiModelPlaceholder': 'meta-llama/llama-3.2-3b-instruct:free',
-		'options.aiBulkGenerate': 'Genera descrizioni mancanti',
-		'options.aiBulkGenerateDesc': 'Esegui l\'AI su tutti i link che non hanno ancora una descrizione.',
-		'options.aiBulkBtn': 'Genera tutto',
-		'options.aiBulkProgress': ({ done, total }) => `Generando… ${done} / ${total}`,
-		'options.aiBulkDone': ({ count }) => count > 0 ? `Fatto — ${count} generate` : 'Tutti i link hanno già una descrizione',
-		'options.aiBulkError': 'Errore — controlla la chiave API e riprova',
-		'options.saveErrorTitle': 'Salvataggio fallito',
-		'options.saveErrorMessage': 'Impossibile salvare le impostazioni. Riprova.',
 
 		// ── Empty states ─────────────────────────────────────
 		'emptyState.noLinks.title': 'Salva il tuo primo link',

@@ -7,7 +7,7 @@ import '../providers/collection_provider.dart';
 import '../theme/void_colors.dart';
 import '../utils/i18n.dart';
 
-/// Bottom sheet to edit a link's title, tags, note and collection.
+/// Bottom sheet to edit a link's title, tags and collection.
 class EditLinkSheet extends StatefulWidget {
   final LinkItem link;
 
@@ -20,7 +20,6 @@ class EditLinkSheet extends StatefulWidget {
 class _EditLinkSheetState extends State<EditLinkSheet> {
   late final TextEditingController _titleController;
   late final TextEditingController _tagsController;
-  late final TextEditingController _noteController;
   String? _selectedCollectionId;
   bool _isSaving = false;
 
@@ -29,7 +28,6 @@ class _EditLinkSheetState extends State<EditLinkSheet> {
     super.initState();
     _titleController = TextEditingController(text: widget.link.title);
     _tagsController = TextEditingController(text: widget.link.tags.join(', '));
-    _noteController = TextEditingController(text: widget.link.note ?? '');
     _selectedCollectionId = widget.link.collectionId;
   }
 
@@ -37,7 +35,6 @@ class _EditLinkSheetState extends State<EditLinkSheet> {
   void dispose() {
     _titleController.dispose();
     _tagsController.dispose();
-    _noteController.dispose();
     super.dispose();
   }
 
@@ -50,14 +47,11 @@ class _EditLinkSheetState extends State<EditLinkSheet> {
         .where((tag) => tag.isNotEmpty)
         .toList();
 
-    final noteText = _noteController.text.trim();
-
     final updated = widget.link.copyWith(
       title: _titleController.text.trim().isEmpty
           ? widget.link.title
           : _titleController.text.trim(),
       tags: tags,
-      note: noteText.isEmpty ? null : noteText,
       collectionId: _selectedCollectionId,
       clearCollectionId: _selectedCollectionId == null,
     );
@@ -107,19 +101,6 @@ class _EditLinkSheetState extends State<EditLinkSheet> {
               border: const OutlineInputBorder(),
             ),
             textCapitalization: TextCapitalization.characters,
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _noteController,
-            decoration: InputDecoration(
-              labelText: t('editLink.noteLabel'),
-              hintText: t('editLink.noteHint'),
-              border: const OutlineInputBorder(),
-              alignLabelWithHint: true,
-            ),
-            maxLines: 4,
-            minLines: 2,
-            textCapitalization: TextCapitalization.sentences,
           ),
           if (collections.isNotEmpty) ...[
             const SizedBox(height: 16),

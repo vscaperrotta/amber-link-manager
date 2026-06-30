@@ -72,16 +72,12 @@ export default function LinkItem(props) {
             {savedAgo ? <span className="newtab__link-time">{savedAgo}</span> : null}
           </div>
         ) : null}
-        {(props.link.metadata?.aiDescription || props.link.metadata?.description) ? (
-          <div className="newtab__link-description">
-            {props.link.metadata.aiDescription || props.link.metadata.description}
-          </div>
-        ) : null}
         <TagEditor
           tags={props.link.metadata?.tags || []}
           allTags={props.allTags}
           onSave={props.onTagSave}
         />
+
       </div>
       {!props.selectable && <div className="newtab__link-actions">
         {props.onToggleRead ? (

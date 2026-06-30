@@ -10,8 +10,6 @@ const FORM_ID = 'edit-modal-form';
 export default function EditModal({ isOpen, link, isSaving, saveError, allTags, collections, onClose, onSubmit }) {
 	const [url, setUrl] = useState('');
 	const [title, setTitle] = useState('');
-	const [description, setDescription] = useState('');
-	const [note, setNote] = useState('');
 	const [tags, setTags] = useState([]);
 	const [collectionId, setCollectionId] = useState('');
 
@@ -19,15 +17,11 @@ export default function EditModal({ isOpen, link, isSaving, saveError, allTags, 
 		if (isOpen && link) {
 			setUrl(link.url || '');
 			setTitle(link.title || '');
-			setDescription(link.metadata?.description || '');
-			setNote(link.metadata?.note || '');
 			setTags((link.metadata?.tags || []).map(tag => tag.toUpperCase()));
 			setCollectionId(link.metadata?.collectionId || '');
 		} else if (isOpen && !link) {
 			setUrl('');
 			setTitle('');
-			setDescription('');
-			setNote('');
 			setTags([]);
 			setCollectionId('');
 		}
@@ -38,8 +32,6 @@ export default function EditModal({ isOpen, link, isSaving, saveError, allTags, 
 		if (!url) return;
 		const metadata = {
 			...(link?.metadata || {}),
-			description,
-			note: note || undefined,
 			tags,
 			collectionId: collectionId || null,
 		};
@@ -83,28 +75,6 @@ export default function EditModal({ isOpen, link, isSaving, saveError, allTags, 
 					value={url}
 					onChange={(e) => setUrl(e.target.value)}
 				/>
-				<div className="input">
-					<textarea
-						id="edit-modal-description"
-						className="input__field"
-						placeholder={t('editModal.fieldDescription')}
-						aria-label={t('editModal.fieldDescription')}
-						value={description}
-						onChange={(e) => setDescription(e.target.value)}
-						rows={3}
-					/>
-				</div>
-				<div className="input">
-					<textarea
-						id="edit-modal-note"
-						className="input__field input__field--note"
-						placeholder={t('editModal.fieldNotePlaceholder')}
-						aria-label={t('editModal.fieldNote')}
-						value={note}
-						onChange={(e) => setNote(e.target.value)}
-						rows={3}
-					/>
-				</div>
 				{collections.length > 0 && (
 					<div className="input">
 						<select

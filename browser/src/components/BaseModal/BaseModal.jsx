@@ -86,7 +86,7 @@ function BaseModal({
 					{primaryAction && (
 						<Button
 							text={primaryAction.loading ? t('common.loading') : primaryAction.label}
-							variant={primaryAction.variant ?? 'primary'}
+							variant={primaryAction.variant ?? 'dark'}
 							size="small"
 							type={primaryAction.type ?? 'button'}
 							form={primaryAction.form}
@@ -111,7 +111,7 @@ BaseModal.propTypes = {
 		onClick: PropTypes.func,
 		type: PropTypes.oneOf(['button', 'submit']),
 		form: PropTypes.string,
-		variant: PropTypes.oneOf(['primary', 'danger']),
+		variant: PropTypes.oneOf(['primary', 'dark', 'danger']),
 		loading: PropTypes.bool,
 		disabled: PropTypes.bool,
 	}),

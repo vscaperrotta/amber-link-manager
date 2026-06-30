@@ -18,7 +18,6 @@ import {
 } from './firebaseDb';
 import { LinkEntry, Metadata } from '../types/LinkType';
 import type MainPlugin from '../main';
-import { generateAiDescription } from './openRouter';
 
 export class LinksService {
   links: LinkEntry[] = [];
@@ -89,26 +88,7 @@ export class LinksService {
       await this._loadLocalLinks();
     }
 
-    this._tryGenerateAiDescription(entry);
     return entry;
-  }
-
-  private async _tryGenerateAiDescription(link: LinkEntry): Promise<void> {
-    const apiKey = this.plugin.openrouterApiKey;
-    if (!apiKey) return;
-    try {
-      const desc = await generateAiDescription({
-        url: link.url,
-        title: link.title,
-        apiKey,
-        model: this.plugin.openrouterModel,
-      });
-      if (desc) {
-        await this.patchLinkMetadata(link.id, { aiDescription: desc });
-      }
-    } catch {
-      // silent failure
-    }
   }
 
   async patchLinkMetadata(id: string, patch: Partial<Metadata>): Promise<void> {
@@ -178,35 +158,6 @@ export class LinksService {
       const updated = [...new Set((link.metadata?.tags ?? []).map((t) => (t === fromTag ? target : t)))];
       await this.patchLinkMetadata(link.id, { tags: updated });
     }
-  }
-
-  // ── Batch AI descriptions ──────────────────────────────────────────────────
-
-  async generateMissingDescriptions(
-    onProgress: (done: number, total: number) => void
-  ): Promise<number> {
-    const apiKey = this.plugin.openrouterApiKey;
-    if (!apiKey) return 0;
-    const missing = this.links.filter((l) => !l.metadata?.aiDescription);
-    let done = 0;
-    for (const link of missing) {
-      try {
-        const desc = await generateAiDescription({
-          url: link.url,
-          title: link.title,
-          apiKey,
-          model: this.plugin.openrouterModel,
-        });
-        if (desc) {
-          await this.patchLinkMetadata(link.id, { aiDescription: desc });
-          done++;
-        }
-      } catch {
-        // skip
-      }
-      onProgress(done, missing.length);
-    }
-    return done;
   }
 
   destroy(): void {

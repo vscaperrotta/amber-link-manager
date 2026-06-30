@@ -90,19 +90,6 @@ const translations: Record<string, Record<string, string>> = {
     // Tag Input
     'tagInput.placeholder': 'Add tag\u2026',
 
-    // OpenRouter / AI
-    'settings.aiHeading': 'AI Descriptions',
-    'settings.openRouterKey': 'OpenRouter API key',
-    'settings.openRouterKeyDesc': 'Used to generate AI descriptions for saved links',
-    'settings.openRouterModel': 'Model',
-    'settings.openRouterModelDesc': 'OpenRouter model ID (default: meta-llama/llama-3.2-3b-instruct:free)',
-    'settings.generateMissing': 'Generate missing descriptions',
-    'settings.generateMissingDesc': 'Run AI on all links that do not yet have a description',
-    'settings.generateBtn': 'Generate',
-    'settings.generating': 'Generating… {done} / {total}',
-    'settings.generateDone': 'Done — {n} generated',
-    'settings.generateError': 'Error — check your API key',
-
     // Settings
     'settings.configHeading': 'Configuration',
     'settings.libraryFolder': 'Library folder',
@@ -223,19 +210,6 @@ const translations: Record<string, Record<string, string>> = {
 
     // Tag Input
     'tagInput.placeholder': 'Aggiungi tag\u2026',
-
-    // OpenRouter / AI
-    'settings.aiHeading': 'Descrizioni AI',
-    'settings.openRouterKey': 'Chiave API OpenRouter',
-    'settings.openRouterKeyDesc': 'Usata per generare descrizioni AI dei link salvati',
-    'settings.openRouterModel': 'Modello',
-    'settings.openRouterModelDesc': 'ID modello OpenRouter (default: meta-llama/llama-3.2-3b-instruct:free)',
-    'settings.generateMissing': 'Genera descrizioni mancanti',
-    'settings.generateMissingDesc': 'Esegui AI su tutti i link privi di descrizione',
-    'settings.generateBtn': 'Genera',
-    'settings.generating': 'Generazione… {done} / {total}',
-    'settings.generateDone': 'Completato — {n} generate',
-    'settings.generateError': 'Errore — controlla la chiave API',
 
     // Settings
     'settings.configHeading': 'Configurazione',

@@ -18,28 +18,6 @@ import {
 import { getCurrentTab, isInternalUrl } from './tabs.js';
 import { normalizeUrl } from './normalizeUrl.js';
 import { FETCH_METADATA, METADATA_ENRICHED, GET_METADATA } from '../common/actions.js';
-import { getOpenRouterApiKey, getOpenRouterModel, generateAiDescription, generateTagSuggestions } from './openRouter.js';
-
-async function _tryGenerateAiDescription({ url, title, id, uid, loadLocal }) {
-  try {
-    const apiKey = await getOpenRouterApiKey();
-    if (!apiKey) return;
-    const model = await getOpenRouterModel();
-    const desc = await generateAiDescription({ url, title, html: '', apiKey, model });
-    if (!desc) return;
-    const pendingTagSuggestions = await generateTagSuggestions({ description: desc, title, apiKey, model });
-    const patch = { aiDescription: desc };
-    if (pendingTagSuggestions.length > 0) patch.pendingTagSuggestions = pendingTagSuggestions;
-    if (uid) {
-      await fbPatchLinkMetadata(uid, id, patch);
-    } else {
-      await dbPatchLinkMetadata(id, patch);
-      if (loadLocal) await loadLocal();
-    }
-  } catch (err) {
-    console.warn('[useLinks] AI description failed:', err?.message);
-  }
-}
 
 export function useLinks() {
   const [links, setLinks] = useState([]);
@@ -154,7 +132,6 @@ export function useLinks() {
           payload: { url: entry.url, id: savedId, uid, tabId: tab.id },
         }).catch(() => { });
       }
-      _tryGenerateAiDescription({ url: entry.url, title: entry.title, id: savedId, uid, loadLocal: null });
     } else {
       console.log('[saveCurrentTab] saving to IndexedDB');
       const newId = await dbAddLink(entry);
@@ -167,7 +144,6 @@ export function useLinks() {
           payload: { url: entry.url, id: savedId, uid: null, tabId: tab.id },
         }).catch(() => { });
       }
-      _tryGenerateAiDescription({ url: entry.url, title: entry.title, id: savedId, uid: null, loadLocal: loadLocalLinks });
     }
     return { duplicate: false, savedId };
   }, [loadLocalLinks, links]);
@@ -194,7 +170,6 @@ export function useLinks() {
           action: FETCH_METADATA,
           payload: { url, id: docRef.id, uid: userRef.current.uid, tabId: null },
         }).catch(() => { });
-        _tryGenerateAiDescription({ url, title: title || url, id: docRef.id, uid: userRef.current.uid, loadLocal: null });
         return { duplicate: false, savedId: docRef.id };
       } catch (err) {
         console.error('[useLinks] fbAddLink error (custom)', err);
@@ -208,7 +183,6 @@ export function useLinks() {
           action: FETCH_METADATA,
           payload: { url, id: newId, uid: null, tabId: null },
         }).catch(() => { });
-        _tryGenerateAiDescription({ url, title: title || url, id: newId, uid: null, loadLocal: loadLocalLinks });
         return { duplicate: false, savedId: newId };
       } catch (err) {
         console.error('[useLinks] dbAddLink error (custom)', err);

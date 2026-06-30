@@ -158,6 +158,7 @@ export default function Sidebar({
 				aria-label={t('sidebar.ariaLabel')}
 			>
 				<div className='sidebar__header'>
+					<p className='sidebar__header-menu'>Menu</p>
 					<div className="sidebar__toggle">
 						<IconButton
 							icon={<PanelRightOpen size={18} />}

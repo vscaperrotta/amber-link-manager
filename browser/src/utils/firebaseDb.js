@@ -7,6 +7,7 @@ import {
   onSnapshot,
   query,
   orderBy,
+  getDocs,
 } from 'firebase/firestore';
 import { db } from '../common/firebase.js';
 
@@ -49,6 +50,17 @@ export function patchLinkMetadata(uid, id, patch) {
  * @param {(links: Array) => void} callback
  * @returns {() => void} unsubscribe function
  */
+/**
+ * One-off fetch of all the user's links (no real-time subscription).
+ * Used by the background service worker, which doesn't hold a live link list.
+ * @param {string} uid
+ * @returns {Promise<Array>}
+ */
+export async function getAllLinksOnce(uid) {
+  const snapshot = await getDocs(collection(db, `users/${uid}/links`));
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
 export function subscribeLinks(uid, callback) {
   const q = query(
     collection(db, `users/${uid}/links`),

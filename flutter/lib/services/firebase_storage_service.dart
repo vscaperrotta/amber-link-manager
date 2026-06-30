@@ -12,28 +12,6 @@ class FirebaseStorageService {
     return _firestore.collection('users').doc(uid).collection('links');
   }
 
-  DocumentReference<Map<String, dynamic>> _settingsDoc(String uid) {
-    return _firestore.collection('users').doc(uid).collection('settings').doc('preferences');
-  }
-
-  Future<Map<String, dynamic>> getUserSettings(String uid) async {
-    try {
-      final snap = await _settingsDoc(uid).get();
-      if (!snap.exists) return {};
-      final data = snap.data() ?? {};
-      return {
-        if (data['openrouterApiKey'] is String) 'openrouterApiKey': data['openrouterApiKey'],
-        if (data['openrouterModel'] is String) 'openrouterModel': data['openrouterModel'],
-      };
-    } catch (_) {
-      return {};
-    }
-  }
-
-  Future<void> saveUserSettings(String uid, Map<String, dynamic> settings) async {
-    await _settingsDoc(uid).set(settings, SetOptions(merge: true));
-  }
-
   Future<List<LinkItem>> getLinks(String uid) async {
     debugPrint(
       '[FirebaseStorageService] Querying collection: users/$uid/links',

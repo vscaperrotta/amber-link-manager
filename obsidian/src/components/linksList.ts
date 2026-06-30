@@ -73,10 +73,6 @@ export default function renderLinksList(
     });
     deleteBtn.addEventListener('click', () => onDelete(link.id));
 
-    if (link.metadata?.aiDescription) {
-      item.createEl('p', { text: link.metadata.aiDescription, cls: 'obs-amber-links-description' });
-    }
-
     const tagsRow = item.createDiv({ cls: 'obs-amber-links-tags' });
 
     const tags = link.metadata?.tags ?? [];

@@ -144,7 +144,7 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
       result = result.filter(l =>
         (l.title || '').toLowerCase().includes(q) ||
         l.url.toLowerCase().includes(q) ||
-        (l.metadata?.aiDescription || l.metadata?.description || '').toLowerCase().includes(q) ||
+        (l.metadata?.description || '').toLowerCase().includes(q) ||
         extractDomain(l.url).toLowerCase().includes(q) ||
         (l.metadata?.tags || []).join(' ').toLowerCase().includes(q)
       );
@@ -202,7 +202,6 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
       link,
       viewMode,
       featured: !!featured,
-      showDescription: settings.showDescription !== false,
       selectable: isSelectMode,
       selected: selectedIds.has(link.id),
       onSelect: () => toggleSelectId(link.id),
@@ -212,17 +211,6 @@ export default function HomeView({ links, loading, auth, onEdit, onDelete, updat
       onTagSave: (tags) => updateLink(link.id, { metadata: { ...(link.metadata || {}), tags } }),
       onToggleFavorite: () => updateLink(link.id, { metadata: { ...(link.metadata || {}), isFavorite: !link.metadata?.isFavorite } }),
       onToggleRead: () => updateLink(link.id, { metadata: { ...(link.metadata || {}), isRead: link.metadata?.isRead === false ? true : false } }),
-      onResolveSuggestions: (autoTags, remaining) => {
-        const current = link.metadata?.tags ?? [];
-        const merged = [...new Set([...current, ...autoTags])];
-        updateLink(link.id, { metadata: { ...(link.metadata || {}), tags: merged, pendingTagSuggestions: remaining.length > 0 ? remaining : null } });
-      },
-      onAcceptSuggestedTag: (tag) => {
-        const current = link.metadata?.tags ?? [];
-        const remaining = (link.metadata?.pendingTagSuggestions ?? []).filter(t => t.toUpperCase() !== tag.toUpperCase());
-        updateLink(link.id, { metadata: { ...(link.metadata || {}), tags: [...new Set([...current, tag.toUpperCase()])], pendingTagSuggestions: remaining.length > 0 ? remaining : null } });
-      },
-      onDismissSuggestions: () => updateLink(link.id, { metadata: { ...(link.metadata || {}), pendingTagSuggestions: null } }),
     };
   }
 

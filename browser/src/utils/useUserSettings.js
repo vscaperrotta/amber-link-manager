@@ -4,7 +4,7 @@ import { subscribeUserSettings, updateUserSettings } from './userSettings.js';
 
 export function useUserSettings() {
 	const { user, authReady } = useAuth();
-	const [settings, setSettings] = useState({ newtabEnabled: false, defaultViewMode: 'grid', headerLinks: [] });
+	const [settings, setSettings] = useState({ newtabEnabled: false, defaultViewMode: 'grid', headerLinks: [], showDescription: true });
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {

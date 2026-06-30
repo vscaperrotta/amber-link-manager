@@ -8,7 +8,6 @@ class LinkItem {
   final DateTime createdAt;
   final bool isFavorite;
   final bool isRead;
-  final String? aiDescription;
   final String? thumbnail;
   final String? note;
   final String? collectionId;
@@ -21,7 +20,6 @@ class LinkItem {
     DateTime? createdAt,
     bool? isFavorite,
     bool? isRead,
-    this.aiDescription,
     this.thumbnail,
     this.note,
     this.collectionId,
@@ -40,7 +38,6 @@ class LinkItem {
       'savedAt': createdAt.millisecondsSinceEpoch,
       'is_favorite': isFavorite ? 1 : 0,
       'is_read': isRead ? 1 : 0,
-      'ai_description': aiDescription ?? '',
       'thumbnail': thumbnail ?? '',
       'note': note ?? '',
       'collection_id': collectionId ?? '',
@@ -53,9 +50,6 @@ class LinkItem {
       'isFavorite': isFavorite,
       'isRead': isRead,
     };
-    if (aiDescription != null && aiDescription!.isNotEmpty) {
-      metadata['aiDescription'] = aiDescription;
-    }
     if (thumbnail != null && thumbnail!.isNotEmpty) {
       metadata['thumbnail'] = thumbnail;
     }
@@ -98,7 +92,6 @@ class LinkItem {
       createdAt: createdDate ?? DateTime.now(),
       isFavorite: _parseFavorite(map),
       isRead: _parseIsRead(map),
-      aiDescription: _parseAiDescription(map),
       thumbnail: _parseThumbnail(map),
       note: _parseNote(map),
       collectionId: _parseCollectionId(map),
@@ -121,19 +114,6 @@ class LinkItem {
     }
     if (map['is_read'] is int) return (map['is_read'] as int) == 1;
     return true;
-  }
-
-  static String? _parseAiDescription(Map<String, dynamic> map) {
-    final metadata = map['metadata'];
-    if (metadata is Map && metadata['aiDescription'] is String) {
-      final val = metadata['aiDescription'] as String;
-      return val.isEmpty ? null : val;
-    }
-    if (map['ai_description'] is String) {
-      final val = map['ai_description'] as String;
-      return val.isEmpty ? null : val;
-    }
-    return null;
   }
 
   static String? _parseThumbnail(Map<String, dynamic> map) {
@@ -198,7 +178,6 @@ class LinkItem {
     List<String>? tags,
     bool? isFavorite,
     bool? isRead,
-    String? aiDescription,
     String? thumbnail,
     String? note,
     String? collectionId,
@@ -212,7 +191,6 @@ class LinkItem {
       createdAt: createdAt,
       isFavorite: isFavorite ?? this.isFavorite,
       isRead: isRead ?? this.isRead,
-      aiDescription: aiDescription ?? this.aiDescription,
       thumbnail: thumbnail ?? this.thumbnail,
       note: note ?? this.note,
       collectionId: clearCollectionId ? null : (collectionId ?? this.collectionId),

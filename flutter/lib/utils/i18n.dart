@@ -18,14 +18,12 @@ const Map<String, Map<String, String>> _translations = {
     // Home
     'home.title': 'Amber',
     'home.emptyTitle': 'No saved links',
-    'home.emptySubtitle':
-        'Tap + to add one\nor share a link from another app',
+    'home.emptySubtitle': 'Tap + to add one\nor share a link from another app',
 
     // Favorites
     'favorites.title': 'Favorites',
     'favorites.emptyTitle': 'No favorites',
-    'favorites.emptySubtitle':
-        'Tap the star on a link to add it to favorites',
+    'favorites.emptySubtitle': 'Tap the star on a link to add it to favorites',
 
     // Tags
     'tags.title': 'Tags',
@@ -94,7 +92,6 @@ const Map<String, Map<String, String>> _translations = {
     'options.title': 'Settings',
     'options.sectionAccount': 'Account',
     'options.sectionCollection': 'Collection',
-    'options.sectionAI': 'AI Descriptions',
     'options.signedInAs': 'Signed in as',
     'options.signOut': 'Sign out',
     'options.signIn': 'Sign in / Register',
@@ -103,12 +100,6 @@ const Map<String, Map<String, String>> _translations = {
     'options.exportJson': 'Export as JSON',
     'options.exportSuccess': '{n} links exported',
     'options.exportError': 'Export failed',
-    'options.openRouterKey': 'OpenRouter API key',
-    'options.openRouterModel': 'Model',
-    'options.generateDescriptions': 'Generate missing descriptions',
-    'options.generating': 'Generating… {done} / {total}',
-    'options.generateDone': 'Done — {n} generated',
-    'options.generateError': 'Error — check your API key',
     'options.save': 'Save',
     'options.saved': 'Saved',
 
@@ -144,13 +135,15 @@ const Map<String, Map<String, String>> _translations = {
     'collections.none': 'No collection',
     'collections.clearFilter': 'Clear collection filter',
     'collections.emptyTitle': 'No links in this collection',
-    'collections.emptySubtitle': 'Edit a link and assign it to this collection.',
+    'collections.emptySubtitle':
+        'Edit a link and assign it to this collection.',
     'collections.add': 'New collection',
     'collections.addTitle': 'Add collection',
     'collections.nameHint': 'Collection name',
     'collections.rename': 'Rename',
     'collections.deleteConfirm': 'Delete collection?',
-    'collections.deleteMessage': 'Links in this collection will not be deleted.',
+    'collections.deleteMessage':
+        'Links in this collection will not be deleted.',
     'collections.manage': 'Manage collections',
   },
   'it': {
@@ -246,7 +239,6 @@ const Map<String, Map<String, String>> _translations = {
     'options.title': 'Impostazioni',
     'options.sectionAccount': 'Account',
     'options.sectionCollection': 'Collezione',
-    'options.sectionAI': 'Descrizioni AI',
     'options.signedInAs': 'Accesso come',
     'options.signOut': 'Esci',
     'options.signIn': 'Accedi / Registrati',
@@ -255,12 +247,6 @@ const Map<String, Map<String, String>> _translations = {
     'options.exportJson': 'Esporta come JSON',
     'options.exportSuccess': '{n} link esportati',
     'options.exportError': 'Esportazione fallita',
-    'options.openRouterKey': 'Chiave API OpenRouter',
-    'options.openRouterModel': 'Modello',
-    'options.generateDescriptions': 'Genera descrizioni mancanti',
-    'options.generating': 'Generazione… {done} / {total}',
-    'options.generateDone': 'Completato — {n} generate',
-    'options.generateError': 'Errore — controlla la chiave API',
     'options.save': 'Salva',
     'options.saved': 'Salvato',
 
@@ -296,13 +282,15 @@ const Map<String, Map<String, String>> _translations = {
     'collections.none': 'Nessuna cartella',
     'collections.clearFilter': 'Rimuovi filtro cartella',
     'collections.emptyTitle': 'Nessun link in questa cartella',
-    'collections.emptySubtitle': 'Modifica un link e assegnalo a questa cartella.',
+    'collections.emptySubtitle':
+        'Modifica un link e assegnalo a questa cartella.',
     'collections.add': 'Nuova cartella',
     'collections.addTitle': 'Aggiungi cartella',
     'collections.nameHint': 'Nome cartella',
     'collections.rename': 'Rinomina',
     'collections.deleteConfirm': 'Eliminare la cartella?',
-    'collections.deleteMessage': 'I link in questa cartella non verranno eliminati.',
+    'collections.deleteMessage':
+        'I link in questa cartella non verranno eliminati.',
     'collections.manage': 'Gestisci cartelle',
   },
 };

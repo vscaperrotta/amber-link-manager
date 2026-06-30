@@ -42,10 +42,6 @@ export default function renderLinksGrid(
       window.open(link.url, '_blank');
     });
 
-    if (link.metadata?.aiDescription) {
-      card.createEl('p', { text: link.metadata.aiDescription, cls: 'obs-amber-links-card-description' });
-    }
-
     card.createEl('span', { text: link.url, cls: 'obs-amber-links-card-url' });
 
     const tagsRow = card.createDiv({ cls: 'obs-amber-links-tags' });
