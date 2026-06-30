@@ -8,8 +8,9 @@ class LinkItem {
   final DateTime createdAt;
   final bool isFavorite;
   final bool isRead;
-  final String? aiDescription;
   final String? thumbnail;
+  final String? note;
+  final String? collectionId;
 
   LinkItem({
     String? id,
@@ -19,8 +20,9 @@ class LinkItem {
     DateTime? createdAt,
     bool? isFavorite,
     bool? isRead,
-    this.aiDescription,
     this.thumbnail,
+    this.note,
+    this.collectionId,
   }) : id = id ?? const Uuid().v4(),
        tags = tags ?? const [],
        createdAt = createdAt ?? DateTime.now(),
@@ -36,8 +38,9 @@ class LinkItem {
       'savedAt': createdAt.millisecondsSinceEpoch,
       'is_favorite': isFavorite ? 1 : 0,
       'is_read': isRead ? 1 : 0,
-      'ai_description': aiDescription ?? '',
       'thumbnail': thumbnail ?? '',
+      'note': note ?? '',
+      'collection_id': collectionId ?? '',
     };
   }
 
@@ -47,11 +50,14 @@ class LinkItem {
       'isFavorite': isFavorite,
       'isRead': isRead,
     };
-    if (aiDescription != null && aiDescription!.isNotEmpty) {
-      metadata['aiDescription'] = aiDescription;
-    }
     if (thumbnail != null && thumbnail!.isNotEmpty) {
       metadata['thumbnail'] = thumbnail;
+    }
+    if (note != null && note!.isNotEmpty) {
+      metadata['note'] = note;
+    }
+    if (collectionId != null && collectionId!.isNotEmpty) {
+      metadata['collectionId'] = collectionId;
     }
     return {
       'url': url,
@@ -86,8 +92,9 @@ class LinkItem {
       createdAt: createdDate ?? DateTime.now(),
       isFavorite: _parseFavorite(map),
       isRead: _parseIsRead(map),
-      aiDescription: _parseAiDescription(map),
       thumbnail: _parseThumbnail(map),
+      note: _parseNote(map),
+      collectionId: _parseCollectionId(map),
     );
   }
 
@@ -109,19 +116,6 @@ class LinkItem {
     return true;
   }
 
-  static String? _parseAiDescription(Map<String, dynamic> map) {
-    final metadata = map['metadata'];
-    if (metadata is Map && metadata['aiDescription'] is String) {
-      final val = metadata['aiDescription'] as String;
-      return val.isEmpty ? null : val;
-    }
-    if (map['ai_description'] is String) {
-      final val = map['ai_description'] as String;
-      return val.isEmpty ? null : val;
-    }
-    return null;
-  }
-
   static String? _parseThumbnail(Map<String, dynamic> map) {
     final metadata = map['metadata'];
     if (metadata is Map && metadata['thumbnail'] is String) {
@@ -130,6 +124,32 @@ class LinkItem {
     }
     if (map['thumbnail'] is String) {
       final val = map['thumbnail'] as String;
+      return val.isEmpty ? null : val;
+    }
+    return null;
+  }
+
+  static String? _parseNote(Map<String, dynamic> map) {
+    final metadata = map['metadata'];
+    if (metadata is Map && metadata['note'] is String) {
+      final val = metadata['note'] as String;
+      return val.isEmpty ? null : val;
+    }
+    if (map['note'] is String) {
+      final val = map['note'] as String;
+      return val.isEmpty ? null : val;
+    }
+    return null;
+  }
+
+  static String? _parseCollectionId(Map<String, dynamic> map) {
+    final metadata = map['metadata'];
+    if (metadata is Map && metadata['collectionId'] is String) {
+      final val = metadata['collectionId'] as String;
+      return val.isEmpty ? null : val;
+    }
+    if (map['collection_id'] is String) {
+      final val = map['collection_id'] as String;
       return val.isEmpty ? null : val;
     }
     return null;
@@ -158,8 +178,10 @@ class LinkItem {
     List<String>? tags,
     bool? isFavorite,
     bool? isRead,
-    String? aiDescription,
     String? thumbnail,
+    String? note,
+    String? collectionId,
+    bool clearCollectionId = false,
   }) {
     return LinkItem(
       id: id,
@@ -169,8 +191,9 @@ class LinkItem {
       createdAt: createdAt,
       isFavorite: isFavorite ?? this.isFavorite,
       isRead: isRead ?? this.isRead,
-      aiDescription: aiDescription ?? this.aiDescription,
       thumbnail: thumbnail ?? this.thumbnail,
+      note: note ?? this.note,
+      collectionId: clearCollectionId ? null : (collectionId ?? this.collectionId),
     );
   }
 

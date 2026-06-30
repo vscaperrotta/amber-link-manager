@@ -31,7 +31,7 @@ Button.propTypes = {
 	type: PropTypes.string,
 	form: PropTypes.string,
 	size: PropTypes.oneOf(['small', 'medium']),
-	variant: PropTypes.oneOf(['primary', 'secondary', 'danger']),
+	variant: PropTypes.oneOf(['primary', 'secondary', 'dark', 'danger']),
 	disabled: PropTypes.bool,
 	className: PropTypes.string,
 };

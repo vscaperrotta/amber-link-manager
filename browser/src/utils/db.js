@@ -1,6 +1,7 @@
 const DB_NAME = 'amber';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'links';
+const COLLECTIONS_STORE = 'collections';
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -14,6 +15,9 @@ function openDB() {
           autoIncrement: true,
         });
         store.createIndex('savedAt', 'savedAt', { unique: false });
+      }
+      if (!db.objectStoreNames.contains(COLLECTIONS_STORE)) {
+        db.createObjectStore(COLLECTIONS_STORE, { keyPath: 'id' });
       }
     };
 

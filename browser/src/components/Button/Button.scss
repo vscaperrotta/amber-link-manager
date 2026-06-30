@@ -50,8 +50,22 @@
 		border-color: transparent;
 
 		&:hover {
-			background-color: var(--accent-muted);
+			background-color: var(--surface-dark-10);
 			color: var(--text-primary);
+		}
+	}
+
+	&.button--dark {
+		background-color: #0F0F12;
+		border-color: var(--border);
+		color: #FFFFFF;
+
+		&:hover {
+			background-color: color-mix(in srgb, #0F0F12 80%, white);
+		}
+
+		&:active {
+			background-color: #000;
 		}
 	}
 

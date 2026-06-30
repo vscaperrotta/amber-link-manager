@@ -1,7 +1,7 @@
 export const APP_NAME = 'Amber';
 export const APP_VERSION = '1.0.0';
 export const APP_DESCRIPTION = 'A smart new tab extension for Chrome.';
-export const MAX_POPUP_LINKS = 20;
+export const MAX_POPUP_LINKS = 5;
 export const TAG_COLORS = [
   "#F28B8B", // rosa
   "#FFB570", // pesca

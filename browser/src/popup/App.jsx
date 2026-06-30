@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Settings, Trash2, Plus, Search, Bookmark, Pin } from 'lucide-react';
+import { Settings, Trash2, Plus, Search, Bookmark, Pin, PanelRight, Folder } from 'lucide-react';
 import Browser from 'webextension-polyfill';
 import { APP_NAME } from '../common/constants.js';
 import { useLinks } from '@utils/useLinks';
+import { useCollections } from '@utils/useCollections';
 import { useAuth } from '@contexts/AuthContext.jsx';
 import { useUserSettings } from '@utils/useUserSettings';
 import { getCurrentTab } from '@utils/tabs';
@@ -14,20 +15,20 @@ import { SkeletonLinkRow } from '@components/Skeleton';
 import EmptyState from '@components/EmptyState';
 import TagEditor from '@newtab/components/TagEditor.jsx';
 import { MAX_POPUP_LINKS } from '../common/constants.js';
-import { timeAgo } from '@utils/timeAgo';
-import { extractDomain } from '@utils/domain';
 import { t } from '@utils/i18n';
 import '@styles/main.scss';
 import '@styles/layout/popup.scss';
 
 export default function App() {
 	const { links, loading, saveCurrentTab, saveCustomLink, deleteLink, updateLink } = useLinks();
+	const { collections } = useCollections();
 	const { user } = useAuth();
 	const { settings, updateSettings } = useUserSettings();
 
 	const [addManually, setAddManually] = useState(false);
 	const [customUrl, setCustomUrl] = useState('');
 	const [customTitle, setCustomTitle] = useState('');
+	const [selectedCollectionId, setSelectedCollectionId] = useState('');
 	const [urlError, setUrlError] = useState('');
 	const [saving, setSaving] = useState(false);
 	const [saveError, setSaveError] = useState('');
@@ -80,7 +81,12 @@ export default function App() {
 		setSaving(true);
 		setSaveError('');
 		try {
-			await saveCurrentTab();
+			const result = await saveCurrentTab(selectedCollectionId || null);
+			if (result?.duplicate) {
+				setSaveError(t('popup.duplicateLink'));
+			} else {
+				setSelectedCollectionId('');
+			}
 		} catch (err) {
 			console.error('[popup] handleSaveCurrentTab — error:', err?.message ?? err);
 			setSaveError(t('popup.errorSave'));
@@ -109,9 +115,14 @@ export default function App() {
 		}
 		setUrlError('');
 		try {
-			await saveCustomLink({ url: customUrl, title: customTitle });
+			const result = await saveCustomLink({ url: customUrl, title: customTitle, collectionId: selectedCollectionId || null });
+			if (result?.duplicate) {
+				setUrlError(t('popup.duplicateLink'));
+				return;
+			}
 			setCustomUrl('');
 			setCustomTitle('');
+			setSelectedCollectionId('');
 			setAddManually(false);
 		} catch (err) {
 			console.error('[popup] handleSaveCustom — error:', err?.message ?? err);
@@ -134,6 +145,15 @@ export default function App() {
 		Browser.tabs.create({});
 	}
 
+	function handleOpenSidePanel() {
+		if (!chrome?.sidePanel?.open) return;
+		chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+			if (!tab?.windowId) return;
+			chrome.sidePanel.open({ windowId: tab.windowId });
+			window.close();
+		});
+	}
+
 	return (
 		<div className="popup__container">
 			<header className="popup__header">
@@ -148,6 +168,11 @@ export default function App() {
 						disabled={!user || !currentTab.url}
 						title={isCurrentTabInHeader ? t('popup.removeFromHeaderLinks') : t('popup.addToHeaderLinks')}
 						className={isCurrentTabInHeader ? 'is-active' : ''}
+					/>
+					<IconButton
+						icon={<PanelRight size={17} />}
+						onClick={handleOpenSidePanel}
+						title={t('sidepanel.openSidePanel')}
 					/>
 					<IconButton
 						icon={<Settings size={18} />}
@@ -174,6 +199,22 @@ export default function App() {
 						variant="ghost"
 					/>
 				</div>
+
+				{collections.length > 0 && (
+					<div className="popup__collection-row">
+						<Folder size={12} className="popup__collection-icon" />
+						<select
+							className="popup__collection-select"
+							value={selectedCollectionId}
+							onChange={e => setSelectedCollectionId(e.target.value)}
+						>
+							<option value="">{t('homeView.bulkNoCollection')}</option>
+							{collections.map(col => (
+								<option key={col.id} value={col.id}>{col.name}</option>
+							))}
+						</select>
+					</div>
+				)}
 
 				{saveError && <p className="popup__error">{saveError}</p>}
 
@@ -235,8 +276,6 @@ export default function App() {
 						) : (
 							<ul className="popup__links">
 								{filteredLinks.map((link) => {
-									const domain = extractDomain(link.url);
-									const savedAgo = timeAgo(link.savedAt);
 									return (
 										<li
 											key={link.id}
@@ -271,14 +310,6 @@ export default function App() {
 												/>
 											</div>
 
-											{(domain || savedAgo) ? (
-												<div className="popup__link-meta">
-													{domain ? <span className="popup__link-domain">{domain}</span> : null}
-													{domain && savedAgo ? <span className="popup__link-dot" aria-hidden="true">·</span> : null}
-													{savedAgo ? <span className="popup__link-time">{savedAgo}</span> : null}
-												</div>
-											) : null}
-
 											<div className="popup__link-tags">
 												<TagEditor
 													tags={link.metadata?.tags ?? []}
@@ -286,6 +317,21 @@ export default function App() {
 													onSave={(newTags) => handleTagSave(link, newTags)}
 												/>
 											</div>
+											{collections.length > 0 && (
+												<div className="popup__link-collection">
+													<Folder size={10} className="popup__link-collection-icon" />
+													<select
+														className="popup__link-collection-select"
+														value={link.metadata?.collectionId || ''}
+														onChange={e => updateLink(link.id, { metadata: { ...(link.metadata || {}), collectionId: e.target.value || null } })}
+													>
+														<option value="">{t('homeView.bulkNoCollection')}</option>
+														{collections.map(col => (
+															<option key={col.id} value={col.id}>{col.name}</option>
+														))}
+													</select>
+												</div>
+											)}
 										</li>
 									);
 								})}

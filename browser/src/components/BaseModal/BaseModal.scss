@@ -1,13 +1,14 @@
 // ── Base Modal ──────────────────────────────────────────────
 
 .modal__overlay {
-	align-items: center;
+	align-items: flex-start;
 	background: var(--bg-overlay);
 	display: flex;
 	inset: 0;
 	justify-content: center;
 	opacity: 0;
 	padding: var(--space-md);
+	padding-top: max(3rem, 10vh);
 	position: fixed;
 	transition: opacity 200ms ease;
 	z-index: 40;
@@ -37,7 +38,9 @@
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-md);
+	max-height: calc(100dvh - 3rem);
 	opacity: 0;
+	overflow: hidden;
 	padding: var(--space-lg);
 	transform: translateY(0.5rem) scale(0.98);
 	transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
@@ -60,8 +63,9 @@
 }
 
 .modal__header {
-	display: flex;
 	align-items: center;
+	display: flex;
+	flex-shrink: 0;
 	justify-content: space-between;
 }
 
@@ -82,23 +86,40 @@
 .modal__body {
 	display: flex;
 	flex-direction: column;
+	flex: 1;
 	gap: var(--space-sm);
+	min-height: 0;
+	overflow-y: auto;
 }
 
 .modal__form {
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-sm);
+	min-height: 0;
+}
+
+.modal__tags-row {
+	background: var(--bg-elevated);
+	border: 0.0625rem solid var(--border);
+	border-radius: var(--radius-sm);
+	min-height: 2.25rem;
+	padding: var(--space-xs) var(--space-sm);
+
+	&:focus-within {
+		border-color: var(--border-focus);
+	}
 }
 
 .modal__footer {
-	display: flex;
 	align-items: center;
-	justify-content: flex-end;
-	gap: var(--space-sm);
-	padding-top: var(--space-sm);
 	border-top: 0.0625rem solid var(--border);
+	display: flex;
+	flex-shrink: 0;
+	gap: var(--space-sm);
+	justify-content: flex-end;
 	margin-top: var(--space-xs);
+	padding-top: var(--space-sm);
 }
 
 // ── UserProfileDropdown ──────────────────────────────────────

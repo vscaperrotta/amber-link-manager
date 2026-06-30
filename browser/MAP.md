@@ -60,6 +60,7 @@ src/
 │   │   ├── Main.jsx              # Main content area wrapper
 │   │   ├── TagEditor.jsx         # Inline tag add/remove
 │   │   ├── TagFilterBar.jsx      # Sidebar tag filter
+│   │   ├── CollectionSidebar.jsx # Collections folder tree navigation
 │   │   ├── UserModal.jsx         # Auth modal (sign in / register)
 │   │   └── UserProfileModal.jsx  # Logged-in user profile
 │   ├── hooks/
@@ -75,8 +76,7 @@ src/
 │   ├── messages.js               # Options-specific message constants
 │   └── components/
 │       ├── AccountForm.jsx       # Sign in / register form
-│       ├── AccountInfo.jsx       # Logged-in account display
-│       └── HeaderLinksSection.jsx # OpenRouter AI settings section
+│       └── AccountInfo.jsx       # Logged-in account display
 ├── popup/
 │   ├── App.jsx                   # Popup root
 │   ├── index.html / index.jsx    # Entry
@@ -105,11 +105,10 @@ src/
     ├── firebaseDb.js             # Firestore CRUD + real-time subscription
     ├── globalMethods.js          # Misc shared helpers
     ├── i18n.js                   # t() — EN/IT translations
-    ├── openRouter.js             # OpenRouter AI description generation
     ├── tabs.js                   # chrome.tabs helpers
     ├── timeAgo.js                # Relative time formatting
     ├── useLinks.js               # Main data hook — Firebase ↔ IndexedDB
-    ├── useUserSettings.js        # Hook for OpenRouter API key + model
+    ├── useCollections.js         # Hook for collections/cartelle management
     └── userSettings.js           # SharedPreferences-style settings (storage.sync)
 ```
 
@@ -136,7 +135,6 @@ Save link (content script)
   → newtab: useLinks.addLink()
     → Firebase (logged in): firebaseDb.addLink() + onSnapshot subscription
     → IndexedDB (offline): db.addLink()
-    → fire-and-forget: openRouter.generateDescription() → patchMetadata
 
 Browse links (newtab)
   useLinks hook → onSnapshot (Firebase) or loadAll (IndexedDB)

@@ -1,7 +1,6 @@
 import { App, Modal, Notice } from 'obsidian';
 import { LinkEntry, Metadata } from '../types/LinkType';
 import renderInput from './input';
-import renderTextarea from './textarea';
 import { t } from '../utils/i18n';
 
 function parseTags(raw: string): string[] {
@@ -35,9 +34,6 @@ export class EditLinkModal extends Modal {
     const titleInput = renderInput(contentEl, { type: 'text', placeholder: t('editLink.titlePlaceholder') });
     titleInput.value = this.link.title ?? '';
 
-    const descriptionInput = renderTextarea(contentEl, t('editLink.descriptionPlaceholder'));
-    descriptionInput.value = this.link.metadata?.description ?? '';
-
     const tagsInput = renderInput(contentEl, { type: 'text', placeholder: t('editLink.tagsPlaceholder') });
     tagsInput.value = (this.link.metadata?.tags ?? []).join(', ');
 
@@ -55,10 +51,9 @@ export class EditLinkModal extends Modal {
 
       const title = titleInput.value.trim();
       const tags = parseTags(tagsInput.value);
-      const description = descriptionInput.value.trim().slice(0, 300) || undefined;
       const metadata: Metadata | undefined =
-        tags.length || description
-          ? { ...this.link.metadata, tags: tags.length ? tags : undefined, description }
+        tags.length
+          ? { ...this.link.metadata, tags, description: undefined }
           : { ...this.link.metadata, tags: undefined, description: undefined };
 
       try {

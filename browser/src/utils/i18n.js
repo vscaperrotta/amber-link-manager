@@ -4,13 +4,11 @@ const translations = {
 		'common.save': 'Save',
 		'common.cancel': 'Cancel',
 		'common.delete': 'Delete',
-		'common.edit': 'Edit',
 		'common.confirm': 'Confirm',
 		'common.add': 'Add',
 		'common.loading': 'Loading...',
 		'common.settings': 'Settings',
 		'common.search': 'Search',
-		'common.close': 'Close',
 
 		// ── Popup ─────────────────────────────────────────────
 		'popup.saveCurrentPage': 'Save this page',
@@ -19,29 +17,31 @@ const translations = {
 		'popup.urlPlaceholder': 'https://',
 		'popup.titleOptional': 'Title (optional)',
 		'popup.errorSave': 'Couldn\'t save. Try again.',
+		'popup.duplicateLink': 'This link is already saved.',
 		'popup.errorUrl': 'Please enter a URL.',
 		'popup.errorUrlInvalid': 'Invalid URL. Must start with https://',
-		'popup.noLinks': 'No saved links yet.',
-		'popup.noResults': 'No links match.',
 		'popup.searchPlaceholder': 'Search saved links...',
 		'popup.openFullView': 'Open full library →',
 		'popup.addToHeaderLinks': 'Add to link bar',
 		'popup.removeFromHeaderLinks': 'Remove from link bar',
-		'popup.headerLinksLoginRequired': 'Sign in to use the link bar',
 
 		// ── HomeView ──────────────────────────────────────────
 		'homeView.linksCount': ({ count }) => `${count} link${count === 1 ? '' : 's'} saved`,
 		'homeView.listView': 'List view',
 		'homeView.gridView': 'Grid view',
-		'homeView.loading': 'Loading...',
-		'homeView.noResults': 'No links match.',
-		'homeView.noLinks': 'No saved links yet.',
+		'homeView.viewModeLabel': 'View mode',
 		'homeView.groupToday': 'Today',
 		'homeView.groupThisWeek': 'This week',
 		'homeView.groupEarlier': 'Earlier',
 		'homeView.unreadOnly': 'Unread',
 		'homeView.clearFilters': 'Clear',
+		'tagFilter.label': 'Tags',
+		'tagFilter.title': 'Filter by tag',
+		'tagFilter.panelLabel': 'Tag filter',
 		'homeView.groupByDate': 'By date',
+		'homeView.bulkAssignCollection': 'Assign to folder',
+		'homeView.bulkAssignBtn': 'Assign',
+		'homeView.bulkNoCollection': 'No folder',
 		'homeView.pagination.prev': 'Previous page',
 		'homeView.pagination.next': 'Next page',
 		'homeView.pagination.page': ({ current, total }) => `${current} of ${total}`,
@@ -51,8 +51,6 @@ const translations = {
 		'tagsView.all': 'All',
 		'tagsView.untagged': 'Untagged',
 		'tagsView.noLinksForTag': 'No links with this tag.',
-		'tagsView.addTag': 'New tag',
-		'tagsView.newTagPlaceholder': 'Tag name...',
 		'tagsView.matchAny': 'Match any',
 		'tagsView.matchAll': 'Match all',
 		'tagsView.selectLinks': 'Select',
@@ -65,7 +63,13 @@ const translations = {
 		'tagsView.deleteTag': 'Delete tag',
 		'tagsView.mergeTag': 'Merge into…',
 		'tagsView.searchPlaceholder': 'Search links or tags…',
-		'tagsView.confirmDeleteTag': ({ tag }) => `Delete "${tag}" from all links?`,
+		'tagsView.statsTags': 'tags',
+		'tagsView.statsTagged': 'tagged',
+		'tagsView.statsUntagged': 'untagged',
+		'tagsView.backToIndex': 'Back to all tags',
+		'tagsView.related': 'Also in:',
+		'tagsView.links': 'links',
+		'tagsView.confirmDelete': 'Delete this tag from all links?',
 
 		// ── EditModal ─────────────────────────────────────────
 		'editModal.titleAdd': 'Add link',
@@ -73,8 +77,12 @@ const translations = {
 		'editModal.fieldTitle': 'Title',
 		'editModal.fieldUrl': 'URL',
 		'editModal.fieldDescription': 'Description',
-		'editModal.fieldTags': 'Tags (comma-separated)',
+		'editModal.fieldNote': 'Personal note',
+		'editModal.fieldNotePlaceholder': 'Your thoughts, context, why you saved this…',
+		'editModal.fieldCollection': 'Collection',
+		'editModal.collectionNone': 'No collection',
 		'editModal.saveError': 'Could not save. Please try again.',
+		'editModal.duplicateError': 'This link is already saved.',
 
 		// ── TagEditor ─────────────────────────────────────────
 		'tagEditor.placeholder': 'new tag...',
@@ -98,18 +106,22 @@ const translations = {
 		'userDropdown.logout': 'Sign out',
 
 		// ── Sidebar ───────────────────────────────────────────
-		'sidebar.menu': 'Menu',
 		'sidebar.ariaLabel': 'Main navigation',
 		'sidebar.expand': 'Expand navigation',
 		'sidebar.collapse': 'Collapse navigation',
-		'sidebar.add': 'Add',
 		'sidebar.addManually': 'Add URL',
 		'sidebar.navHome': 'Home',
 		'sidebar.navFavorites': 'Favorites',
 		'sidebar.navTags': 'Tags',
+		'sidebar.collectionsLabel': 'Collections',
+		'sidebar.collectionsEmpty': 'No collections yet',
+		'sidebar.collectionAdd': 'New collection',
+		'sidebar.collectionNamePlaceholder': 'Collection name',
+		'sidebar.collectionRename': 'Rename collection',
+		'sidebar.collectionDelete': 'Delete collection',
+		'sidebar.collectionDeleteConfirm': ({ name }) => `Delete "${name}"? Links inside will not be deleted.`,
 
 		// ── Header ────────────────────────────────────────────
-		'header.logoAlt': 'Logo',
 		'header.accountLabel': 'User account',
 		'header.signIn': 'Sign in',
 
@@ -121,10 +133,6 @@ const translations = {
 		'pill.removeAriaLabel': ({ label }) => `Remove tag ${label}`,
 		'options.headerLinkRemove': ({ label }) => `Remove ${label}`,
 
-		// ── FavoritesView ─────────────────────────────────────
-		'favoritesView.noLinks': 'No favorites yet. Click the star on a link to add it here.',
-		'favoritesView.noResults': 'No favorites match your search.',
-
 		// ── LinkItem ──────────────────────────────────────────
 		'linkItem.favorite': 'Add to favorites',
 		'linkItem.unfavorite': 'Remove from favorites',
@@ -132,7 +140,6 @@ const translations = {
 		'linkItem.delete': 'Delete',
 		'linkItem.markRead': 'Mark as read',
 		'linkItem.markUnread': 'Mark as unread',
-
 		// ── BaseModal ─────────────────────────────────────────
 		'baseModal.close': 'Close',
 
@@ -153,6 +160,8 @@ const translations = {
 		'options.preferencesSection': 'Preferences',
 		'options.defaultView': 'Default view',
 		'options.defaultViewDesc': 'Layout shown when you open a new tab.',
+		'options.showDescription': 'Show description',
+		'options.showDescriptionDesc': 'Display the AI-generated (or page) description under each saved link.',
 		'options.headerLinksSection': 'Header Links',
 		'options.headerLinksDesc': 'Quick-access links shown in the header.',
 		'options.headerLinkLabel': 'Label',
@@ -166,25 +175,12 @@ const translations = {
 		'options.exportLinks': 'Export links',
 		'options.exportDesc': 'Download all saved links as JSON.',
 		'options.exportBtn': 'Export JSON',
-
-		// ── AI description ────────────────────────────────────
-		'options.aiSection': 'AI Descriptions',
-		'options.aiApiKey': 'OpenRouter API Key',
-		'options.aiApiKeyDesc': 'Auto-generate descriptions using a free AI model when saving links. Get a free key at openrouter.ai.',
-		'options.aiApiKeyPlaceholder': 'sk-or-v1-...',
-		'options.aiApiKeySaved': 'Saved ✓',
-		'options.aiApiKeyRemove': 'Remove',
-		'options.aiModel': 'Model',
-		'options.aiModelDesc': 'OpenRouter model ID. Append :free for free-tier models.',
-		'options.aiModelPlaceholder': 'meta-llama/llama-3.2-3b-instruct:free',
-		'options.aiBulkGenerate': 'Generate missing descriptions',
-		'options.aiBulkGenerateDesc': 'Run AI on all links that don\'t have a description yet.',
-		'options.aiBulkBtn': 'Generate all',
-		'options.aiBulkProgress': ({ done, total }) => `Generating… ${done} / ${total}`,
-		'options.aiBulkDone': ({ count }) => count > 0 ? `Done — ${count} generated` : 'All links already have descriptions',
-		'options.aiBulkError': 'Error — check your API key and try again',
-		'options.saveErrorTitle': 'Save failed',
-		'options.saveErrorMessage': 'Could not save settings. Please try again.',
+		'options.importSection': 'Import bookmarks',
+		'options.importDesc': 'Import from a browser bookmarks export (HTML file).',
+		'options.importBtn': 'Choose file',
+		'options.importProgress': 'Importing… {done}/{total}',
+		'options.importDone': 'Done — {count} imported, {skipped} duplicates skipped',
+		'options.importError': "Couldn't read that file. Make sure it's a bookmarks HTML export.",
 
 		// ── Empty states ─────────────────────────────────────
 		'emptyState.noLinks.title': 'Save your first link',
@@ -195,6 +191,8 @@ const translations = {
 		'emptyState.noFavorites.description': 'Star a link to find it here.',
 		'emptyState.noTags.title': 'No tags yet',
 		'emptyState.noTags.description': 'Add tags to organize your links.',
+		'emptyState.noCollectionLinks.title': 'No links in this collection',
+		'emptyState.noCollectionLinks.description': 'Edit a link and assign it to this collection.',
 
 		// ── Auth errors ───────────────────────────────────────
 		'auth.invalidEmail': 'Invalid email.',
@@ -207,10 +205,21 @@ const translations = {
 		'auth.popupBlocked': 'Sign-in popup was blocked. Allow popups for this site in your browser settings.',
 		'auth.genericError': 'An error occurred. Please try again.',
 
+		// ── Side panel ────────────────────────────────────────
+		'sidepanel.save': 'Save this page',
+		'sidepanel.saving': 'Saving…',
+		'sidepanel.saved': 'Saved!',
+		'sidepanel.duplicate': 'Already saved',
+		'sidepanel.error': "Couldn't save",
+		'sidepanel.searchPlaceholder': 'Search…',
+		'sidepanel.openFullView': 'Open Amber →',
+		'sidepanel.openSidePanel': 'Open side panel',
+
 		// ── SaveOverlay (content script) ──────────────────────
 		'overlay.saving': 'Saving...',
 		'overlay.saved': 'Link saved',
 		'overlay.error': 'Save failed',
+		'overlay.duplicate': 'Already saved',
 		'overlay.close': 'Close',
 	},
 
@@ -219,13 +228,11 @@ const translations = {
 		'common.save': 'Salva',
 		'common.cancel': 'Annulla',
 		'common.delete': 'Elimina',
-		'common.edit': 'Modifica',
 		'common.confirm': 'Conferma',
 		'common.add': 'Aggiungi',
 		'common.loading': 'Caricamento...',
 		'common.settings': 'Impostazioni',
 		'common.search': 'Cerca',
-		'common.close': 'Chiudi',
 
 		// ── Popup ─────────────────────────────────────────────
 		'popup.saveCurrentPage': 'Salva questa pagina',
@@ -234,29 +241,31 @@ const translations = {
 		'popup.urlPlaceholder': 'https://',
 		'popup.titleOptional': 'Titolo (opzionale)',
 		'popup.errorSave': 'Salvataggio non riuscito. Riprova.',
+		'popup.duplicateLink': 'Questo link è già stato salvato.',
 		'popup.errorUrl': 'Inserisci un URL.',
 		'popup.errorUrlInvalid': 'URL non valido. Inizia con https://',
-		'popup.noLinks': 'Ancora nessun link salvato.',
-		'popup.noResults': 'Nessun link trovato.',
 		'popup.searchPlaceholder': 'Cerca nei link salvati...',
 		'popup.openFullView': 'Apri libreria completa →',
 		'popup.addToHeaderLinks': 'Aggiungi alla barra link',
 		'popup.removeFromHeaderLinks': 'Rimuovi dalla barra link',
-		'popup.headerLinksLoginRequired': 'Accedi per usare la barra link',
 
 		// ── HomeView ──────────────────────────────────────────
 		'homeView.linksCount': ({ count }) => `${count} link salvat${count === 1 ? 'o' : 'i'}`,
 		'homeView.listView': 'Vista lista',
 		'homeView.gridView': 'Vista griglia',
-		'homeView.loading': 'Caricamento...',
-		'homeView.noResults': 'Nessun link trovato.',
-		'homeView.noLinks': 'Ancora nessun link salvato.',
+		'homeView.viewModeLabel': 'Modalità vista',
 		'homeView.groupToday': 'Oggi',
 		'homeView.groupThisWeek': 'Questa settimana',
 		'homeView.groupEarlier': 'Precedenti',
 		'homeView.unreadOnly': 'Non letti',
 		'homeView.clearFilters': 'Rimuovi',
+		'tagFilter.label': 'Tag',
+		'tagFilter.title': 'Filtra per tag',
+		'tagFilter.panelLabel': 'Filtro tag',
 		'homeView.groupByDate': 'Per data',
+		'homeView.bulkAssignCollection': 'Assegna a cartella',
+		'homeView.bulkAssignBtn': 'Assegna',
+		'homeView.bulkNoCollection': 'Nessuna cartella',
 		'homeView.pagination.prev': 'Pagina precedente',
 		'homeView.pagination.next': 'Pagina successiva',
 		'homeView.pagination.page': ({ current, total }) => `${current} di ${total}`,
@@ -266,8 +275,6 @@ const translations = {
 		'tagsView.all': 'Tutti',
 		'tagsView.untagged': 'Senza tag',
 		'tagsView.noLinksForTag': 'Nessun link con questo tag.',
-		'tagsView.addTag': 'Nuovo tag',
-		'tagsView.newTagPlaceholder': 'Nome tag...',
 		'tagsView.matchAny': 'Uno qualsiasi',
 		'tagsView.matchAll': 'Tutti i tag',
 		'tagsView.selectLinks': 'Seleziona',
@@ -280,7 +287,13 @@ const translations = {
 		'tagsView.deleteTag': 'Elimina tag',
 		'tagsView.mergeTag': 'Unisci in…',
 		'tagsView.searchPlaceholder': 'Cerca link o tag…',
-		'tagsView.confirmDeleteTag': ({ tag }) => `Eliminare "${tag}" da tutti i link?`,
+		'tagsView.statsTags': 'tag',
+		'tagsView.statsTagged': 'con tag',
+		'tagsView.statsUntagged': 'senza tag',
+		'tagsView.backToIndex': 'Torna a tutti i tag',
+		'tagsView.related': 'Anche in:',
+		'tagsView.links': 'link',
+		'tagsView.confirmDelete': 'Eliminare questo tag da tutti i link?',
 
 		// ── EditModal ─────────────────────────────────────────
 		'editModal.titleAdd': 'Aggiungi link',
@@ -288,8 +301,12 @@ const translations = {
 		'editModal.fieldTitle': 'Titolo',
 		'editModal.fieldUrl': 'URL',
 		'editModal.fieldDescription': 'Descrizione',
-		'editModal.fieldTags': 'Tag (separati da virgola)',
+		'editModal.fieldNote': 'Nota personale',
+		'editModal.fieldNotePlaceholder': 'Pensieri, contesto, perché hai salvato questo link…',
+		'editModal.fieldCollection': 'Cartella',
+		'editModal.collectionNone': 'Nessuna cartella',
 		'editModal.saveError': 'Salvataggio non riuscito. Riprova.',
+		'editModal.duplicateError': 'Questo link è già stato salvato.',
 
 		// ── TagEditor ─────────────────────────────────────────
 		'tagEditor.placeholder': 'nuovo tag...',
@@ -313,18 +330,22 @@ const translations = {
 		'userDropdown.logout': 'Esci',
 
 		// ── Sidebar ───────────────────────────────────────────
-		'sidebar.menu': 'Menu',
 		'sidebar.ariaLabel': 'Navigazione principale',
 		'sidebar.expand': 'Espandi navigazione',
 		'sidebar.collapse': 'Comprimi navigazione',
-		'sidebar.add': 'Aggiungi',
 		'sidebar.addManually': 'Aggiungi URL',
 		'sidebar.navHome': 'Home',
 		'sidebar.navFavorites': 'Preferiti',
 		'sidebar.navTags': 'Tag',
+		'sidebar.collectionsLabel': 'Cartelle',
+		'sidebar.collectionsEmpty': 'Nessuna cartella',
+		'sidebar.collectionAdd': 'Nuova cartella',
+		'sidebar.collectionNamePlaceholder': 'Nome cartella',
+		'sidebar.collectionRename': 'Rinomina cartella',
+		'sidebar.collectionDelete': 'Elimina cartella',
+		'sidebar.collectionDeleteConfirm': ({ name }) => `Eliminare "${name}"? I link al suo interno non saranno eliminati.`,
 
 		// ── Header ────────────────────────────────────────────
-		'header.logoAlt': 'Logo',
 		'header.accountLabel': 'Account utente',
 		'header.signIn': 'Accedi',
 
@@ -336,10 +357,6 @@ const translations = {
 		'pill.removeAriaLabel': ({ label }) => `Rimuovi tag ${label}`,
 		'options.headerLinkRemove': ({ label }) => `Rimuovi ${label}`,
 
-		// ── FavoritesView ─────────────────────────────────────
-		'favoritesView.noLinks': 'Nessun preferito. Clicca la stella su un link per aggiungerlo.',
-		'favoritesView.noResults': 'Nessun preferito corrisponde alla ricerca.',
-
 		// ── LinkItem ──────────────────────────────────────────
 		'linkItem.favorite': 'Aggiungi ai preferiti',
 		'linkItem.unfavorite': 'Rimuovi dai preferiti',
@@ -347,7 +364,6 @@ const translations = {
 		'linkItem.delete': 'Elimina',
 		'linkItem.markRead': 'Segna come letto',
 		'linkItem.markUnread': 'Segna come non letto',
-
 		// ── BaseModal ─────────────────────────────────────────
 		'baseModal.close': 'Chiudi',
 
@@ -368,6 +384,8 @@ const translations = {
 		'options.preferencesSection': 'Preferenze',
 		'options.defaultView': 'Vista predefinita',
 		'options.defaultViewDesc': 'Layout all\'apertura di una nuova scheda.',
+		'options.showDescription': 'Mostra descrizione',
+		'options.showDescriptionDesc': 'Mostra la descrizione (generata da AI o della pagina) sotto ogni link salvato.',
 		'options.headerLinksSection': 'Link nell\'header',
 		'options.headerLinksDesc': 'Link rapidi mostrati nell\'header.',
 		'options.headerLinkLabel': 'Etichetta',
@@ -381,25 +399,12 @@ const translations = {
 		'options.exportLinks': 'Esporta link',
 		'options.exportDesc': 'Scarica tutti i link salvati come JSON.',
 		'options.exportBtn': 'Esporta JSON',
-
-		// ── AI description ────────────────────────────────────
-		'options.aiSection': 'Descrizioni AI',
-		'options.aiApiKey': 'Chiave API OpenRouter',
-		'options.aiApiKeyDesc': 'Genera automaticamente descrizioni con un modello AI gratuito quando salvi un link. Ottieni una chiave gratuita su openrouter.ai.',
-		'options.aiApiKeyPlaceholder': 'sk-or-v1-...',
-		'options.aiApiKeySaved': 'Salvata ✓',
-		'options.aiApiKeyRemove': 'Rimuovi',
-		'options.aiModel': 'Modello',
-		'options.aiModelDesc': 'ID modello OpenRouter. Aggiungi :free per i modelli gratuiti.',
-		'options.aiModelPlaceholder': 'meta-llama/llama-3.2-3b-instruct:free',
-		'options.aiBulkGenerate': 'Genera descrizioni mancanti',
-		'options.aiBulkGenerateDesc': 'Esegui l\'AI su tutti i link che non hanno ancora una descrizione.',
-		'options.aiBulkBtn': 'Genera tutto',
-		'options.aiBulkProgress': ({ done, total }) => `Generando… ${done} / ${total}`,
-		'options.aiBulkDone': ({ count }) => count > 0 ? `Fatto — ${count} generate` : 'Tutti i link hanno già una descrizione',
-		'options.aiBulkError': 'Errore — controlla la chiave API e riprova',
-		'options.saveErrorTitle': 'Salvataggio fallito',
-		'options.saveErrorMessage': 'Impossibile salvare le impostazioni. Riprova.',
+		'options.importSection': 'Importa bookmark',
+		'options.importDesc': 'Importa da un\'esportazione bookmark del browser (file HTML).',
+		'options.importBtn': 'Scegli file',
+		'options.importProgress': 'Importazione… {done}/{total}',
+		'options.importDone': 'Completato — {count} importati, {skipped} duplicati ignorati',
+		'options.importError': 'File non leggibile. Assicurati sia un export HTML dei bookmark.',
 
 		// ── Empty states ─────────────────────────────────────
 		'emptyState.noLinks.title': 'Salva il tuo primo link',
@@ -410,6 +415,8 @@ const translations = {
 		'emptyState.noFavorites.description': 'Aggiungi una stella a un link per trovarlo qui.',
 		'emptyState.noTags.title': 'Ancora nessun tag',
 		'emptyState.noTags.description': 'Aggiungi tag per organizzare i tuoi link.',
+		'emptyState.noCollectionLinks.title': 'Nessun link in questa cartella',
+		'emptyState.noCollectionLinks.description': 'Modifica un link e assegnalo a questa cartella.',
 
 		// ── Auth errors ───────────────────────────────────────
 		'auth.invalidEmail': 'Email non valida.',
@@ -422,10 +429,21 @@ const translations = {
 		'auth.popupBlocked': 'Il popup di accesso è stato bloccato. Consenti i popup nelle impostazioni del browser.',
 		'auth.genericError': 'Si è verificato un errore. Riprova.',
 
+		// ── Side panel ────────────────────────────────────────
+		'sidepanel.save': 'Salva questa pagina',
+		'sidepanel.saving': 'Salvataggio…',
+		'sidepanel.saved': 'Salvato!',
+		'sidepanel.duplicate': 'Già salvato',
+		'sidepanel.error': 'Salvataggio fallito',
+		'sidepanel.searchPlaceholder': 'Cerca…',
+		'sidepanel.openFullView': 'Apri Amber →',
+		'sidepanel.openSidePanel': 'Apri pannello laterale',
+
 		// ── SaveOverlay (content script) ──────────────────────
 		'overlay.saving': 'Salvataggio in corso...',
 		'overlay.saved': 'Link salvato',
 		'overlay.error': 'Salvataggio fallito',
+		'overlay.duplicate': 'Già salvato',
 		'overlay.close': 'Chiudi',
 	},
 };

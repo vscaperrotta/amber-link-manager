@@ -207,15 +207,21 @@ class LinkCard extends StatelessWidget {
               children: [
                 // Thumbnail — flush left/top/bottom, fills full card height
                 if (link.thumbnail != null && link.thumbnail!.isNotEmpty)
-                  SizedBox(
-                    width: 88,
-                    child: CachedNetworkImage(
-                      imageUrl: link.thumbnail!,
-                      fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) =>
-                          Container(color: VoidColors.darkBgElevated),
-                      placeholder: (_, __) =>
-                          Container(color: VoidColors.darkBgElevated),
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      bottomLeft: Radius.circular(12),
+                    ),
+                    child: SizedBox(
+                      width: 88,
+                      child: CachedNetworkImage(
+                        imageUrl: link.thumbnail!,
+                        fit: BoxFit.cover,
+                        errorWidget: (_, __, ___) =>
+                            Container(color: VoidColors.darkBgElevated),
+                        placeholder: (_, __) =>
+                            Container(color: VoidColors.darkBgElevated),
+                      ),
                     ),
                   ),
                 // Text content
@@ -295,20 +301,6 @@ class LinkCard extends StatelessWidget {
                             color: VoidColors.darkTextTertiary,
                           ),
                         ),
-                        // AI description
-                        if ((link.aiDescription ?? '').isNotEmpty) ...[
-                          const SizedBox(height: 6),
-                          Text(
-                            link.aiDescription!,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.outfit(
-                              fontSize: 12,
-                              color: VoidColors.darkTextSecondary,
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
                         // Tags
                         if (link.tags.isNotEmpty) ...[
                           const SizedBox(height: 8),

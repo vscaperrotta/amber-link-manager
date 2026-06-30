@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../models/link_item.dart';
 import '../providers/link_provider.dart';
+import '../providers/collection_provider.dart';
 import '../theme/void_colors.dart';
 import '../utils/i18n.dart';
 import '../widgets/link_card.dart';
@@ -50,7 +51,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _showUnreadOnly = false;
 
-  // Groups links into ordered buckets, returns a flat list of header + item widgets.
   List<Widget> _buildGroupedList(BuildContext context, List<LinkItem> links) {
     final grouped = <_TimeBucket, List<LinkItem>>{};
     for (final link in links) {
@@ -87,17 +87,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () => Navigator.pop(context, true),
                   child: Text(
                     t('common.delete'),
-                    style:
-                        const TextStyle(color: VoidColors.darkStatusError),
+                    style: const TextStyle(color: VoidColors.darkStatusError),
                   ),
                 ),
               ],
             ),
           ),
-          onDismissed: () =>
-              context.read<LinkProvider>().deleteLink(link.id),
-          onReadToggle: () =>
-              context.read<LinkProvider>().toggleRead(link.id),
+          onDismissed: () => context.read<LinkProvider>().deleteLink(link.id),
+          onReadToggle: () => context.read<LinkProvider>().toggleRead(link.id),
         ));
       }
     }
@@ -105,11 +102,153 @@ class _HomeScreenState extends State<HomeScreen> {
     return items;
   }
 
+  void _showAddCollectionDialog(BuildContext context) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t('collections.addTitle')),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(hintText: t('collections.nameHint')),
+          textCapitalization: TextCapitalization.sentences,
+          onSubmitted: (val) {
+            if (val.trim().isNotEmpty) {
+              context.read<CollectionProvider>().addCollection(val.trim());
+              Navigator.pop(ctx);
+            }
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(t('common.cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              final val = controller.text.trim();
+              if (val.isNotEmpty) {
+                context.read<CollectionProvider>().addCollection(val);
+                Navigator.pop(ctx);
+              }
+            },
+            child: Text(t('collections.add')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCollectionOptions(BuildContext context, collection) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.drive_file_rename_outline),
+              title: Text(t('collections.rename')),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showRenameDialog(context, collection);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: VoidColors.darkStatusError),
+              title: Text(
+                t('common.delete'),
+                style: const TextStyle(color: VoidColors.darkStatusError),
+              ),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showDeleteConfirm(context, collection);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showRenameDialog(BuildContext context, collection) {
+    final controller = TextEditingController(text: collection.name);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t('collections.rename')),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(hintText: t('collections.nameHint')),
+          textCapitalization: TextCapitalization.sentences,
+          onSubmitted: (val) {
+            if (val.trim().isNotEmpty) {
+              context.read<CollectionProvider>().renameCollection(collection.id, val.trim());
+              Navigator.pop(ctx);
+            }
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(t('common.cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              final val = controller.text.trim();
+              if (val.isNotEmpty) {
+                context.read<CollectionProvider>().renameCollection(collection.id, val);
+                Navigator.pop(ctx);
+              }
+            },
+            child: Text(t('common.save')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirm(BuildContext context, collection) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(t('collections.deleteConfirm')),
+        content: Text(t('collections.deleteMessage')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(t('common.cancel')),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<CollectionProvider>().deleteCollection(collection.id);
+              Navigator.pop(ctx);
+            },
+            child: Text(
+              t('common.delete'),
+              style: const TextStyle(color: VoidColors.darkStatusError),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final linkProvider = context.watch<LinkProvider>();
+    final collectionProvider = context.watch<CollectionProvider>();
+    final collections = collectionProvider.collections;
+    final activeCollectionId = collectionProvider.activeCollectionId;
 
-    final allLinks = linkProvider.links;
+    var allLinks = linkProvider.links;
+
+    if (activeCollectionId != null) {
+      allLinks = allLinks.where((l) => l.collectionId == activeCollectionId).toList();
+    }
+
     final filteredLinks = _showUnreadOnly
         ? allLinks.where((l) => !l.isRead).toList()
         : allLinks;
@@ -117,15 +256,59 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          t('home.title'),
+          activeCollectionId != null
+              ? (collectionProvider.activeCollection?.name ?? t('home.title'))
+              : t('home.title'),
           style: GoogleFonts.outfit(fontWeight: FontWeight.w700),
         ),
         centerTitle: true,
+        actions: activeCollectionId != null
+            ? [
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  tooltip: t('collections.clearFilter'),
+                  onPressed: () => collectionProvider.setActiveCollection(null),
+                ),
+              ]
+            : null,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Filter chips ─────────────────────────────────────────────────────
+          // ── Collection chips + add button ─────────────────────────────────
+          SizedBox(
+            height: 44,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              children: [
+                _CollectionChip(
+                  label: t('home.filterAll'),
+                  selected: activeCollectionId == null,
+                  onTap: () => collectionProvider.setActiveCollection(null),
+                  icon: Icons.inbox_outlined,
+                ),
+                const SizedBox(width: 6),
+                ...collections.asMap().entries.map((e) => Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: _CollectionChip(
+                    label: e.value.name,
+                    selected: activeCollectionId == e.value.id,
+                    color: e.value.color,
+                    colorFallbackIndex: e.key,
+                    onTap: () => collectionProvider.setActiveCollection(e.value.id),
+                    onLongPress: () => _showCollectionOptions(context, e.value),
+                    icon: Icons.folder_outlined,
+                  ),
+                )),
+                // Add collection button
+                _AddCollectionChip(
+                  onTap: () => _showAddCollectionDialog(context),
+                ),
+              ],
+            ),
+          ),
+          // ── Filter chips ─────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
             child: Row(
@@ -144,16 +327,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          // ── Main content ─────────────────────────────────────────────────────
+          // ── Main content ─────────────────────────────────────────────────
           Expanded(
             child: RefreshIndicator(
               onRefresh: () => linkProvider.loadLinks(),
               child: linkProvider.isLoading
                   ? const Center(
-                      child: CircularProgressIndicator(
-                          color: VoidColors.darkAccent))
+                      child: CircularProgressIndicator(color: VoidColors.darkAccent))
                   : filteredLinks.isEmpty
-                      ? _buildEmptyState()
+                      ? _buildEmptyState(activeCollectionId != null)
                       : _buildGroupedListView(context, filteredLinks),
             ),
           ),
@@ -162,18 +344,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isFiltered) {
     return ListView(
       children: [
         const SizedBox(height: 200),
         Center(
           child: Column(
             children: [
-              const Icon(Icons.link_off,
-                  size: 64, color: VoidColors.darkTextTertiary),
+              Icon(
+                isFiltered ? Icons.folder_open : Icons.link_off,
+                size: 64,
+                color: VoidColors.darkTextTertiary,
+              ),
               const SizedBox(height: 16),
               Text(
-                t('home.emptyTitle'),
+                isFiltered ? t('collections.emptyTitle') : t('home.emptyTitle'),
                 style: GoogleFonts.outfit(
                   fontSize: 18,
                   color: VoidColors.darkTextTertiary,
@@ -181,7 +366,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                t('home.emptySubtitle'),
+                isFiltered
+                    ? t('collections.emptySubtitle')
+                    : t('home.emptySubtitle'),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.outfit(
                   fontSize: 14,
@@ -201,6 +388,134 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(bottom: 96),
       itemCount: items.length,
       itemBuilder: (_, i) => items[i],
+    );
+  }
+}
+
+// ── Collection chip ────────────────────────────────────────────────────────────
+
+class _CollectionChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final VoidCallback? onLongPress;
+  final IconData icon;
+  final String? color;
+  final int colorFallbackIndex;
+
+  const _CollectionChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    required this.icon,
+    this.onLongPress,
+    this.color,
+    this.colorFallbackIndex = 0,
+  });
+
+  Color get _resolvedColor {
+    final hex = (color?.isNotEmpty == true
+            ? color!
+            : _kCollectionColorFallbacks[colorFallbackIndex % _kCollectionColorFallbacks.length])
+        .replaceAll('#', '');
+    return Color(int.parse('FF$hex', radix: 16));
+  }
+
+  static const _kCollectionColorFallbacks = [
+    '#F5A623', '#5096F0', '#50D282', '#EE5555',
+    '#A78BFA', '#4ECDC4', '#FF8C42', '#F06292',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final chipColor = (color != null || label != t('home.filterAll'))
+        ? _resolvedColor
+        : VoidColors.darkAccent;
+
+    return GestureDetector(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected
+              ? chipColor.withAlpha(38)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: selected ? chipColor : VoidColors.darkBorder,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (color != null) ...[
+              Container(
+                width: 7,
+                height: 7,
+                decoration: BoxDecoration(
+                  color: chipColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 5),
+            ] else ...[
+              Icon(
+                icon,
+                size: 14,
+                color: selected ? chipColor : VoidColors.darkTextSecondary,
+              ),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              label,
+              style: GoogleFonts.outfit(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: selected ? chipColor : VoidColors.darkTextSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Add collection chip ────────────────────────────────────────────────────────
+
+class _AddCollectionChip extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _AddCollectionChip({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: VoidColors.darkBorder),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.add, size: 14, color: VoidColors.darkTextTertiary),
+            const SizedBox(width: 4),
+            Text(
+              t('collections.add'),
+              style: GoogleFonts.outfit(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: VoidColors.darkTextTertiary,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -237,9 +552,7 @@ class _FilterChip extends StatelessWidget {
           style: GoogleFonts.outfit(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: selected
-                ? VoidColors.darkAccent
-                : VoidColors.darkTextSecondary,
+            color: selected ? VoidColors.darkAccent : VoidColors.darkTextSecondary,
           ),
         ),
       ),

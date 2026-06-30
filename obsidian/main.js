@@ -21159,13 +21159,13 @@ function __PRIVATE_convertToDocSnapshot(t2, e, n) {
 
 // src/firebase.ts
 var firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.YOUR_REGION.firebasedatabase.app",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyB9sUgJPMHUFs0h95Wg-oqrVZjg0H8LPDs",
+  authDomain: "voidpocket-97ae7.firebaseapp.com",
+  databaseURL: "https://voidpocket-97ae7-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "voidpocket-97ae7",
+  storageBucket: "voidpocket-97ae7.firebasestorage.app",
+  messagingSenderId: "30821726892",
+  appId: "1:30821726892:web:71f5ba8e91b92cb2e9bd09"
 };
 var app = initializeApp(firebaseConfig);
 var auth = getAuth(app);
@@ -21253,18 +21253,6 @@ var translations = {
     "view.errorAddLink": "Error adding link. Check console for details.",
     // Tag Input
     "tagInput.placeholder": "Add tag\u2026",
-    // OpenRouter / AI
-    "settings.aiHeading": "AI Descriptions",
-    "settings.openRouterKey": "OpenRouter API key",
-    "settings.openRouterKeyDesc": "Used to generate AI descriptions for saved links",
-    "settings.openRouterModel": "Model",
-    "settings.openRouterModelDesc": "OpenRouter model ID (default: meta-llama/llama-3.2-3b-instruct:free)",
-    "settings.generateMissing": "Generate missing descriptions",
-    "settings.generateMissingDesc": "Run AI on all links that do not yet have a description",
-    "settings.generateBtn": "Generate",
-    "settings.generating": "Generating\u2026 {done} / {total}",
-    "settings.generateDone": "Done \u2014 {n} generated",
-    "settings.generateError": "Error \u2014 check your API key",
     // Settings
     "settings.configHeading": "Configuration",
     "settings.libraryFolder": "Library folder",
@@ -21374,18 +21362,6 @@ var translations = {
     "view.errorAddLink": "Errore nell'aggiunta del link.",
     // Tag Input
     "tagInput.placeholder": "Aggiungi tag\u2026",
-    // OpenRouter / AI
-    "settings.aiHeading": "Descrizioni AI",
-    "settings.openRouterKey": "Chiave API OpenRouter",
-    "settings.openRouterKeyDesc": "Usata per generare descrizioni AI dei link salvati",
-    "settings.openRouterModel": "Modello",
-    "settings.openRouterModelDesc": "ID modello OpenRouter (default: meta-llama/llama-3.2-3b-instruct:free)",
-    "settings.generateMissing": "Genera descrizioni mancanti",
-    "settings.generateMissingDesc": "Esegui AI su tutti i link privi di descrizione",
-    "settings.generateBtn": "Genera",
-    "settings.generating": "Generazione\u2026 {done} / {total}",
-    "settings.generateDone": "Completato \u2014 {n} generate",
-    "settings.generateError": "Errore \u2014 controlla la chiave API",
     // Settings
     "settings.configHeading": "Configurazione",
     "settings.libraryFolder": "Cartella libreria",
@@ -21566,36 +21542,6 @@ function subscribeLinks(uid, callback) {
   );
 }
 
-// src/utils/openRouter.ts
-async function generateAiDescription({
-  url,
-  title,
-  apiKey,
-  model = "meta-llama/llama-3.2-3b-instruct:free"
-}) {
-  var _a, _b, _c, _d;
-  const prompt = `Provide a concise 1-2 sentence description of this web page.
-URL: ${url}
-Title: ${title}
-Respond with only the description, no preamble.`;
-  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model,
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 150
-    })
-  });
-  if (!res.ok)
-    return null;
-  const data = await res.json();
-  return ((_d = (_c = (_b = (_a = data.choices) == null ? void 0 : _a[0]) == null ? void 0 : _b.message) == null ? void 0 : _c.content) == null ? void 0 : _d.trim()) || null;
-}
-
 // src/utils/linksService.ts
 var LinksService = class {
   constructor(app2, plugin, onChange) {
@@ -21654,25 +21600,7 @@ var LinksService = class {
       entry = await addLink(this.app, { url, title: resolvedTitle, metadata });
       await this._loadLocalLinks();
     }
-    this._tryGenerateAiDescription(entry);
     return entry;
-  }
-  async _tryGenerateAiDescription(link) {
-    const apiKey = this.plugin.openrouterApiKey;
-    if (!apiKey)
-      return;
-    try {
-      const desc = await generateAiDescription({
-        url: link.url,
-        title: link.title,
-        apiKey,
-        model: this.plugin.openrouterModel
-      });
-      if (desc) {
-        await this.patchLinkMetadata(link.id, { aiDescription: desc });
-      }
-    } catch (e) {
-    }
   }
   async patchLinkMetadata(id, patch) {
     if (this.uid) {
@@ -21751,34 +21679,6 @@ var LinksService = class {
       const updated = [...new Set(((_b = (_a = link.metadata) == null ? void 0 : _a.tags) != null ? _b : []).map((t2) => t2 === fromTag ? target : t2))];
       await this.patchLinkMetadata(link.id, { tags: updated });
     }
-  }
-  // ── Batch AI descriptions ──────────────────────────────────────────────────
-  async generateMissingDescriptions(onProgress) {
-    const apiKey = this.plugin.openrouterApiKey;
-    if (!apiKey)
-      return 0;
-    const missing = this.links.filter((l) => {
-      var _a;
-      return !((_a = l.metadata) == null ? void 0 : _a.aiDescription);
-    });
-    let done = 0;
-    for (const link of missing) {
-      try {
-        const desc = await generateAiDescription({
-          url: link.url,
-          title: link.title,
-          apiKey,
-          model: this.plugin.openrouterModel
-        });
-        if (desc) {
-          await this.patchLinkMetadata(link.id, { aiDescription: desc });
-          done++;
-        }
-      } catch (e) {
-      }
-      onProgress(done, missing.length);
-    }
-    return done;
   }
   destroy() {
     this.unsubscribeAuth();
@@ -21934,22 +21834,6 @@ var AuthModal = class extends import_obsidian2.Modal {
 
 // src/components/addLinkModal.ts
 var import_obsidian3 = require("obsidian");
-
-// src/components/textarea.ts
-function renderTextarea(container, placeholder) {
-  const field = container.createDiv({
-    cls: "obs-amber-input-field"
-  });
-  const input = field.createEl(
-    "textarea",
-    {
-      placeholder
-    }
-  );
-  return input;
-}
-
-// src/components/addLinkModal.ts
 function parseTags(raw) {
   return raw.split(",").map((t2) => t2.trim().toUpperCase()).filter(Boolean).slice(0, 10);
 }
@@ -21965,7 +21849,6 @@ var AddLinkModal = class extends import_obsidian3.Modal {
     contentEl.createEl("h2", { text: t("addLink.title"), cls: "obs-amber-add-link-modal-title" });
     const urlInput = renderInput(contentEl, { type: "text", placeholder: t("addLink.urlPlaceholder") });
     const titleInput = renderInput(contentEl, { type: "text", placeholder: t("addLink.titlePlaceholder") });
-    const descriptionInput = renderTextarea(contentEl, t("editLink.descriptionPlaceholder"));
     const tagsInput = renderInput(contentEl, { type: "text", placeholder: t("addLink.tagsPlaceholder") });
     const submitBtn = contentEl.createEl("button", {
       text: t("addLink.title"),
@@ -21979,8 +21862,7 @@ var AddLinkModal = class extends import_obsidian3.Modal {
       }
       const title = titleInput.value.trim();
       const tags = parseTags(tagsInput.value);
-      const description = descriptionInput.value.trim().slice(0, 300) || void 0;
-      const metadata = tags.length || description ? { tags: tags.length ? tags : void 0, description } : void 0;
+      const metadata = tags.length ? { tags } : void 0;
       try {
         await this.onSubmit(url, title, metadata);
         this.close();
@@ -22007,7 +21889,7 @@ var EditLinkModal = class extends import_obsidian4.Modal {
     this.onSubmit = onSubmit;
   }
   onOpen() {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c;
     this.modalEl.addClass("obs-amber-edit-link-modal");
     const { contentEl } = this;
     contentEl.empty();
@@ -22016,10 +21898,8 @@ var EditLinkModal = class extends import_obsidian4.Modal {
     urlInput.value = this.link.url;
     const titleInput = renderInput(contentEl, { type: "text", placeholder: t("editLink.titlePlaceholder") });
     titleInput.value = (_a = this.link.title) != null ? _a : "";
-    const descriptionInput = renderTextarea(contentEl, t("editLink.descriptionPlaceholder"));
-    descriptionInput.value = (_c = (_b = this.link.metadata) == null ? void 0 : _b.description) != null ? _c : "";
     const tagsInput = renderInput(contentEl, { type: "text", placeholder: t("editLink.tagsPlaceholder") });
-    tagsInput.value = ((_e = (_d = this.link.metadata) == null ? void 0 : _d.tags) != null ? _e : []).join(", ");
+    tagsInput.value = ((_c = (_b = this.link.metadata) == null ? void 0 : _b.tags) != null ? _c : []).join(", ");
     const submitBtn = contentEl.createEl("button", {
       text: t("common.save"),
       cls: "obs-amber-edit-link-modal-submit"
@@ -22032,8 +21912,7 @@ var EditLinkModal = class extends import_obsidian4.Modal {
       }
       const title = titleInput.value.trim();
       const tags = parseTags2(tagsInput.value);
-      const description = descriptionInput.value.trim().slice(0, 300) || void 0;
-      const metadata = tags.length || description ? { ...this.link.metadata, tags: tags.length ? tags : void 0, description } : { ...this.link.metadata, tags: void 0, description: void 0 };
+      const metadata = tags.length ? { ...this.link.metadata, tags, description: void 0 } : { ...this.link.metadata, tags: void 0, description: void 0 };
       try {
         await this.onSubmit(this.link.id, { url, title, metadata });
         this.close();
@@ -22221,7 +22100,7 @@ function renderLinksList(container, links, loading, allTags, onDelete, onAddTag,
   }
   const list = container.createEl("ul", { cls: "obs-amber-links-list" });
   links.forEach((link) => {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f;
     const isRead = (_b = (_a = link.metadata) == null ? void 0 : _a.isRead) != null ? _b : false;
     const item = list.createEl("li", { cls: `obs-amber-links-item${isRead ? " is-read" : ""}` });
     const row = item.createDiv({ cls: "obs-amber-links-item-row" });
@@ -22258,11 +22137,8 @@ function renderLinksList(container, links, loading, allTags, onDelete, onAddTag,
       cls: "obs-amber-links-delete"
     });
     deleteBtn.addEventListener("click", () => onDelete(link.id));
-    if ((_e = link.metadata) == null ? void 0 : _e.aiDescription) {
-      item.createEl("p", { text: link.metadata.aiDescription, cls: "obs-amber-links-description" });
-    }
     const tagsRow = item.createDiv({ cls: "obs-amber-links-tags" });
-    const tags = (_g = (_f = link.metadata) == null ? void 0 : _f.tags) != null ? _g : [];
+    const tags = (_f = (_e = link.metadata) == null ? void 0 : _e.tags) != null ? _f : [];
     tags.forEach((tag) => {
       const pill = tagsRow.createEl("span", { cls: "obs-amber-pill" });
       pill.createEl("span", { text: tag, cls: "obs-amber-pill__label" });
@@ -22305,7 +22181,7 @@ function renderLinksGrid(container, links, loading, allTags, onDelete, onAddTag,
   }
   const grid = container.createDiv({ cls: "obs-amber-links-grid" });
   links.forEach((link) => {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f;
     const isRead = (_b = (_a = link.metadata) == null ? void 0 : _a.isRead) != null ? _b : false;
     const card = grid.createDiv({ cls: `obs-amber-links-card${isRead ? " is-read" : ""}` });
     const anchor = card.createEl("a", {
@@ -22317,12 +22193,9 @@ function renderLinksGrid(container, links, loading, allTags, onDelete, onAddTag,
       e.preventDefault();
       window.open(link.url, "_blank");
     });
-    if ((_c = link.metadata) == null ? void 0 : _c.aiDescription) {
-      card.createEl("p", { text: link.metadata.aiDescription, cls: "obs-amber-links-card-description" });
-    }
     card.createEl("span", { text: link.url, cls: "obs-amber-links-card-url" });
     const tagsRow = card.createDiv({ cls: "obs-amber-links-tags" });
-    const tags = (_e = (_d = link.metadata) == null ? void 0 : _d.tags) != null ? _e : [];
+    const tags = (_d = (_c = link.metadata) == null ? void 0 : _c.tags) != null ? _d : [];
     tags.forEach((tag) => {
       const pill = tagsRow.createEl("span", { cls: "obs-amber-pill" });
       pill.createEl("span", { text: tag, cls: "obs-amber-pill__label" });
@@ -22350,7 +22223,7 @@ function renderLinksGrid(container, links, loading, allTags, onDelete, onAddTag,
       );
     });
     const rowActions = card.createDiv({ cls: "obs-amber-links-item-actions" });
-    const isFav = (_g = (_f = link.metadata) == null ? void 0 : _f.isFavorite) != null ? _g : false;
+    const isFav = (_f = (_e = link.metadata) == null ? void 0 : _e.isFavorite) != null ? _f : false;
     const starBtn = rowActions.createEl("button", {
       text: isFav ? "\u2605" : "\u2606",
       cls: `obs-amber-links-star-btn${isFav ? " is-active" : ""}`,
@@ -22393,7 +22266,7 @@ function renderLinksFavorites(container, links, loading, allTags, onDelete, onAd
   }
   const grid = container.createDiv({ cls: "obs-amber-links-grid" });
   favorites.forEach((link) => {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d;
     const isRead = (_b = (_a = link.metadata) == null ? void 0 : _a.isRead) != null ? _b : false;
     const card = grid.createDiv({ cls: `obs-amber-links-card${isRead ? " is-read" : ""}` });
     const anchor = card.createEl("a", {
@@ -22434,9 +22307,6 @@ function renderLinksFavorites(container, links, loading, allTags, onDelete, onAd
         }
       );
     });
-    if ((_e = link.metadata) == null ? void 0 : _e.aiDescription) {
-      card.createEl("p", { text: link.metadata.aiDescription, cls: "obs-amber-links-card-description" });
-    }
     const rowActions = card.createDiv({ cls: "obs-amber-links-item-actions" });
     const starBtn = rowActions.createEl("button", {
       text: "\u2605",
@@ -22878,41 +22748,6 @@ var LibrarySettingTab = class extends import_obsidian7.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    new import_obsidian7.Setting(containerEl).setName(t("settings.aiHeading")).setHeading();
-    new import_obsidian7.Setting(containerEl).setName(t("settings.openRouterKey")).setDesc(t("settings.openRouterKeyDesc")).addText((text) => text.setPlaceholder("sk-or-...").setValue(this.plugin.openrouterApiKey).onChange(async (value) => {
-      await this.plugin.setOpenRouterApiKey(value.trim());
-    }));
-    new import_obsidian7.Setting(containerEl).setName(t("settings.openRouterModel")).setDesc(t("settings.openRouterModelDesc")).addText((text) => text.setPlaceholder("meta-llama/llama-3.2-3b-instruct:free").setValue(this.plugin.openrouterModel).onChange(async (value) => {
-      await this.plugin.setOpenRouterModel(value.trim() || "meta-llama/llama-3.2-3b-instruct:free");
-    }));
-    let generateStatusEl = null;
-    const generateSetting = new import_obsidian7.Setting(containerEl).setName(t("settings.generateMissing")).setDesc(t("settings.generateMissingDesc")).addButton((button) => button.setButtonText(t("settings.generateBtn")).onClick(async () => {
-      if (!this.plugin.openrouterApiKey) {
-        if (generateStatusEl)
-          generateStatusEl.textContent = t("settings.generateError");
-        return;
-      }
-      const service = this._getLinksService();
-      if (!service)
-        return;
-      button.setDisabled(true);
-      if (generateStatusEl)
-        generateStatusEl.textContent = "";
-      try {
-        const n = await service.generateMissingDescriptions((done, total) => {
-          if (generateStatusEl) {
-            generateStatusEl.textContent = t("settings.generating", { done: String(done), total: String(total) });
-          }
-        });
-        if (generateStatusEl)
-          generateStatusEl.textContent = t("settings.generateDone", { n: String(n) });
-      } catch (e) {
-        if (generateStatusEl)
-          generateStatusEl.textContent = t("settings.generateError");
-      }
-      button.setDisabled(false);
-    }));
-    generateStatusEl = generateSetting.settingEl.createSpan({ cls: "obs-amber-generate-status" });
     new import_obsidian7.Setting(containerEl).setName(t("settings.configHeading")).setHeading();
     new import_obsidian7.Setting(containerEl).setName(t("settings.libraryFolder")).setDesc(t("settings.libraryFolderDesc")).addText((text) => text.setPlaceholder(t("settings.folderPlaceholder")).setValue(this.plugin.libraryFolder).onChange(async (value) => {
       const folder = value.trim() || NAME;
@@ -23024,15 +22859,6 @@ var LibrarySettingTab = class extends import_obsidian7.PluginSettingTab {
       }
     }
   }
-  _getLinksService() {
-    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE);
-    for (const leaf of leaves) {
-      if (leaf.view instanceof PluginView) {
-        return leaf.view.linksService;
-      }
-    }
-    return null;
-  }
 };
 
 // src/main.ts
@@ -23040,11 +22866,8 @@ var MainPlugin = class extends import_obsidian8.Plugin {
   constructor() {
     super(...arguments);
     this.localJsonPath = null;
-    this.omdbApiKey = "";
     this.viewMode = "grid";
     this.libraryFolder = FOLDER;
-    this.openrouterApiKey = "";
-    this.openrouterModel = "meta-llama/llama-3.2-3b-instruct:free";
   }
   async onload() {
     await this.loadPluginData();
@@ -23060,18 +22883,11 @@ var MainPlugin = class extends import_obsidian8.Plugin {
   onunload() {
   }
   async loadPluginData() {
-    var _a, _b, _c, _d, _e;
+    var _a, _b;
     const data = await this.loadData();
     this.localJsonPath = (_a = data == null ? void 0 : data.localJsonPath) != null ? _a : null;
-    this.omdbApiKey = (_b = data == null ? void 0 : data.omdbApiKey) != null ? _b : "";
     this.viewMode = (data == null ? void 0 : data.viewMode) === "list" ? "list" : "grid";
-    this.libraryFolder = (_c = data == null ? void 0 : data.libraryFolder) != null ? _c : FOLDER;
-    this.openrouterApiKey = (_d = data == null ? void 0 : data.openrouterApiKey) != null ? _d : "";
-    this.openrouterModel = (_e = data == null ? void 0 : data.openrouterModel) != null ? _e : "meta-llama/llama-3.2-3b-instruct:free";
-  }
-  async setOmdbApiKey(apiKey) {
-    this.omdbApiKey = apiKey;
-    await this.savePluginData();
+    this.libraryFolder = (_b = data == null ? void 0 : data.libraryFolder) != null ? _b : FOLDER;
   }
   async setViewMode(viewMode) {
     this.viewMode = viewMode;
@@ -23079,23 +22895,12 @@ var MainPlugin = class extends import_obsidian8.Plugin {
   }
   async savePluginData() {
     const data = {
-      omdbApiKey: this.omdbApiKey,
       viewMode: this.viewMode,
-      libraryFolder: this.libraryFolder,
-      openrouterApiKey: this.openrouterApiKey,
-      openrouterModel: this.openrouterModel
+      libraryFolder: this.libraryFolder
     };
     if (this.localJsonPath)
       data.localJsonPath = this.localJsonPath;
     await this.saveData(data);
-  }
-  async setOpenRouterApiKey(key) {
-    this.openrouterApiKey = key;
-    await this.savePluginData();
-  }
-  async setOpenRouterModel(model) {
-    this.openrouterModel = model;
-    await this.savePluginData();
   }
   async setLocalJsonPath(path) {
     this.localJsonPath = path;

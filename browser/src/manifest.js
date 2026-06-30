@@ -28,8 +28,12 @@ export async function getManifest() {
       'storage',
       'tabs',
       'activeTab',
-      "cookies",
+      'cookies',
+      'sidePanel',
     ],
+    side_panel: {
+      default_path: 'src/sidepanel/index.html',
+    },
     host_permissions: [
       "<all_urls>"
     ],
@@ -61,6 +65,15 @@ export async function getManifest() {
         "object-src 'self'",
         "connect-src https: wss: http://localhost:*",
       ].join('; ')
+    },
+    commands: {
+      "save-current-tab": {
+        suggested_key: {
+          default: "Ctrl+Shift+S",
+          mac: "Command+Shift+S"
+        },
+        description: "Save the current tab to Amber"
+      }
     }
   }
 

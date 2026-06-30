@@ -1,11 +1,11 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
 	signOut,
 	signInWithEmailAndPassword,
 	signInWithPopup,
 	GoogleAuthProvider,
 } from '@firebase/auth';
-import { LayoutGrid, List, Bookmark, Download, Sparkles } from 'lucide-react';
+import { LayoutGrid, List, Download, Upload } from 'lucide-react';
 import Browser from 'webextension-polyfill';
 import { APP_NAME, APP_VERSION } from '../common/constants.js';
 import '@styles/main.scss';
@@ -20,43 +20,54 @@ import AccountInfo from './components/AccountInfo.jsx';
 import AccountForm from './components/AccountForm.jsx';
 import HeaderLinksSection from './components/HeaderLinksSection.jsx';
 import { t } from '@utils/i18n';
-import { DEFAULT_MODEL, generateAiDescription } from '@utils/openRouter.js';
+
+/**
+ * Parses a Netscape-format bookmarks export (the universal format Chrome,
+ * Firefox, Raindrop, and Pocket all produce). Returns a flat list of
+ * { url, title, tag } — `tag` is the nearest enclosing folder name, or '' for
+ * bookmarks at the root.
+ */
+function parseBookmarksHtml(html) {
+	const doc = new DOMParser().parseFromString(html, 'text/html');
+	const results = [];
+
+	function walk(node, currentFolder) {
+		for (const child of node.children) {
+			if (child.tagName === 'DT') {
+				const folderHeading = child.querySelector(':scope > H3');
+				const link = child.querySelector(':scope > A');
+				if (folderHeading) {
+					const nextDl = child.querySelector(':scope > DL');
+					if (nextDl) walk(nextDl, folderHeading.textContent.trim());
+				} else if (link) {
+					const url = link.getAttribute('href') || '';
+					if (url.startsWith('http://') || url.startsWith('https://')) {
+						results.push({ url, title: link.textContent.trim() || url, tag: currentFolder });
+					}
+				}
+			} else if (child.tagName === 'DL') {
+				walk(child, currentFolder);
+			}
+		}
+	}
+
+	const rootDl = doc.querySelector('DL');
+	if (rootDl) walk(rootDl, '');
+	return results;
+}
 
 export default function App() {
 	const { user, authReady } = useAuth();
-	const { links, updateLink } = useLinks();
+	const { links, updateLink, saveCustomLink } = useLinks();
 	const { settings, updateSettings, loading: settingsLoading } = useUserSettings();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-	const [apiKey, setApiKey] = useState('');
-	const [apiKeySaved, setApiKeySaved] = useState(false);
-	const [model, setModel] = useState(DEFAULT_MODEL);
-	const [modelSaved, setModelSaved] = useState(false);
-	const [bulkGenerating, setBulkGenerating] = useState(false);
-	const [bulkProgress, setBulkProgress] = useState(null);
-	const [bulkResult, setBulkResult] = useState(null);
-	const [saveError, setSaveError] = useState(false);
-
-	// When logged in: prefer Firestore settings (via useUserSettings subscription)
-	useEffect(() => {
-		if (!authReady || settingsLoading) return;
-		if (settings.openrouterApiKey) setApiKey(settings.openrouterApiKey);
-		if (settings.openrouterModel) setModel(settings.openrouterModel || DEFAULT_MODEL);
-	}, [authReady, settingsLoading, settings.openrouterApiKey, settings.openrouterModel]);
-
-	// When not logged in: fall back to local storage.sync
-	useEffect(() => {
-		if (!authReady || user) return;
-		async function loadLocal() {
-			const synced = await Browser.storage.sync.get(['openrouterApiKey', 'openrouterModel']);
-			if (synced.openrouterApiKey) setApiKey(synced.openrouterApiKey);
-			if (synced.openrouterModel) setModel(synced.openrouterModel);
-		}
-		loadLocal();
-	}, [authReady, user]);
+	const [importing, setImporting] = useState(false);
+	const [importProgress, setImportProgress] = useState(null);
+	const [importResult, setImportResult] = useState(null);
 
 	const stats = useMemo(() => ({
 		total: links.length,
@@ -102,108 +113,95 @@ export default function App() {
 		}
 	}
 
+	function normalizeSavedAt(savedAt) {
+		if (!savedAt) return null;
+		if (typeof savedAt === 'string') return savedAt;
+		if (typeof savedAt === 'number') return new Date(savedAt).toISOString();
+		if (typeof savedAt.toMillis === 'function') return new Date(savedAt.toMillis()).toISOString();
+		if (typeof savedAt.seconds === 'number') return new Date(savedAt.seconds * 1000).toISOString();
+		return null;
+	}
+
 	function handleExport() {
-		const data = links.map(l => ({
+		const now = new Date().toISOString();
+		const exportedLinks = links.map(l => ({
 			id: l.id,
 			url: l.url,
 			title: l.title,
-			savedAt: l.savedAt,
+			savedAt: normalizeSavedAt(l.savedAt),
+			isRead: l.metadata?.isRead ?? true,
+			isFavorite: l.metadata?.isFavorite ?? false,
 			tags: l.metadata?.tags ?? [],
 			description: l.metadata?.description ?? '',
-			isFavorite: l.metadata?.isFavorite ?? false,
+			thumbnail: l.metadata?.thumbnail ?? '',
 		}));
-		const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+		const payload = {
+			version: 1,
+			app: 'Amber',
+			exportedAt: now,
+			count: exportedLinks.length,
+			links: exportedLinks,
+		};
+		const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = `amber-links-${new Date().toISOString().slice(0, 10)}.json`;
+		a.download = `amber-links-${now.slice(0, 10)}.json`;
 		a.click();
 		URL.revokeObjectURL(url);
 	}
 
-	async function handleSaveApiKey() {
-		try {
-			const trimmed = apiKey.trim();
-			await updateSettings({ openrouterApiKey: trimmed });
-			await Browser.storage.sync.set({ openrouterApiKey: trimmed });
-			setApiKeySaved(true);
-			setTimeout(() => setApiKeySaved(false), 2500);
-		} catch (err) {
-			console.error(err);
-			setSaveError(true);
-		}
-	}
+	async function handleImportFile(e) {
+		const file = e.target.files?.[0];
+		e.target.value = '';
+		if (!file) return;
 
-	async function handleRemoveApiKey() {
+		setImportResult(null);
+		let entries;
 		try {
-			await updateSettings({ openrouterApiKey: '' });
-			await Browser.storage.sync.remove('openrouterApiKey');
-			setApiKey('');
-			setApiKeySaved(false);
+			const html = await file.text();
+			entries = parseBookmarksHtml(html);
 		} catch (err) {
-			console.error(err);
-			setSaveError(true);
-		}
-	}
-
-	async function handleBulkGenerate() {
-		const pending = links.filter(l => !l.metadata?.aiDescription);
-		if (pending.length === 0) {
-			setBulkResult({ count: 0, error: false });
+			console.error('[options] bookmarks parse error', err);
+			setImportResult({ error: true });
 			return;
 		}
-		setBulkGenerating(true);
-		setBulkResult(null);
-		setBulkProgress({ done: 0, total: pending.length });
-		let done = 0;
-		let errors = 0;
-		for (const link of pending) {
-			try {
-				const desc = await generateAiDescription({
-					url: link.url,
-					title: link.title,
-					html: '',
-					apiKey,
-					model,
-				});
-				if (desc) {
-					await updateLink(link.id, { metadata: { ...(link.metadata || {}), aiDescription: desc } });
-					done++;
-				}
-			} catch {
-				errors++;
-			}
-			setBulkProgress({ done: done + errors, total: pending.length });
-		}
-		setBulkGenerating(false);
-		setBulkProgress(null);
-		if (done === 0 && errors > 0) {
-			setBulkResult({ count: 0, error: true });
-		} else {
-			setBulkResult({ count: done, error: false });
-		}
-	}
 
-	async function handleSaveModel() {
-		try {
-			const trimmed = model.trim() || DEFAULT_MODEL;
-			setModel(trimmed);
-			await updateSettings({ openrouterModel: trimmed });
-			await Browser.storage.sync.set({ openrouterModel: trimmed });
-			setModelSaved(true);
-			setTimeout(() => setModelSaved(false), 2500);
-		} catch (err) {
-			console.error(err);
-			setSaveError(true);
+		if (entries.length === 0) {
+			setImportResult({ error: true });
+			return;
 		}
+
+		setImporting(true);
+		setImportProgress({ done: 0, total: entries.length });
+		let imported = 0;
+		let skipped = 0;
+
+		for (const entry of entries) {
+			try {
+				const result = await saveCustomLink({ url: entry.url, title: entry.title });
+				if (result?.duplicate) {
+					skipped += 1;
+				} else {
+					imported += 1;
+					if (entry.tag) {
+						await updateLink(result.savedId, { metadata: { tags: [entry.tag.toUpperCase()] } });
+					}
+				}
+			} catch (err) {
+				console.warn('[options] import entry failed', entry.url, err?.message);
+			}
+			setImportProgress((p) => ({ done: p.done + 1, total: p.total }));
+		}
+
+		setImporting(false);
+		setImportResult({ error: false, imported, skipped });
 	}
 
 	return (
 		<div className="options__container">
 			<header className="options__page-header">
-				<span className="options__page-mark" aria-hidden="true">
-					<Bookmark size={20} strokeWidth={2.5} />
-				</span>
+				<img src="/icons/icon32.png" alt="" className="options__page-mark" width={24} height={24} />
 				<h1 className="options__title">{t('options.title')}</h1>
 			</header>
 
@@ -292,111 +290,46 @@ export default function App() {
 				</div>
 			</section>
 
+			{/* Import */}
+			<section className="options__section">
+				<h2 className="options__section-title">{t('options.importSection')}</h2>
+				<hr className="options__section-divider" />
+				<div className="options__export-row">
+					<div className="options__export-label">
+						<span className="options__export-title">{t('options.importSection')}</span>
+						<span className="options__export-desc">{t('options.importDesc')}</span>
+					</div>
+					<label className="options__view-btn" style={{ cursor: 'pointer' }}>
+						<Upload size={14} />
+						{t('options.importBtn')}
+						<input
+							type="file"
+							accept=".html,.htm"
+							onChange={handleImportFile}
+							disabled={importing}
+							style={{ display: 'none' }}
+						/>
+					</label>
+				</div>
+				{importing && importProgress && (
+					<p className="options__ai-bulk-status">
+						{t('options.importProgress', { done: importProgress.done, total: importProgress.total })}
+					</p>
+				)}
+				{!importing && importResult && (
+					<p className={`options__ai-bulk-status${importResult.error ? ' options__ai-bulk-status--error' : ' options__ai-bulk-status--done'}`}>
+						{importResult.error
+							? t('options.importError')
+							: t('options.importDone', { count: importResult.imported, skipped: importResult.skipped })}
+					</p>
+				)}
+			</section>
+
 			{/* Header Links */}
 			<section className="options__section">
 				<h2 className="options__section-title">{t('options.headerLinksSection')}</h2>
 				<hr className="options__section-divider" />
 				<HeaderLinksSection settings={settings} updateSettings={updateSettings} />
-			</section>
-
-			{/* AI Descriptions */}
-			<section className="options__section">
-				<h2 className="options__section-title">
-					<Sparkles size={15} style={{ verticalAlign: 'middle', marginRight: 6 }} />
-					{t('options.aiSection')}
-				</h2>
-				<hr className="options__section-divider" />
-
-				{/* API Key */}
-				<div className="options__pref-row options__pref-row--wrap">
-					<div className="options__pref-label">
-						<span>{t('options.aiApiKey')}</span>
-						<span className="options__pref-desc">{t('options.aiApiKeyDesc')}</span>
-					</div>
-					<div className="options__ai-key-row">
-						<input
-							className="options__ai-key-input"
-							type="password"
-							placeholder={t('options.aiApiKeyPlaceholder')}
-							value={apiKey}
-							onChange={e => { setApiKey(e.target.value); setApiKeySaved(false); }}
-							onKeyDown={e => { if (e.key === 'Enter') handleSaveApiKey(); }}
-							autoComplete="off"
-						/>
-						<button
-							type="button"
-							className={`options__view-btn${apiKeySaved ? ' options__view-btn--active' : ''}`}
-							onClick={handleSaveApiKey}
-						>
-							{apiKeySaved ? t('options.aiApiKeySaved') : t('common.save')}
-						</button>
-						{apiKey && !apiKeySaved && (
-							<button
-								type="button"
-								className="options__view-btn"
-								onClick={handleRemoveApiKey}
-							>
-								{t('options.aiApiKeyRemove')}
-							</button>
-						)}
-					</div>
-				</div>
-
-				{/* Model */}
-				<div className="options__pref-row options__pref-row--wrap">
-					<div className="options__pref-label">
-						<span>{t('options.aiModel')}</span>
-						<span className="options__pref-desc">{t('options.aiModelDesc')}</span>
-					</div>
-					<div className="options__ai-key-row">
-						<input
-							className="options__ai-key-input options__ai-key-input--wide"
-							type="text"
-							placeholder={t('options.aiModelPlaceholder')}
-							value={model}
-							onChange={e => { setModel(e.target.value); setModelSaved(false); }}
-							onKeyDown={e => { if (e.key === 'Enter') handleSaveModel(); }}
-							autoComplete="off"
-							spellCheck={false}
-						/>
-						<button
-							type="button"
-							className={`options__view-btn${modelSaved ? ' options__view-btn--active' : ''}`}
-							onClick={handleSaveModel}
-						>
-							{modelSaved ? t('options.aiApiKeySaved') : t('common.save')}
-						</button>
-					</div>
-				</div>
-
-				{/* Bulk generate */}
-				<div className="options__pref-row options__pref-row--wrap">
-					<div className="options__pref-label">
-						<span>{t('options.aiBulkGenerate')}</span>
-						<span className="options__pref-desc">{t('options.aiBulkGenerateDesc')}</span>
-					</div>
-					<div className="options__ai-key-row">
-						{bulkGenerating && bulkProgress && (
-							<span className="options__ai-bulk-status options__ai-bulk-status--progress">
-								{t('options.aiBulkProgress', { done: bulkProgress.done, total: bulkProgress.total })}
-							</span>
-						)}
-						{!bulkGenerating && bulkResult !== null && (
-							<span className={`options__ai-bulk-status${bulkResult.error ? ' options__ai-bulk-status--error' : ' options__ai-bulk-status--done'}`}>
-								{bulkResult.error ? t('options.aiBulkError') : t('options.aiBulkDone', { count: bulkResult.count })}
-							</span>
-						)}
-						<button
-							type="button"
-							className="options__view-btn"
-							disabled={!apiKey || bulkGenerating || links.length === 0}
-							onClick={handleBulkGenerate}
-						>
-							<Sparkles size={13} />
-							{t('options.aiBulkBtn')}
-						</button>
-					</div>
-				</div>
 			</section>
 
 			<ConfirmModal
@@ -405,14 +338,6 @@ export default function App() {
 				message={t('options.logoutMessage')}
 				onConfirm={handleSignOut}
 				onCancel={() => setShowLogoutConfirm(false)}
-			/>
-
-			<ConfirmModal
-				isOpen={saveError}
-				title={t('options.saveErrorTitle')}
-				message={t('options.saveErrorMessage')}
-				onConfirm={() => setSaveError(false)}
-				onCancel={() => setSaveError(false)}
 			/>
 
 			{/* Privacy Policy */}

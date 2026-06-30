@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useState, useMemo } from 'react';
 import { useLinks } from '@utils/useLinks';
+import { useCollections } from '@utils/useCollections';
 import Sidebar from '@components/Sidebar';
 import EditModal from './EditModal.jsx';
 import HomeView from '@newtab/views/HomeView.jsx';
@@ -9,13 +10,28 @@ import TagsView from '@newtab/views/TagsView.jsx';
 
 export default function Main(props) {
 	const { links, loading, deleteLink, updateLink, saveCustomLink } = useLinks();
+	const { collections, addCollection, renameCollection, deleteCollection } = useCollections();
 	const [activeView, setActiveView] = useState('home');
+	const [activeCollectionId, setActiveCollectionId] = useState(null);
 
 	const linkCounts = useMemo(() => ({
 		home: links.length,
 		favorites: links.filter(l => l.metadata?.isFavorite).length,
 		tags: new Set(links.flatMap(l => l.metadata?.tags || [])).size,
 	}), [links]);
+
+	const collectionCounts = useMemo(() => {
+		const counts = {};
+		links.forEach(l => {
+			const cid = l.metadata?.collectionId;
+			if (cid) counts[cid] = (counts[cid] || 0) + 1;
+		});
+		return counts;
+	}, [links]);
+
+	const allTags = useMemo(() =>
+		[...new Set(links.flatMap(l => l.metadata?.tags || []))].sort(),
+	[links]);
 	const [editingLink, setEditingLink] = useState(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
@@ -56,13 +72,28 @@ export default function Main(props) {
 		setIsSaving(true);
 		setSaveError(null);
 		try {
-			await saveCustomLink(updates);
+			const result = await saveCustomLink(updates);
+			if (result?.duplicate) {
+				setSaveError('duplicate');
+				setIsSaving(false);
+				return;
+			}
 			closeModal();
 		} catch (err) {
 			console.error('[Main] saveCustomLink error', err);
 			setIsSaving(false);
 			setSaveError(true);
 		}
+	}
+
+	function handleNavigate(view) {
+		setActiveView(view);
+		setActiveCollectionId(null);
+	}
+
+	function handleCollectionSelect(id) {
+		setActiveCollectionId(id);
+		setActiveView('home');
 	}
 
 	return (
@@ -72,8 +103,15 @@ export default function Main(props) {
 				isOpen={isSidebarOpen}
 				onToggle={() => setIsSidebarOpen(prev => !prev)}
 				activeView={activeView}
-				onNavigate={setActiveView}
+				onNavigate={handleNavigate}
 				linkCounts={linkCounts}
+				collections={collections}
+				activeCollectionId={activeCollectionId}
+				onCollectionSelect={handleCollectionSelect}
+				onCollectionAdd={addCollection}
+				onCollectionRename={renameCollection}
+				onCollectionDelete={deleteCollection}
+				collectionCounts={collectionCounts}
 			/>
 
 			<section className="newtab__main-content">
@@ -85,6 +123,8 @@ export default function Main(props) {
 						onEdit={openEdit}
 						onDelete={deleteLink}
 						updateLink={updateLink}
+						activeCollectionId={activeCollectionId}
+						collections={collections}
 					/>
 				)}
 				{activeView === 'favorites' && (
@@ -95,6 +135,8 @@ export default function Main(props) {
 						onEdit={openEdit}
 						onDelete={deleteLink}
 						updateLink={updateLink}
+						activeCollectionId={activeCollectionId}
+						collections={collections}
 					/>
 				)}
 				{activeView === 'tags' && (
@@ -113,6 +155,8 @@ export default function Main(props) {
 					link={editingLink}
 					isSaving={isSaving}
 					saveError={saveError}
+					allTags={allTags}
+					collections={collections}
 					onClose={closeModal}
 					onSubmit={(updates) => (editingLink ? handleUpdate(editingLink.id, updates) : handleAdd(updates))}
 				/>

@@ -11,7 +11,7 @@ lib/
 ├── firebase_options.dart              # FlutterFire generated config — replace with your own Firebase project
 │
 ├── models/
-│   └── link_item.dart                 # LinkItem — id, url, title, createdAt, aiDescription, metadata (tags, isFavorite, isRead, …)
+│   └── link_item.dart                 # LinkItem — id, url, title, createdAt, metadata (tags, isFavorite, isRead, …)
 │
 ├── providers/                         # ChangeNotifier state (Provider pattern)
 │   ├── auth_provider.dart             # Firebase Auth state — user, isLoggedIn, sign-in/out
@@ -23,17 +23,16 @@ lib/
 │   ├── firebase_storage_service.dart  # Firestore CRUD + migration + user settings
 │   ├── local_storage_service.dart     # SQLite (amber.db) — schema, migrations, CRUD
 │   ├── auth_service.dart              # Firebase Auth wrappers (Google, email, sign-out)
-│   ├── metadata_service.dart          # Fetch OG/meta from URL for title/thumbnail
-│   └── openrouter_service.dart        # OpenRouter AI description generation
+│   └── metadata_service.dart          # Fetch OG/meta from URL for title/thumbnail
 │
 ├── screens/
 │   ├── home_screen.dart               # Link list/grid — search, sort, filter
-│   ├── add_link_screen.dart           # Save new link + fire-and-forget AI description
+│   ├── add_link_screen.dart           # Save new link
 │   ├── favorites_screen.dart          # Filtered favorites view
 │   ├── tags_screen.dart               # Tag list + counts
 │   ├── tag_filtered_screen.dart       # Links filtered by selected tag
 │   ├── graph_screen.dart              # D3-style force graph (CustomPaint)
-│   ├── options_screen.dart            # Settings — OpenRouter API key, model, generate CTA, default view
+│   ├── options_screen.dart            # Settings — default view
 │   └── auth_screen.dart              # Sign in / register
 │
 ├── widgets/
@@ -57,8 +56,6 @@ Save link
     → linkRepository.addLink()
       → logged in:  FirebaseStorageService.addLink() (Firestore)
       → offline:    LocalStorageService.insert() (SQLite)
-    → fire-and-forget: OpenRouterService.generateDescription()
-      → linkProvider.updateLink(link.copyWith(aiDescription: desc))
 
 Login migration
   AuthProvider.signIn() → linkRepository.migrateLocalToCloud()
@@ -80,10 +77,11 @@ CREATE TABLE links (
   is_favorite INTEGER DEFAULT 0,
   is_read INTEGER DEFAULT 0,
   tags TEXT DEFAULT '',        -- comma-separated
-  ai_description TEXT DEFAULT ''
+  description TEXT DEFAULT '',
+  note TEXT DEFAULT ''
 );
 ```
 
 ## Settings persistence
 
-OpenRouter API key + model: `SharedPreferences` locally, synced to Firestore at `/users/{uid}/settings/preferences` when logged in.
+User preferences: `SharedPreferences` locally, synced to Firestore at `/users/{uid}/settings/preferences` when logged in.

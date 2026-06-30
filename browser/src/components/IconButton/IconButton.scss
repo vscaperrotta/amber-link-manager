@@ -12,8 +12,8 @@
 	gap: .5rem;
 
 	&:hover {
-		color: var(--accent);
-		background: var(--accent-muted);
+		color: var(--text-primary);
+		background: var(--bg-elevated);
 	}
 
 	&:focus-visible {
@@ -36,8 +36,8 @@
 	}
 
 	&.is-active {
-		color: var(--accent);
-		background: var(--accent-muted);
+		color: var(--text-primary);
+		background: var(--bg-elevated);
 	}
 
 	&.icon-button--disabled {

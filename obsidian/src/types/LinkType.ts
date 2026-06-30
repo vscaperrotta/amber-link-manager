@@ -6,7 +6,6 @@ export type Metadata = {
   tags?: string[];
   isFavorite?: boolean;
   isRead?: boolean;
-  aiDescription?: string;
   canonicalUrl?: string;
   author?: string;
   publishedDate?: string;

@@ -39,8 +39,8 @@
 }
 
 .toggle__input:checked ~ .toggle__track {
-	background: var(--accent);
-	border-color: var(--accent);
+	background: var(--text-primary);
+	border-color: var(--text-primary);
 }
 
 .toggle__input:focus-visible ~ .toggle__track {

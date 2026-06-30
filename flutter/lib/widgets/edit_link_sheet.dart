@@ -3,10 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../models/link_item.dart';
 import '../providers/link_provider.dart';
+import '../providers/collection_provider.dart';
 import '../theme/void_colors.dart';
 import '../utils/i18n.dart';
 
-/// Bottom sheet to edit a link's title, description (aiDescription) and tags.
+/// Bottom sheet to edit a link's title, tags and collection.
 class EditLinkSheet extends StatefulWidget {
   final LinkItem link;
 
@@ -18,24 +19,21 @@ class EditLinkSheet extends StatefulWidget {
 
 class _EditLinkSheetState extends State<EditLinkSheet> {
   late final TextEditingController _titleController;
-  late final TextEditingController _descriptionController;
   late final TextEditingController _tagsController;
+  String? _selectedCollectionId;
   bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.link.title);
-    _descriptionController =
-        TextEditingController(text: widget.link.aiDescription ?? '');
-    _tagsController =
-        TextEditingController(text: widget.link.tags.join(', '));
+    _tagsController = TextEditingController(text: widget.link.tags.join(', '));
+    _selectedCollectionId = widget.link.collectionId;
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _descriptionController.dispose();
     _tagsController.dispose();
     super.dispose();
   }
@@ -53,8 +51,9 @@ class _EditLinkSheetState extends State<EditLinkSheet> {
       title: _titleController.text.trim().isEmpty
           ? widget.link.title
           : _titleController.text.trim(),
-      aiDescription: _descriptionController.text.trim(),
       tags: tags,
+      collectionId: _selectedCollectionId,
+      clearCollectionId: _selectedCollectionId == null,
     );
 
     await context.read<LinkProvider>().updateLink(updated);
@@ -64,6 +63,8 @@ class _EditLinkSheetState extends State<EditLinkSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final collections = context.watch<CollectionProvider>().collections;
+
     return Padding(
       padding: EdgeInsets.only(
         left: 16,
@@ -94,16 +95,6 @@ class _EditLinkSheetState extends State<EditLinkSheet> {
           ),
           const SizedBox(height: 16),
           TextFormField(
-            controller: _descriptionController,
-            decoration: InputDecoration(
-              labelText: t('editLink.descriptionLabel'),
-              border: const OutlineInputBorder(),
-            ),
-            maxLines: 3,
-            textCapitalization: TextCapitalization.sentences,
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
             controller: _tagsController,
             decoration: InputDecoration(
               labelText: t('editLink.tagsLabel'),
@@ -111,6 +102,28 @@ class _EditLinkSheetState extends State<EditLinkSheet> {
             ),
             textCapitalization: TextCapitalization.characters,
           ),
+          if (collections.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String?>(
+              value: _selectedCollectionId,
+              decoration: InputDecoration(
+                labelText: t('collections.fieldLabel'),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.folder_outlined, size: 20),
+              ),
+              items: [
+                DropdownMenuItem(
+                  value: null,
+                  child: Text(t('collections.none')),
+                ),
+                ...collections.map((col) => DropdownMenuItem(
+                  value: col.id,
+                  child: Text(col.name),
+                )),
+              ],
+              onChanged: (val) => setState(() => _selectedCollectionId = val),
+            ),
+          ],
           const SizedBox(height: 24),
           FilledButton.icon(
             onPressed: _isSaving ? null : _save,

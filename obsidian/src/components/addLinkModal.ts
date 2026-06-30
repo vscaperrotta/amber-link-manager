@@ -1,7 +1,6 @@
 import { App, Modal, Notice } from 'obsidian';
 import { Metadata } from '../types/LinkType';
 import renderInput from './input';
-import renderTextarea from './textarea';
 import { t } from '../utils/i18n';
 
 function parseTags(raw: string): string[] {
@@ -28,7 +27,6 @@ export class AddLinkModal extends Modal {
 
     const urlInput = renderInput(contentEl, { type: 'text', placeholder: t('addLink.urlPlaceholder') });
     const titleInput = renderInput(contentEl, { type: 'text', placeholder: t('addLink.titlePlaceholder') });
-    const descriptionInput = renderTextarea(contentEl, t('editLink.descriptionPlaceholder'));
     const tagsInput = renderInput(contentEl, { type: 'text', placeholder: t('addLink.tagsPlaceholder') });
 
     const submitBtn = contentEl.createEl('button', {
@@ -45,9 +43,8 @@ export class AddLinkModal extends Modal {
 
       const title = titleInput.value.trim();
       const tags = parseTags(tagsInput.value);
-      const description = descriptionInput.value.trim().slice(0, 300) || undefined;
       const metadata: Metadata | undefined =
-        tags.length || description ? { tags: tags.length ? tags : undefined, description } : undefined;
+        tags.length ? { tags } : undefined;
 
       try {
         await this.onSubmit(url, title, metadata);

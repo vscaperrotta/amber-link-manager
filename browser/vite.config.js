@@ -30,6 +30,7 @@ export default defineConfig({
         newtab: path.resolve(APP_DIR, 'newtab', 'index.html'),
         options: path.resolve(APP_DIR, 'options', 'index.html'),
         popup: path.resolve(APP_DIR, 'popup', 'index.html'),
+        sidepanel: path.resolve(APP_DIR, 'sidepanel', 'index.html'),
       },
       output: {
         entryFileNames: 'assets/[name].js',

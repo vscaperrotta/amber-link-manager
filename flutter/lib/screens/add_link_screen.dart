@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/link_item.dart';
-import '../providers/auth_provider.dart';
 import '../providers/link_provider.dart';
-import '../services/firebase_storage_service.dart';
+import '../providers/collection_provider.dart';
 import '../services/metadata_service.dart';
-import '../services/openrouter_service.dart';
 import '../theme/void_colors.dart';
 import '../utils/i18n.dart';
 
@@ -31,6 +27,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
   bool _isFetchingTitle = false;
   List<String> _tagSuggestions = [];
   String? _thumbnail;
+  String? _selectedCollectionId;
 
   @override
   void initState() {
@@ -152,57 +149,28 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
         .where((t) => t.isNotEmpty)
         .toList();
 
-    // Capture providers before popping — context invalid after Navigator.pop
+    // Capture provider before popping — context invalid after Navigator.pop
     final provider = context.read<LinkProvider>();
-    final auth = context.read<AuthProvider>();
 
-    final link = await provider.addLink(
+    final result = await provider.addLink(
       url: url,
       title: title,
       tags: tags,
       thumbnail: _thumbnail,
+      collectionId: _selectedCollectionId,
     );
 
+    if (result.isDuplicate) {
+      setState(() => _isSaving = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(t('addLink.duplicateError'))),
+        );
+      }
+      return;
+    }
+
     if (mounted) Navigator.pop(context, true);
-
-    // Fire-and-forget: generate AI description after save (screen already closed)
-    _generateAiDescription(provider, auth, link);
-  }
-
-  Future<void> _generateAiDescription(
-    LinkProvider provider,
-    AuthProvider auth,
-    LinkItem link,
-  ) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      String apiKey = prefs.getString('openrouter_api_key') ?? '';
-      String model = prefs.getString('openrouter_model') ??
-          'meta-llama/llama-3.2-3b-instruct:free';
-
-      if (auth.isLoggedIn && auth.user != null) {
-        try {
-          final remote =
-              await FirebaseStorageService().getUserSettings(auth.user!.uid);
-          if (remote['openrouterApiKey'] is String &&
-              (remote['openrouterApiKey'] as String).isNotEmpty) {
-            apiKey = remote['openrouterApiKey'] as String;
-          }
-          if (remote['openrouterModel'] is String &&
-              (remote['openrouterModel'] as String).isNotEmpty) {
-            model = remote['openrouterModel'] as String;
-          }
-        } catch (_) {}
-      }
-
-      if (apiKey.isEmpty) return;
-
-      final desc = await OpenRouterService(apiKey: apiKey, model: model)
-          .generateDescription(url: link.url, title: link.title);
-      if (desc != null && desc.isNotEmpty) {
-        await provider.updateLink(link.copyWith(aiDescription: desc));
-      }
-    } catch (_) {}
   }
 
   @override
@@ -302,6 +270,32 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                     ),
                   ),
                 ),
+              const SizedBox(height: 16),
+              Consumer<CollectionProvider>(
+                builder: (context, collectionProvider, _) {
+                  final collections = collectionProvider.collections;
+                  if (collections.isEmpty) return const SizedBox.shrink();
+                  return DropdownButtonFormField<String>(
+                    value: _selectedCollectionId,
+                    decoration: InputDecoration(
+                      labelText: t('collections.fieldLabel'),
+                      prefixIcon: const Icon(Icons.folder_outlined),
+                      border: const OutlineInputBorder(),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: null,
+                        child: Text(t('collections.none')),
+                      ),
+                      ...collections.map((col) => DropdownMenuItem(
+                        value: col.id,
+                        child: Text(col.name),
+                      )),
+                    ],
+                    onChanged: (val) => setState(() => _selectedCollectionId = val),
+                  );
+                },
+              ),
               const SizedBox(height: 24),
               FilledButton.icon(
                 onPressed: _isSaving ? null : _save,

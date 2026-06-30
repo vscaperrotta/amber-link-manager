@@ -6,6 +6,7 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart' as app;
 import 'providers/link_provider.dart';
+import 'providers/collection_provider.dart';
 import 'providers/ui_state_provider.dart';
 import 'screens/add_link_screen.dart';
 import 'theme/void_colors.dart';
@@ -80,6 +81,7 @@ class _AmberAppState extends State<AmberApp> {
       providers: [
         ChangeNotifierProvider(create: (_) => app.AuthProvider()),
         ChangeNotifierProvider(create: (_) => LinkProvider()),
+        ChangeNotifierProvider(create: (_) => CollectionProvider()),
         ChangeNotifierProvider(create: (_) => UiStateProvider()),
       ],
       child: MaterialApp(

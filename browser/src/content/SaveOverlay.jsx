@@ -4,6 +4,7 @@ import {
 	SAVE_LINK_LOADING,
 	SAVE_LINK_SUCCESS,
 	SAVE_LINK_FAILURE,
+	SAVE_LINK_DUPLICATE,
 	UPDATE_ITEM_PREVIEW,
 } from '../common/actions.js';
 import { t } from '@utils/i18n';
@@ -29,7 +30,7 @@ function getTokens() {
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function SaveOverlay() {
-	const [status, setStatus] = useState('loading'); // 'loading' | 'saved' | 'error'
+	const [status, setStatus] = useState('loading'); // 'loading' | 'saved' | 'error' | 'duplicate'
 	const [preview, setPreview] = useState(null);    // { title, thumbnail, publisher }
 	const [errorMsg, setErrorMsg] = useState('');
 	const [visible, setVisible] = useState(true);
@@ -53,6 +54,9 @@ export function SaveOverlay() {
 					setStatus('error');
 					setErrorMsg(msg.payload?.message || t('overlay.error'));
 					break;
+				case SAVE_LINK_DUPLICATE:
+					setStatus('duplicate');
+					break;
 				case UPDATE_ITEM_PREVIEW:
 					if (msg.payload?.preview) setPreview(msg.payload.preview);
 					break;
@@ -65,7 +69,7 @@ export function SaveOverlay() {
 
 	// Auto-dismiss on success
 	useEffect(() => {
-		if (status !== 'saved') return;
+		if (status !== 'saved' && status !== 'duplicate') return;
 		const timer = setTimeout(dismiss, AUTO_DISMISS_MS);
 		return () => clearTimeout(timer);
 	}, [status, dismiss]);
@@ -110,12 +114,14 @@ export function SaveOverlay() {
 					{status === 'loading' && <LoadingSpinner color={tokens.accent} />}
 					{status === 'saved' && <CheckIcon color={tokens.accent} />}
 					{status === 'error' && <ErrorIcon color={tokens.error} />}
+					{status === 'duplicate' && <CheckIcon color={tokens.textSecondary} />}
 				</span>
 
 				<span style={{ fontSize: '14px', fontWeight: 600, color: tokens.text, flex: 1 }}>
 					{status === 'loading' && t('overlay.saving')}
 					{status === 'saved' && t('overlay.saved')}
 					{status === 'error' && t('overlay.error')}
+					{status === 'duplicate' && t('overlay.duplicate')}
 				</span>
 
 				{/* Close button */}
